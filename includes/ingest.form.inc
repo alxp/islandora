@@ -137,33 +137,6 @@ function islandora_ingest_form_get_last_step_id(array &$form_state) {
 }
 
 /**
- * Prepares a new object based on the given configuration.
- *
- * @param array $configuration
- *   The list of key/value pairs of configuration.
- *
- * @return NewFedoraObject
- *   The new object.
- */
-function islandora_ingest_form_prepare_new_object(array $configuration) {
-  module_load_include('inc', 'islandora', 'includes/utilities');
-  if (empty($configuration['object'])) {
-    $message = islandora_deprecated('7.x-1.2', t('Please use "objects" as the default ingest form configuration property.'));
-    trigger_error(filter_xss($message), E_USER_DEPRECATED);
-    // ID is more specific than namespace so it will take precedence.
-    $id = isset($configuration['namespace']) ? $configuration['namespace'] : 'islandora';
-    $id = isset($configuration['id']) ? $configuration['id'] : $id;
-    $label = isset($configuration['label']) ? $configuration['label'] : 'New Object';
-    $relationship_map = function($o) {
-      return array('relationship' => 'isMemberOfCollection', 'pid' => $o);
-    };
-    $relationships = empty($configuration['collections']) ? array() : array_map($relationship_map, $configuration['collections']);
-    return islandora_prepare_new_object($id, $label, array(), array(), $relationships);
-  }
-  return $configuration['object'];
-}
-
-/**
  * Gets the given/current step.
  *
  * If the current step is not defined it's assumed that all steps have executed.
