@@ -222,10 +222,12 @@ class MimeDetect {
     "tar" => "application/x-tar",
     "gtar" => "application/x-gtar",
     "zip" => "application/x-zip",
+    "dat" => "application/octet-stream",
     // others:
     'bin' => 'application/octet-stream',
     // Web Archives:
     "warc" => "application/warc",
+    "json" => "application/json",
   );
   protected $protectedFileExtensions;
   protected $extensionExceptions = array(

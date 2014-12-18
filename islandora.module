@@ -1511,6 +1511,14 @@ function islandora_entity_info() {
       'label' => 'label',
     ),
   );
+  $entities['islandora_datastream'] = array(
+    'label' => t('Islandora Datastream'),
+    'fieldable' => FALSE,
+    'entity keys' => array(
+      'id' => 'id',
+      'label' => 'label',
+    ),
+  );
 
   return $entities;
 }
@@ -1523,37 +1531,77 @@ function islandora_entity_info() {
 function islandora_entity_property_info() {
   $info = array();
 
-  $p = &$info['islandora_object']['properties'];
+  $object_properties = &$info['islandora_object']['properties'];
+  $datastream_properties = &$info['islandora_datastream']['properties'];
 
-  $p['id'] = array(
+  $object_properties['id'] = array(
     'type' => 'text',
     'label' => t('ID'),
     'description' => t('The identifier of the object.'),
   );
-  $p['label'] = array(
+  $object_properties['label'] = array(
     'type' => 'text',
     'label' => t('Object Label'),
     'description' => t('The label of the object.'),
+    'setter callback' => 'islandora_entity_set_property',
   );
-  $p['owner'] = array(
+  $object_properties['owner'] = array(
     'type' => 'text',
     'label' => t('Object Owner'),
     'description' => t('The name of the owner of the object.'),
+    'setter callback' => 'islandora_entity_set_property',
   );
-  $p['state'] = array(
+  $object_properties['state'] = array(
     'type' => 'text',
     'label' => t('Object State'),
     'description' => t('An initial representing the state of the object.'),
+    'setter callback' => 'islandora_entity_set_property',
   );
-  $p['models'] = array(
+  $object_properties['models'] = array(
     'type' => 'list<text>',
     'label' => t('Content Models'),
     'description' => t('The list of content models which the object has.'),
+    'setter callback' => 'islandora_entity_set_property',
   );
-  $p['createdDate'] = array(
+  $object_properties['createdDate'] = array(
     'type' => 'text',
     'label' => t('Created Date'),
     'description' => t('When the object was created.'),
+  );
+
+  $datastream_properties['id'] = array(
+    'type' => 'text',
+    'label' => t('ID'),
+    'description' => t('The identifier of the datastream.'),
+  );
+  $datastream_properties['state'] = array(
+    'type' => 'text',
+    'label' => t('Datastream State'),
+    'description' => t('An initial representing the state of the datastream.'),
+    'setter callback' => 'islandora_entity_set_property',
+  );
+  $datastream_properties['label'] = array(
+    'type' => 'text',
+    'label' => t('Datastream Label'),
+    'description' => t('The label of the datastream.'),
+    'setter callback' => 'islandora_entity_set_property',
+  );
+  $datastream_properties['mimetype'] = array(
+    'type' => 'text',
+    'label' => t('MIME type'),
+    'description' => t('Content type of the datastream.'),
+    'setter callback' => 'islandora_entity_set_property',
+  );
+  $datastream_properties['parent'] = array(
+    'type' => 'islandora_object',
+    'label' => t('Object'),
+    'description' => t('The Tuque object on which this datastream exists.'),
+  );
+  $datastream_properties['content'] = array(
+    'type' => 'text',
+    'label' => t('Datastream content'),
+    'description' => t('The contents of the datastream; only useful when the content is textual.'),
+    'setter callback' => 'islandora_entity_set_property',
   );
 
   return $info;
@@ -1766,10 +1814,29 @@ function islandora_islandora_datastream_modified(AbstractObject $object, Abstrac
  */
 function islandora_form_simpletest_test_form_alter(array &$form) {
   module_load_include('inc', 'simpletest', 'simpletest.pages');
+  module_load_include('inc', 'islandora', 'tests/includes/test_utility_abstraction');
+  $configuration = IslandoraTestUtilityClass::getTestConfiguration();
+  $filter_path = $configuration['drupal_filter_file'];
+  $filter_status = is_writable($filter_path);
+  if ($filter_status) {
+    $filter_status_message = theme_image(array('path' => 'misc/watchdog-ok.png', 'attributes' => array())) . " ";
+    $filter_status_message .= t("Drupal filter at <b>!filter_path</b> is writable by the server.", array(
+      '!filter_path' => $filter_path,
+    ));
+  }
+  else {
+    $filter_status_message = theme_image(array('path' => 'misc/watchdog-error.png', 'attributes' => array())) . " ";
+    $filter_status_message .= t("Drupal filter at <b>!filter_path</b> is not writable by the server. Please make sure your webserver has permission to write to the Drupal filter. If the path given is incorrect, you will need to change it in your server's test config file, located in the Islandora module's 'tests' folder as test_config.ini or default.test_config.ini.", array(
+      '!filter_path' => $filter_path,
+    ));
+  }
+
   $form['tests'] = array(
     '#type' => 'fieldset',
     '#title' => t('Tests'),
-    '#description' => t('Select the test(s) or test group(s) you would like to run, and click <em>Run tests</em>.<br/><br/>NOTE: Tests in groups prefixed with <em>Islandora</em> generally require a configuration file, found in the Islandora module "tests" folder, as well as the use of the Islandora Drupal filter. Before any tests are run, please ensure that your web server has the appropriate permissions to alter the drupal_filter.xml file in your Fedora config folder. Your original Islandora Drupal filter configuration will NOT be overwritten by tests; HOWEVER, if PHP exits abnormally before the filter is reset, please use the "Repair Drupal Filter" button below.'),
+    '#description' => t("Select the test(s) or test group(s) you would like to run, and click <em>Run tests</em>.<p>NOTE: Tests in groups prefixed with <em>Islandora</em> generally require a configuration file, found in the Islandora module 'tests' folder, as well as the use of the Islandora Drupal filter. Before any tests are run, please ensure that your web server has the appropriate permissions to alter the drupal-filter.xml file in your Fedora config folder. Your original Islandora Drupal filter configuration will NOT be overwritten by tests; HOWEVER, if PHP exits abnormally before the filter is reset, please use the 'Repair Drupal Filter' button below.</p><p><em>Drupal Filter Write Status:</em> !filter_status_message</p>", array(
+      '!filter_status_message' => $filter_status_message,
+    )),
   );
 
   $form['tests']['table'] = array(
@@ -1789,6 +1856,9 @@ function islandora_form_simpletest_test_form_alter(array &$form) {
         '#title' => filter_xss($info['name']),
         '#description' => filter_xss($info['description']),
       );
+      if (is_subclass_of($class, 'IslandoraWebTestCase', TRUE) && !$filter_status) {
+        $form['tests']['table'][$group][$class]['#disabled'] = TRUE;
+      }
     }
   }
 
@@ -1813,7 +1883,7 @@ function islandora_form_simpletest_test_form_alter(array &$form) {
 }
 
 /**
- * Submit handler for islandora_form_simpletest_test_form_alter().
+ * Removes simpletest entries from the Drupal filter.
  */
 function islandora_repair_drupal_filter() {
 
@@ -1940,6 +2010,8 @@ function islandora_menu_local_tasks_alter(&$data, $router_item, $root_path) {
         if ($tab['#link']['path'] == 'islandora/object/%/print_object') {
           if ($root_path == 'islandora/object/%') {
             $islandora_path = drupal_get_path('module', 'islandora');
+            $tab['#prefix'] = '<li>';
+            $tab['#suffix'] = '</li>';
             $tab['#theme'] = 'link';
             $tab['#text'] = theme('image', array(
               'path' => "$islandora_path/images/print-icon.png",
@@ -1972,5 +2044,17 @@ function islandora_islandora_object_alter(AbstractObject $object, array &$contex
   if ($context['action'] == 'ingest' && variable_get('islandora_defer_derivatives_on_ingest', FALSE)) {
     module_load_include('inc', 'islandora', 'includes/derivatives');
     islandora_set_defer_derivatives_flag($object);
+  }
+}
+
+/**
+ * Set property on an entity.
+ *
+ * Drupal's usual entity_property_verbatim_set() does not work, as tries to use
+ * ArrayAccess stuff instead of setting properties directly.
+ */
+function islandora_entity_set_property(&$data, $name, $value, $langcode) {
+  if (is_object($data)) {
+    $data->$name = $value;
   }
 }

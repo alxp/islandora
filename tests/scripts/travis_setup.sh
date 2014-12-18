@@ -22,8 +22,8 @@ tar xf drush-6.3.tar.gz
 sudo mv drush-6.3 /opt/
 sudo ln -s /opt/drush-6.3/drush /usr/bin/drush
 
-wget http://alpha.library.yorku.ca/PHP_CodeSniffer-1.5.4.tgz
-pear install PHP_CodeSniffer-1.5.4.tgz
+wget http://alpha.library.yorku.ca/PHP_CodeSniffer-1.5.6.tgz
+pear install PHP_CodeSniffer-1.5.6.tgz
 
 wget http://alpha.library.yorku.ca/phpcpd.phar
 sudo mv phpcpd.phar /usr/local/bin/phpcpd
@@ -39,7 +39,7 @@ mv sites/all/modules/islandora/tests/travis.test_config.ini sites/all/modules/is
 mkdir sites/all/libraries
 ln -s $HOME/tuque sites/all/libraries/tuque
 drush dl --yes coder
-drush dl --yes potx
+drush dl --yes potx-7.x-1.0
 drush en --yes coder_review
 drush en --yes simpletest
 drush en --yes potx

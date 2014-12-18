@@ -499,6 +499,14 @@ function islandora_ingest_form_stepify(array $form, array &$form_state, array $s
   );
   $form['prev'] = $first_form_step ? NULL : islandora_ingest_form_previous_button($form_state);
   $form['next'] = $last_form_step ? islandora_ingest_form_ingest_button($form_state) : islandora_ingest_form_next_button($form_state);
+  // Duplicate next button and hide it at the top of the form so that the form
+  // always triggers "next" if the user submits the form with the enter key.
+  if (!is_null($form['prev'])) {
+    $form['hidden_next'] = $form['next'];
+    $form['hidden_next']['#weight'] = -99;
+    $form['hidden_next']['#prefix'] = '<div style="display:none;">';
+    $form['hidden_next']['#suffix'] = '</div>';
+  }
   // Allow for a hook_form_FORM_ID_alter().
   drupal_alter(array('form_' . $step['form_id'], 'form'), $form, $form_state, $step['form_id']);
   return $form;
@@ -799,7 +807,7 @@ function islandora_ingest_form_submit(array $form, array &$form_state) {
         WATCHDOG_ERROR
       );
       drupal_set_message(
-        t('A problem occured while ingesting "@label" (ID: @pid), please notifiy the administrator.',
+        t('A problem occured while ingesting "@label" (ID: @pid), please notify the administrator.',
         array('@label' => $object->label, '@pid' => $object->id)),
         'error'
       );
