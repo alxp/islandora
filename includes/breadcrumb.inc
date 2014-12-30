@@ -12,7 +12,7 @@
  *
  * Each link in the bread-crumbs represents a member of the given objects
  * ancestry which is identified by any of the following RELS-EXT terms
- * (isMemberOf,isMemberOfCollection,isPartOf).
+ * (isMemberOf,isMemberOfCollection,isPartOf,isConstituentOf).
  *
  * @param AbstractObject $object
  *   An object whose ancestry will be mapped to bread-crumbs.
@@ -84,13 +84,14 @@ function islandora_get_breadcrumbs_recursive($pid, FedoraRepository $repository,
     SELECT DISTINCT ?object ?label
     FROM <#ri>
     WHERE {
-        <info:fedora/!pid> ?collection_predicate ?object;
+        <info:fedora/!pid> ?parentship_predicate ?object;
         <fedora-model:label> ?label .
         ?object <fedora-model:state> <fedora-model:Active>
         .
         !optionals
         !filters
           }
+        !order
 EOQ;
 
     $query_optionals = (array) module_invoke('islandora_xacml_api', 'islandora_basic_collection_get_query_optionals', 'view');
@@ -98,10 +99,15 @@ EOQ;
     $filter_map = function ($filter) {
       return "FILTER($filter)";
     };
-    $query_filters[] = "sameTerm(?collection_predicate, <fedora-rels-ext:isMemberOfCollection>) || sameTerm(?collection_predicate, <fedora-rels-ext:isMemberOf>)";
+    $compound_object_predicate = variable_get('islandora_compound_object_relationship', 'isConstituentOf');
+    $parentship_predicate_filters = "sameTerm(?parentship_predicate, <fedora-rels-ext:isPartOf>) || sameTerm(?parentship_predicate, <fedora-rels-ext:{$compound_object_predicate}>)";
+    $parentship_predicate_filters .= " || sameTerm(?parentship_predicate, <fedora-rels-ext:isMemberOfCollection>) || sameTerm(?parentship_predicate, <fedora-rels-ext:isMemberOf>)";
+    $query_filters[] = $parentship_predicate_filters;
+    $query_order = "ORDER BY DESC(?label)";
     $query = format_string($query, array(
       '!optionals' => !empty($query_optionals) ? ('OPTIONAL {{' . implode('} UNION {', $query_optionals) . '}}') : '',
       '!filters' => implode(' ', array_map($filter_map, $query_filters)),
+      '!order' => $query_order,
     ));
     $query = format_string($query, array(
       '!pid' => $pid,
