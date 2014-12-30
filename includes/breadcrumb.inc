@@ -77,7 +77,7 @@ function islandora_get_breadcrumbs_recursive($pid, FedoraRepository $repository,
     );
   }
   else {
-     
+
     $query = <<<EOQ
     PREFIX islandora-rels-ext: <http://islandora.ca/ontology/relsext#>
     PREFIX fedora-rels-ext: <info:fedora/fedora-system:def/relations-external#>
@@ -106,7 +106,7 @@ EOQ;
     $query = format_string($query, array(
       '!pid' => $pid,
     ));
-    
+
     $results = $repository->ri->sparqlQuery($query, 'unlimited');
 
     if (count($results) > 0 && $context['level'] > 0) {
