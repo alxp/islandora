@@ -77,7 +77,7 @@ function islandora_get_breadcrumbs_recursive($pid, FedoraRepository $repository,
     );
   }
   else {
-	   
+     
     $query = <<<EOQ
     PREFIX islandora-rels-ext: <http://islandora.ca/ontology/relsext#>
     PREFIX fedora-rels-ext: <info:fedora/fedora-system:def/relations-external#>
@@ -85,19 +85,19 @@ function islandora_get_breadcrumbs_recursive($pid, FedoraRepository $repository,
     FROM <#ri>
     WHERE {
         <info:fedora/!pid> ?collection_predicate ?object;
-		    <fedora-model:label> ?label .
+        <fedora-model:label> ?label .
         ?object <fedora-model:state> <fedora-model:Active>
-	      .
-	      !optionals
-	      !filters
-	        }
+        .
+        !optionals
+        !filters
+          }
 EOQ;
 
     $query_optionals = (array) module_invoke('islandora_xacml_api', 'islandora_basic_collection_get_query_optionals', 'view');
     $query_filters = (array) module_invoke('islandora_xacml_api', 'islandora_basic_collection_get_query_filters');
     $filter_map = function ($filter) {
       return "FILTER($filter)";
-      };
+    };
     $query_filters[] = "sameTerm(?collection_predicate, <fedora-rels-ext:isMemberOfCollection>) || sameTerm(?collection_predicate, <fedora-rels-ext:isMemberOf>)";
     $query = format_string($query, array(
       '!optionals' => !empty($query_optionals) ? ('OPTIONAL {{' . implode('} UNION {', $query_optionals) . '}}') : '',
@@ -106,7 +106,7 @@ EOQ;
     $query = format_string($query, array(
       '!pid' => $pid,
     ));
-		
+    
     $results = $repository->ri->sparqlQuery($query, 'unlimited');
 
     if (count($results) > 0 && $context['level'] > 0) {
