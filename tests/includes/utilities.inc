@@ -218,13 +218,14 @@ class IslandoraTestUtilities extends IslandoraTestUtilityClass {
    *   'parent' - The PID of the parent collection.
    * @param array $datastreams
    *   An array containing zero or more datastream arrays that use the keys:
-   *   'dsid' - the datastream ID; randomized if not set.
+   *   'dsid' - The datastream ID; randomized if not set.
    *   'path' - The path to the file to use; defaults to fixtures/test.jpg.
+   *   'string' - A string to set the datastream from; overrides 'path'.
    *   'control_group' - The single-letter control group identifier.
    *   'mimetype' - The datastream's mimetype.
    *
-   * @return bool|array
-   *   FALSE if the object ingest failed, or the object array if successful.
+   * @return bool|AbstractObject
+   *   FALSE if the object ingest failed, or the object if successful.
    */
   public function ingestConstructedObject(array $properties = array(), array $datastreams = array()) {
     if (!isset($properties['pid'])) {
@@ -264,9 +265,6 @@ class IslandoraTestUtilities extends IslandoraTestUtilityClass {
         if (!isset($datastream['dsid'])) {
           $datastream['dsid'] = DrupalUnitTestCase::randomName();
         }
-        if (!isset($datastream['path'])) {
-          $datastream['path'] = drupal_get_path('module', 'islandora') . '/tests/fixtures/test.jpg';
-        }
         if (!isset($datastream['control_group'])) {
           $new_datastream = $object->constructDatastream($datastream['dsid']);
         }
@@ -277,7 +275,13 @@ class IslandoraTestUtilities extends IslandoraTestUtilityClass {
         if (isset($datastream['mimetype'])) {
           $new_datastream->mimetype = $datastream['mimetype'];
         }
-        $new_datastream->setContentFromFile($datastream['path']);
+        if (isset($datastream['string'])) {
+          $new_datastream->setContentFromString($datastream['string']);
+        }
+        else {
+          $path = isset($datastream['path']) ? $datastream['path'] : drupal_get_path('module', 'islandora') . '/tests/fixtures/test.jpg';
+          $new_datastream->setContentFromFile($path);
+        }
         $object->ingestDatastream($new_datastream);
       }
     }
