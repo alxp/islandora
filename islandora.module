@@ -663,7 +663,7 @@ function islandora_print_object(AbstractObject $object) {
   return theme('islandora_object_print', array('object' => $object));
 }
 
-/** 
+/**
  * View print tab access.
  *
  * Configurable option in islandora configuration.
@@ -681,11 +681,11 @@ function islandora_print_object(AbstractObject $object) {
  *   configuraton.
  */
 function islandora_print_object_access($op, $object) {
-  $access = islandora_object_access($op, $object);
-  if ($access && variable_get('islandora_show_print_option', FALSE)) {
-    return $access;
+  if (!variable_get('islandora_show_print_option', FALSE)) {
+    return FALSE;
   }
-  return FALSE;
+  $access = islandora_object_access($op, $object);
+  return $access;
 }
 
 /**
