@@ -72,6 +72,9 @@ function islandora_temp_file_entry($file_uri, $mime = NULL) {
     if (isset($mime)) {
       $file->filemime = $mime;
     }
+    else {
+      $file->filemime = file_get_mimetype($file_uri);
+    }
   }
   $file->status = 0;
   return file_save($file);
