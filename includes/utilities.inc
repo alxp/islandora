@@ -197,11 +197,14 @@ function islandora_invoke_hook_list($hook, array $refinements, array $args) {
     $return = array_merge_recursive($return, $result);
     array_shift($args);
   }
-  if (module_exists('rules') && $event = rules_get_cache("event_$hook")) {
-    $parameters = $event->parameterInfo();
-    $rule_args = array_slice($args, 0, count($parameters));
-    array_unshift($rule_args, $hook);
-    $result = call_user_func_array('rules_invoke_event', $rule_args);
+  if (module_exists('rules')) {
+    $event_info = rules_get_event_info($hook);
+    if (isset($event_info['module'])) {
+      $parameters = $event_info['variables'];
+      $rule_args = array_slice($args, 0, count($parameters));
+      array_unshift($rule_args, $hook);
+      $result = call_user_func_array('rules_invoke_event', $rule_args);
+    }
   }
   return $return;
 }
