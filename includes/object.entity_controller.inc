@@ -29,13 +29,9 @@ class IslandoraObjectEntityController implements DrupalEntityControllerInterface
    *   An array of loaded objects.
    */
   public function load($ids = array(), $conditions = array()) {
-    if (isset($conditions['id'])) {
-      // Allow loading by specifying the ID as a property as a work-around,
-      // since some components dealing with entities expect IDs to be numeric.
-      $ids = array_merge($ids, (array) $conditions['id']);
-    }
-    elseif (!empty($conditions)) {
-      throw new Exception('Conditions other than "id" not implemented.');
+    if (!empty($conditions)) {
+      // TODO: Allow loading by specifying IDs in the condition.
+      throw new Exception('Conditions not implemented.');
     }
 
     $loaded = array();
