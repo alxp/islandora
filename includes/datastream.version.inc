@@ -275,35 +275,29 @@ function islandora_get_object_extensions(AbstractObject $object) {
 function islandora_datastream_version_replace_form($form, &$form_state, AbstractDatastream $datastream) {
   module_load_include('inc', 'islandora', 'includes/content_model');
   module_load_include('inc', 'islandora', 'includes/utilities');
+  module_load_include('inc', 'islandora', 'includes/mimetype.utils');
 
   $object = islandora_object_load($datastream->parent->id);
   $form_state['object_id'] = $object->id;
   $form_state['dsid'] = $datastream->id;
   $form_state['object'] = $object;
-  $datastream_mime_map = islandora_get_object_extensions($object);
-  $mime_detect = new MimeDetect();
-  $ext = array();
-  if (isset($datastream_mime_map[$datastream->id])) {
-    foreach ($datastream_mime_map[$datastream->id]['mime'] as $key => $value) {
-      $extensions = $mime_detect->getValidExtensions($value);
-      $ext = array_merge($ext, $extensions);
-    }
-  }
 
+  $extensions = islandora_get_extensions_for_datastream($object, $datastream->id);
+  $valid_extensions = implode(' ', $extensions);
   $upload_size = min((int) ini_get('post_max_size'), (int) ini_get('upload_max_filesize'));
   return array(
     'dsid_fieldset' => array(
       '#type' => 'fieldset',
-      '#title' => t("Update datastream with latest version"),
+      '#title' => t("Update Datastream"),
       '#collapsible' => FALSE,
       '#collapsed' => FALSE,
       'dsid' => array(
         '#type' => 'markup',
-        '#markup' => "<div>DSID: <b>$datastream->id</b></div>",
+        '#markup' => t("<div>DSID: <strong>@dsid</strong></div>", array('@dsid' => $datastream->id)),
       ),
       'label' => array(
         '#type' => 'markup',
-        '#markup' => "<div>Label: <b>$datastream->label</b></div>",
+        '#markup' => t("<div>Label: <strong>@label</strong></div>", array('@label' => $datastream->label)),
       ),
       'file' => array(
         '#type' => 'managed_file',
@@ -311,9 +305,9 @@ function islandora_datastream_version_replace_form($form, &$form_state, Abstract
         '#title' => t('Upload Document'),
         '#size' => 64,
         '#description' => t('Select a file to upload.<br/>Files must be less than <strong>@size MB.</strong>', array('@size' => $upload_size)),
-        '#upload_location' => 'temporary://',
+        '#upload_location' => file_default_scheme() . '://',
         '#upload_validators' => array(
-          'file_validate_extensions' => $ext,
+          'file_validate_extensions' => array($valid_extensions),
           // Assume its specified in MB.
           'file_validate_size' => array($upload_size * 1024 * 1024),
         ),
@@ -342,7 +336,9 @@ function islandora_datastream_version_replace_form_submit($form, &$form_state) {
   $file = file_load($form_state['values']['file']);
   try {
     $ds = $object[$form_state['dsid']];
-    $ds->mimetype = $file->filemime;
+    if ($ds->mimetype != $file->filemime) {
+      $ds->mimetype = $file->filemime;
+    }
     $path = drupal_realpath($file->uri);
     $ds->setContentFromFile($path);
     file_delete($file);
