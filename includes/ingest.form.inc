@@ -80,10 +80,6 @@ function islandora_ingest_form(array $form, array &$form_state, array $configura
  */
 function islandora_ingest_form_init_form_state_storage(array &$form_state, array $configuration) {
   if (empty($form_state['islandora'])) {
-    $objects = isset($configuration['objects']) ? $configuration['objects'] : array();
-    if (empty($objects)) {
-      $objects[] = islandora_ingest_form_prepare_new_object($configuration);
-    }
     $configuration['models'] = isset($configuration['models']) ? $configuration['models'] : array();
     // Make sure the models actually exist.
     foreach ($configuration['models'] as $key => $model) {
@@ -91,15 +87,15 @@ function islandora_ingest_form_init_form_state_storage(array &$form_state, array
         unset($configuration['models'][$key]);
       }
     }
-    // No need to persist the 'objects' within the configuration.
-    unset($configuration['objects']);
     // Required for step hooks.
     $form_state['islandora'] = array(
       'step_id' => NULL,
-      'objects' => $objects,
+      'objects' => $configuration['objects'],
       'shared_storage' => $configuration,
       'step_storage' => array(),
     );
+    // No need to persist the 'objects' within the configuration.
+    unset($configuration['objects']);
     // Must be called after $form_state['islandora'] is initialized, otherwise,
     // the values in 'islandora' would not be availible to the step hooks.
     $form_state['islandora']['step_id'] = islandora_ingest_form_get_first_step_id($form_state);
