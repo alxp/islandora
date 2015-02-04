@@ -762,6 +762,7 @@ function islandora_ingest_form_ingest_button_process(array $element) {
       "$islandora_path/js/spinner.js",
     ),
   );
+  $element['#attributes']['class'][] = 'islandora-spinner-submit';
   return $element;
 }
 

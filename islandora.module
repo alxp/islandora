@@ -147,7 +147,7 @@ function islandora_menu() {
     'page callback' => 'islandora_printer_object',
     'page arguments' => array(2),
     'type' => MENU_LOCAL_TASK,
-    'access callback' => 'islandora_object_access',
+    'access callback' => 'islandora_print_object_access',
     'access arguments' => array(ISLANDORA_VIEW_OBJECTS, 2),
   );
   $items['islandora/object/%islandora_object/print'] = array(
@@ -664,6 +664,31 @@ function islandora_print_object(AbstractObject $object) {
 }
 
 /**
+ * View print tab access.
+ *
+ * Configurable option in islandora configuration.
+ *
+ * @param string $op
+ *   String identifying an operation to check. Should correspond to a
+ *   permission declared via hook_permission().
+ * @param AbstractObject $object
+ *   An object to check for permissions.
+ *
+ * @return bool
+ *   TRUE if at least one implementation of hook_islandora_object_access()
+ *   returned TRUE, and no implementation return FALSE; FALSE otherwise, or
+ *   FALSE if 'islandora_show_print_option' is not selected in islandora
+ *   configuraton.
+ */
+function islandora_print_object_access($op, $object) {
+  if (!variable_get('islandora_show_print_option', FALSE)) {
+    return FALSE;
+  }
+  $access = islandora_object_access($op, $object);
+  return $access;
+}
+
+/**
  * Implements hook_forms().
  */
 function islandora_forms($form_id) {
@@ -1070,6 +1095,7 @@ function islandora_view_object(AbstractObject $object) {
 function islandora_printer_object(AbstractObject $object) {
   $output = array();
   $temp_arr = array();
+
   // Dispatch print hook.
   foreach (islandora_build_hook_list(ISLANDORA_PRINT_HOOK, $object->models) as $hook) {
     $temp = module_invoke_all($hook, $object);
@@ -1950,7 +1976,7 @@ function islandora_islandora_datastream_access($op, AbstractDatastream $datastre
     $hooks = islandora_invoke_hook_list(ISLANDORA_DERVIATIVE_CREATION_HOOK, $object->models, array($object));
     $hooks = islandora_filter_derivatives($hooks, array('force' => TRUE), $object);
     foreach ($hooks as $hook) {
-      if ($hook['destination_dsid'] == $datastream->id &&
+      if (isset($hook['destination_dsid']) && $hook['destination_dsid'] == $datastream->id &&
         (is_null($hook['source_dsid']) || islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $object[$hook['source_dsid']], $user))) {
         $applicable_hook = TRUE;
         break;
