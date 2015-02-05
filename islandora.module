@@ -1122,7 +1122,9 @@ function islandora_printer_object(AbstractObject $object) {
  *   The object to view.
  *
  * @return string
- *   The objects label.
+ *   The objects label. Note that we return the raw value to prevent
+ *   double encoding, as we expect drupal_set_title() to check_plain() down
+ *   the road.
  */
 function islandora_drupal_title(AbstractObject $object) {
   module_load_include('inc', 'islandora', 'includes/breadcrumb');
