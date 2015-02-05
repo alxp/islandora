@@ -1117,7 +1117,6 @@ function islandora_printer_object(AbstractObject $object) {
  * Title callback for drupal title.
  *
  * Changes the drupal title to be the objects label.
- * models that their modules want to provide a view for.
  *
  * @param AbstractObject $object
  *   The object to view.
