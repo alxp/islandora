@@ -91,6 +91,7 @@ function islandora_get_breadcrumbs_recursive($pid, FedoraRepository $repository,
         !optionals
         !filters
           }
+        !order
 EOQ;
 
     $query_optionals = (array) module_invoke('islandora_xacml_api', 'islandora_basic_collection_get_query_optionals', 'view');
@@ -98,10 +99,14 @@ EOQ;
     $filter_map = function ($filter) {
       return "FILTER($filter)";
     };
-    $query_filters[] = "sameTerm(?collection_predicate, <fedora-rels-ext:isMemberOfCollection>) || sameTerm(?collection_predicate, <fedora-rels-ext:isMemberOf>)";
+    $collection_predicate_filters = "sameTerm(?collection_predicate, <fedora-rels-ext:isPartOf>)";
+    $collection_predicate_filters .= " || sameTerm(?collection_predicate, <fedora-rels-ext:isMemberOfCollection>) || sameTerm(?collection_predicate, <fedora-rels-ext:isMemberOf>)";
+    $query_filters[] = $collection_predicate_filters;
+    $query_order = "ORDER BY DESC(?label)";
     $query = format_string($query, array(
       '!optionals' => !empty($query_optionals) ? ('OPTIONAL {{' . implode('} UNION {', $query_optionals) . '}}') : '',
       '!filters' => implode(' ', array_map($filter_map, $query_filters)),
+      '!order' => $query_order,
     ));
     $query = format_string($query, array(
       '!pid' => $pid,
