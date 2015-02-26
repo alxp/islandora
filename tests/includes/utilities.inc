@@ -335,7 +335,7 @@ QUERY;
     foreach ($objects as $object) {
       $loaded_object = islandora_object_load($object['object']['value']);
       $this->repository->api->m->purgeObject($loaded_object->id);
-      if (islandora_object_load($object['object']['value'])) {
+      if (!islandora_object_load($object['object']['value'])) {
         $this->addResult(TRUE, "Object {$object['object']['value']} successfully removed from repository.");
       }
       else {
