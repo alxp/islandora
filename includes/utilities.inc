@@ -72,6 +72,9 @@ function islandora_temp_file_entry($file_uri, $mime = NULL) {
     if (isset($mime)) {
       $file->filemime = $mime;
     }
+    else {
+      $file->filemime = file_get_mimetype($file_uri);
+    }
   }
   $file->status = 0;
   return file_save($file);
@@ -194,11 +197,14 @@ function islandora_invoke_hook_list($hook, array $refinements, array $args) {
     $return = array_merge_recursive($return, $result);
     array_shift($args);
   }
-  if (module_exists('rules') && $event = rules_get_cache("event_$hook")) {
-    $parameters = $event->parameterInfo();
-    $rule_args = array_slice($args, 0, count($parameters));
-    array_unshift($rule_args, $hook);
-    $result = call_user_func_array('rules_invoke_event', $rule_args);
+  if (module_exists('rules')) {
+    $event_info = rules_get_event_info($hook);
+    if (isset($event_info['module'])) {
+      $parameters = $event_info['variables'];
+      $rule_args = array_slice($args, 0, count($parameters));
+      array_unshift($rule_args, $hook);
+      $result = call_user_func_array('rules_invoke_event', $rule_args);
+    }
   }
   return $return;
 }
@@ -653,53 +659,6 @@ function islandora_directory_exists_message($path) {
  */
 function islandora_system_settings_form_default_value($name, $default_value, array &$form_state) {
   return isset($form_state['values'][$name]) ? $form_state['values'][$name] : variable_get($name, $default_value);
-}
-
-/**
- * Checks that the given/current account has all the given permissions.
- *
- * @param array $perms
- *   The permissions to check.
- * @param mixed $account
- *   (optional) The account to check, if not given use currently logged in user.
- *
- * @return bool
- *   TRUE if the account has all the given permissions, FALSE otherwise.
- */
-function islandora_user_access_all(array $perms, $account = NULL) {
-  $message = islandora_deprecated('7.x-1.2', 'Roll your own code or use islandora_user_access().');
-  trigger_error(filter_xss($message), E_USER_DEPRECATED);
-
-  foreach ($perms as $perm) {
-    if (!user_access($perm, $account)) {
-      return FALSE;
-    }
-  }
-  return TRUE;
-}
-
-/**
- * Checks that the given/current account has at one of the given permissions.
- *
- * @param array $perms
- *   The permissions to check.
- * @param mixed $account
- *   (optional) The account to check, if not given use currently logged in user.
- *
- * @return bool
- *   TRUE if the account has at least one of the given permissions, FALSE
- *   otherwise.
- */
-function islandora_user_access_any(array $perms, $account = NULL) {
-  $message = islandora_deprecated('7.x-1.2', 'Roll your own code or use islandora_user_access().');
-  trigger_error(filter_xss($message), E_USER_DEPRECATED);
-
-  foreach ($perms as $perm) {
-    if (user_access($perm, $account)) {
-      return TRUE;
-    }
-  }
-  return FALSE;
 }
 
 /**

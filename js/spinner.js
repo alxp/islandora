@@ -44,6 +44,7 @@
                 spinner.spin(this);
                 $('#edit-next').hide();
                 $('#edit-prev').hide();
+                $('.islandora-spinner-submit').hide();
                 // Submit the form after a set timeout, this handles problems with
                 // safari, in that safari submits immediately..
                 if (navigator.userAgent.indexOf('Safari') !== -1 && navigator.userAgent.indexOf('Chrome') === -1) {
