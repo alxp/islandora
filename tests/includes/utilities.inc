@@ -314,7 +314,8 @@ class IslandoraTestUtilities extends IslandoraTestUtilityClass {
    *   The user whose objects we'd like to remove.
    *
    * @return bool
-   *   TRUE on success, FALSE on failure.
+   *   TRUE if all objects were removed, or FALSE if any of them still remained
+   *   after removal.   
    */
   public function deleteUserCreatedObjects($username) {
     if ($username === $this->configuration['admin_user']) {
@@ -330,16 +331,19 @@ SELECT ?object FROM <#ri> WHERE
 QUERY;
 
     $objects = $this->repository->ri->sparqlQuery($query);
+    $return_value = TRUE;
     foreach ($objects as $object) {
       $loaded_object = islandora_object_load($object['object']['value']);
       $this->repository->api->m->purgeObject($loaded_object->id);
       if (islandora_object_load($object['object']['value'])) {
         $this->addResult(TRUE, "Object {$object['object']['value']} successfully removed from repository.");
-        return TRUE;
       }
-      $this->addResult(FALSE, "Unable to remove object {$object['object']['value']} from the repository.");
-      return FALSE;
+      else {
+        $this->addResult(FALSE, "Unable to remove object {$object['object']['value']} from the repository.");
+        $return_value = FALSE;
+      }
     }
+    return $return_value;
   }
 
   /**
