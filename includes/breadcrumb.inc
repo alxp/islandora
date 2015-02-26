@@ -12,7 +12,7 @@
  *
  * Each link in the bread-crumbs represents a member of the given objects
  * ancestry which is identified by any of the following RELS-EXT terms
- * (isMemberOf,isMemberOfCollection,isPartOf,isConstituentOf).
+ * (isMemberOf,isMemberOfCollection,isPartOf).
  *
  * @param AbstractObject $object
  *   An object whose ancestry will be mapped to bread-crumbs.
