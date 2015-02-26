@@ -84,7 +84,7 @@ function islandora_get_breadcrumbs_recursive($pid, FedoraRepository $repository,
     SELECT DISTINCT ?object ?label
     FROM <#ri>
     WHERE {
-        <info:fedora/!pid> ?parentship_predicate ?object;
+        <info:fedora/!pid> ?collection_predicate ?object;
         <fedora-model:label> ?label .
         ?object <fedora-model:state> <fedora-model:Active>
         .
@@ -99,10 +99,9 @@ EOQ;
     $filter_map = function ($filter) {
       return "FILTER($filter)";
     };
-    $compound_object_predicate = variable_get('islandora_compound_object_relationship', 'isConstituentOf');
-    $parentship_predicate_filters = "sameTerm(?parentship_predicate, <fedora-rels-ext:isPartOf>) || sameTerm(?parentship_predicate, <fedora-rels-ext:{$compound_object_predicate}>)";
-    $parentship_predicate_filters .= " || sameTerm(?parentship_predicate, <fedora-rels-ext:isMemberOfCollection>) || sameTerm(?parentship_predicate, <fedora-rels-ext:isMemberOf>)";
-    $query_filters[] = $parentship_predicate_filters;
+    $collection_predicate_filters = "sameTerm(?collection_predicate, <fedora-rels-ext:isPartOf>)";
+    $collection_predicate_filters .= " || sameTerm(?collection_predicate, <fedora-rels-ext:isMemberOfCollection>) || sameTerm(?collection_predicate, <fedora-rels-ext:isMemberOf>)";
+    $query_filters[] = $collection_predicate_filters;
     $query_order = "ORDER BY DESC(?label)";
     $query = format_string($query, array(
       '!optionals' => !empty($query_optionals) ? ('OPTIONAL {{' . implode('} UNION {', $query_optionals) . '}}') : '',
