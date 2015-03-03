@@ -406,9 +406,11 @@ function islandora_rules_datastream_load_namespace_vocab($xpath, $xpath_vocab) {
 /**
  * Rules XPath helper; grab the datastream content and build a DOMXPath.
  */
-function islandora_rules_datastream_load_xpath(AbstractDatastream $datastream, $xpath_vocab) {
-  $result = islandora_rules_datastream_load_domxpath($datastream->content, $xpath_vocab);
-  islandora_rules_datastream_load_namespace_vocab($result['islandora_domxpath'], $xpath_vocab);
+function islandora_rules_datastream_load_xpath(AbstractDatastream $datastream, $xpath_vocab = NULL) {
+  $result = islandora_rules_datastream_load_domxpath($datastream->content);
+  if (is_object($xpath_vocab)) {
+    islandora_rules_datastream_load_namespace_vocab($result['islandora_domxpath'], $xpath_vocab);
+  }
   return $result;
 }
 
