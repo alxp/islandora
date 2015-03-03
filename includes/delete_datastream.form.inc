@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @file
  * The admin/confirmation form to delete/purge a datastream.
  */
+
 /**
  * The admin delete datastream form.
  *
@@ -19,7 +21,7 @@
 function islandora_delete_datastream_form(array $form, array &$form_state, AbstractDatastream $datastream) {
   $form_state['datastream'] = $datastream;
   $form['delete_derivatives'] = array(
-    '#title' => t('Delete Derviatives'), 
+    '#title' => t('Delete Derviatives'),
     '#type' => 'checkbox',
     '#default_value' => 0,
   );
@@ -33,7 +35,6 @@ function islandora_delete_datastream_form(array $form, array &$form_state, Abstr
 }
 /**
  * Purge a given DSID's derivative datastreams on an object.
- * 
  */
 function islandora_datastream_derivatives_purged(AbstractObject $object, $dsid) {
   module_load_include('inc', 'islandora', 'includes/utilities');
@@ -44,7 +45,8 @@ function islandora_datastream_derivatives_purged(AbstractObject $object, $dsid) 
   $dsids = array_map($dsid_map, $hooks);
   array_map(array($object, 'purgeDatastream'), $dsids);
 }
-/** Submit handler for the delete datastream form.
+/**
+ * Submit handler for the delete datastream form.
  *
  * Purges/Delete's the given AbstractDatastream if possible.
  *
@@ -62,10 +64,9 @@ function islandora_delete_datastream_form_submit(array $form, array &$form_state
   $datastream_id = $datastream->id;
   $object = $datastream->parent;
   $deleted = FALSE;
-  
-  if($form_state['values']['delete_derivatives']){
+  if ($form_state['values']['delete_derivatives']) {
     islandora_datastream_derivatives_purged($object, $datastream_id);
-  } 
+  }
   try {
     $deleted = islandora_delete_datastream($datastream);
   }
