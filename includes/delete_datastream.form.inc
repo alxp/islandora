@@ -19,7 +19,7 @@
 function islandora_delete_datastream_form(array $form, array &$form_state, AbstractDatastream $datastream) {
   $form_state['datastream'] = $datastream;
   $form['delete_derivatives'] = array(
-    '#title' => t('Delete derivatives?'),
+    '#title' => t('Delete Derviatives'), 
     '#type' => 'checkbox',
     '#default_value' => 0,
   );
@@ -32,15 +32,10 @@ function islandora_delete_datastream_form(array $form, array &$form_state, Abstr
   );
 }
 /**
- * Purges datastream derivatives if selected.
- *
- * Implements hook_islandora_datastream_purged().
+ * Purge a given DSID's derivative datastreams on an object.
+ * 
  */
 function islandora_datastream_derivatives_purged(AbstractObject $object, $dsid) {
-   $models = array(
-    'ir:citationCModel',
-    'ir:thesisCModel',
-  );
   module_load_include('inc', 'islandora', 'includes/utilities');
   $hooks = islandora_invoke_hook_list(ISLANDORA_DERVIATIVE_CREATION_HOOK, $object->models, array($object));
   $dsid_map = function ($hook_definition) {
@@ -68,7 +63,7 @@ function islandora_delete_datastream_form_submit(array $form, array &$form_state
   $object = $datastream->parent;
   $deleted = FALSE;
   
-  if(!empty($form_state['values']['delete_derivatives'])){
+  if($form_state['values']['delete_derivatives']){
     islandora_datastream_derivatives_purged($object, $datastream_id);
   } 
   try {
