@@ -276,8 +276,10 @@ class IslandoraFedoraApiM extends FedoraApiM {
     );
     islandora_alter_datastream($object, $datastream, $context);
     $params = $context['params'];
-    if (isset($params['lastModifiedDate'])) {
-      $params['lastModifiedDate'] = (string) $object[$dsid]->createdDate;
+    // Anything may be altered during the alter_datastream hook invocation so
+    // we need to update our time to the change we know about.
+    if (isset($params['lastModifiedDate']) && $params['lastModifiedDate'] < (string) $object->lastModifiedDate) {
+      $params['lastModifiedDate'] = (string) $object->lastModifiedDate;
     }
     if ($context['block']) {
       throw new Exception('Modify Datastream was blocked.');
