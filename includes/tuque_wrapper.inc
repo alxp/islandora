@@ -267,8 +267,7 @@ class IslandoraFedoraObject extends FedoraObject {
           return array();
 
         default:
-          parent::purgeDatastream($id);
-          return TRUE;
+          return parent::purgeDatastream($id);
       }
     }
     catch (Exception $e) {
