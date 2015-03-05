@@ -233,6 +233,56 @@ class IslandoraFedoraObject extends FedoraObject {
       throw $e;
     }
   }
+
+  /**
+   * Purge a datastream.
+   *
+   * Invokes datastream altered/purged hooks and calls the API-M method.
+   *
+   * @see FedoraObject::purgeObject()
+   */
+  public function purgeDatastream($id) {
+    $this->populateDatastreams();
+
+    if (!array_key_exists($id, $this->datastreams)) {
+      return FALSE;
+    }
+    $context = array(
+      'action' => 'purge',
+      'purge' => TRUE,
+      'delete' => FALSE,
+      'block' => FALSE,
+    );
+    islandora_alter_datastream($this, $this[$id], $context);
+    try {
+      $action = $context['block'] ? 'block' : FALSE;
+      $action = (!$action && $context['delete']) ? 'delete' : $action;
+      $action = !$action ? 'purge' : $action;
+      switch ($action) {
+        case 'block':
+          throw new Exception('Purge Datastream was blocked.');
+
+        case 'delete':
+          $this[$id]->state = 'D';
+          return array();
+
+        default:
+          $this->repository->api->m->purgeDatastream($this->id, $id);
+          unset($this->datastreams[$id]);
+          $this->refresh();
+          islandora_invoke_datastream_hooks(ISLANDORA_DATASTREAM_PURGED_HOOK, $this->models, $id, $this, $id);
+          return TRUE;
+      }
+    }
+    catch (Exception $e) {
+      watchdog('islandora', 'Failed to purge datastream @dsid from @pid</br>code: @code<br/>message: @msg', array(
+          '@pid' => $this->id,
+          '@dsid' => $id,
+          '@code' => $e->getCode(),
+          '@msg' => $e->getMessage()), WATCHDOG_ERROR);
+      throw $e;
+    }
+  }
 }
 
 class IslandoraRepositoryConnection extends RepositoryConnection {}
@@ -305,55 +355,6 @@ class IslandoraFedoraApiM extends FedoraApiM {
       throw new Exception('Modify Object was blocked.');
     }
     return parent::modifyObject($pid, $params);
-  }
-
-  /**
-   * Purge a datastream from from Fedora.
-   *
-   * @see FedoraApiM::purgeDatastream
-   */
-  public function purgeDatastream($pid, $dsid, $params = array()) {
-    $object = islandora_object_load($pid);
-    $context = array(
-      'action' => 'purge',
-      'purge' => TRUE,
-      'delete' => FALSE,
-      'block' => FALSE,
-    );
-    islandora_alter_datastream($object, $object[$dsid], $context);
-    try {
-      $action = $context['block'] ? 'block' : FALSE;
-      $action = (!$action && $context['delete']) ? 'delete' : $action;
-      $action = !$action ? 'purge' : $action;
-      switch ($action) {
-        case 'block':
-          throw new Exception('Purge Datastream was blocked.');
-
-        case 'delete':
-          $object[$dsid]->state = 'D';
-          return array();
-
-        default:
-          $ret = parent::purgeDatastream($pid, $dsid, $params);
-          // We need to remove this object from the cache and reload it as
-          // Tuque may not have an updated copy. That is the datastream could
-          // still be present within the object even though it's purged out of
-          // Fedora.
-          $tuque = islandora_get_tuque_connection();
-          $tuque->cache->delete($pid);
-          $non_cached_object = islandora_object_load($pid);
-          islandora_invoke_datastream_hooks(ISLANDORA_DATASTREAM_PURGED_HOOK, $non_cached_object->models, $dsid, $non_cached_object, $dsid);
-          return $ret;
-      }
-    }
-    catch (Exception $e) {
-      watchdog('islandora', 'Failed to purge datastream @dsid from @pid</br>code: @code<br/>message: @msg', array(
-          '@pid' => $pid,
-          '@dsid' => $dsid,
-          '@code' => $e->getCode(),
-          '@msg' => $e->getMessage()), WATCHDOG_ERROR);
-      throw $e;
-    }
   }
 
   /**
