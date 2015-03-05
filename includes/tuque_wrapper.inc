@@ -267,7 +267,9 @@ class IslandoraFedoraObject extends FedoraObject {
           return array();
 
         default:
-          return parent::purgeDatastream($id);
+          $to_return = parent::purgeDatastream($id);
+          islandora_invoke_datastream_hooks(ISLANDORA_DATASTREAM_PURGED_HOOK, $this->models, $id, $this, $id);
+          return $to_return;
       }
     }
     catch (Exception $e) {
@@ -331,16 +333,6 @@ class IslandoraFedoraApiM extends FedoraApiM {
       throw new Exception('Modify Datastream was blocked.');
     }
     return parent::modifyDatastream($pid, $dsid, $params);
-  }
-
-  /**
-   * Purge a datastream from from Fedora.
-   *
-   * @see FedoraApiM::purgeDatastream
-   */
-  public function purgeDatastream($pid, $dsid, $params = array()) {
-    $object = islandora_object_load($pid);
-    islandora_invoke_datastream_hooks(ISLANDORA_DATASTREAM_PURGED_HOOK, $object->models, $dsid, $object, $dsid);
   }
 
   /**
