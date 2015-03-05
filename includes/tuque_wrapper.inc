@@ -56,7 +56,7 @@ function islandora_alter_datastream(AbstractObject $object, AbstractDatastream $
 }
 
 /**
- * Constructs a list of hooks from the given paramenters and invokes them.
+ * Constructs a list of hooks from the given parameters and invokes them.
  */
 function islandora_invoke_object_hooks($hook, array $models) {
   module_load_include('inc', 'islandora', 'includes/utilities');
@@ -64,7 +64,7 @@ function islandora_invoke_object_hooks($hook, array $models) {
 }
 
 /**
- * Constructs a list of hooks from the given paramenters and invokes them.
+ * Constructs a list of hooks from the given parameters and invokes them.
  */
 function islandora_invoke_datastream_hooks($hook, array $models, $dsid) {
   module_load_include('inc', 'islandora', 'includes/utilities');
@@ -253,8 +253,8 @@ class IslandoraFedoraObject extends FedoraObject {
       'delete' => FALSE,
       'block' => FALSE,
     );
-    islandora_alter_datastream($this, $this[$id], $context);
     try {
+      islandora_alter_datastream($this, $this[$id], $context);
       $action = $context['block'] ? 'block' : FALSE;
       $action = (!$action && $context['delete']) ? 'delete' : $action;
       $action = !$action ? 'purge' : $action;
@@ -267,10 +267,7 @@ class IslandoraFedoraObject extends FedoraObject {
           return array();
 
         default:
-          $this->repository->api->m->purgeDatastream($this->id, $id);
-          unset($this->datastreams[$id]);
-          $this->refresh();
-          islandora_invoke_datastream_hooks(ISLANDORA_DATASTREAM_PURGED_HOOK, $this->models, $id, $this, $id);
+          parent::purgeDatastream($id);
           return TRUE;
       }
     }
@@ -335,6 +332,16 @@ class IslandoraFedoraApiM extends FedoraApiM {
       throw new Exception('Modify Datastream was blocked.');
     }
     return parent::modifyDatastream($pid, $dsid, $params);
+  }
+
+  /**
+   * Purge a datastream from from Fedora.
+   *
+   * @see FedoraApiM::purgeDatastream
+   */
+  public function purgeDatastream($pid, $dsid, $params = array()) {
+    $object = islandora_object_load($pid);
+    islandora_invoke_datastream_hooks(ISLANDORA_DATASTREAM_PURGED_HOOK, $object->models, $dsid, $object, $dsid);
   }
 
   /**
