@@ -20,10 +20,14 @@
  */
 function islandora_delete_datastream_form(array $form, array &$form_state, AbstractDatastream $datastream) {
   $form_state['datastream'] = $datastream;
+  $object = $datastream->parent;
+  $dsid = $datastream->id;
+  $derivs = implode(', ', islandora_datastream_to_purge($object, $dsid));
   $form['delete_derivatives'] = array(
     '#title' => t('Delete Derviatives'),
     '#type' => 'checkbox',
     '#default_value' => 0,
+    '#description' => t('Derivatives can be regenerated at a later time. <p><strong>Datastream(s) to be purged: </strong></p>@dsid, @derivs', array('@dsid' => $datastream->id, '@derivs' => $derivs)),
   );
   return confirm_form($form,
     t('Are you sure you want to delete the %dsid datastream?', array('%dsid' => $datastream->id)),
@@ -33,18 +37,34 @@ function islandora_delete_datastream_form(array $form, array &$form_state, Abstr
     t('Cancel')
   );
 }
+
 /**
- * Purge a given DSID's derivative datastreams on an object.
+ * Return $dsids based on a given DSID and filter.
  */
-function islandora_datastream_derivatives_purged(AbstractObject $object, $dsid) {
+function islandora_datastream_to_purge(AbstractObject $object, $dsid) {
   module_load_include('inc', 'islandora', 'includes/utilities');
   $hooks = islandora_invoke_hook_list(ISLANDORA_DERVIATIVE_CREATION_HOOK, $object->models, array($object));
+  $hook_filter = function ($hook_def) use ($dsid) {
+    return isset($hook_def['source_dsid']) && isset($hook_def['destination_dsid']) ?
+      $hook_def['source_dsid'] == $dsid :
+      FALSE;
+  };
+  $hooks = array_filter($hooks, $hook_filter);
   $dsid_map = function ($hook_definition) {
     return $hook_definition['destination_dsid'];
   };
   $dsids = array_map($dsid_map, $hooks);
+  return $dsids;
+}
+
+/**
+ * Purge a given DSID's derivative datastreams on an object.
+ */
+function islandora_datastream_derivatives_purged(AbstractObject $object, $dsid) {
+  $dsids = islandora_datastream_to_purge($object, $dsid);
   array_map(array($object, 'purgeDatastream'), $dsids);
 }
+
 /**
  * Submit handler for the delete datastream form.
  *
