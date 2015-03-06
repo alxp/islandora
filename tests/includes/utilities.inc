@@ -315,7 +315,7 @@ class IslandoraTestUtilities extends IslandoraTestUtilityClass {
    *
    * @return bool
    *   TRUE if all objects were removed, or FALSE if any of them still remained
-   *   after removal.   
+   *   after removal.
    */
   public function deleteUserCreatedObjects($username) {
     if ($username === $this->configuration['admin_user']) {
