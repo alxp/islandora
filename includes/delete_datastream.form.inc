@@ -53,7 +53,14 @@ function islandora_datastream_to_purge(AbstractObject $object, $dsid) {
   $dsid_map = function ($hook_definition) {
     return $hook_definition['destination_dsid'];
   };
-  $dsids = array_map($dsid_map, $hooks);
+  $dsids = array();
+  $derived_dsids = array_map($dsid_map, $hooks);
+  while ($current = array_pop($derived_dsids)) {
+    $dsids[] = $current;
+    $current_derived = islandora_datastream_to_purge($object, $current);
+    $current_diff = array_diff($current_derived, $derived_dsids, $dsids);
+    $derived_dsids = array_merge($derived_dsids, $current_diff);
+  }
   return $dsids;
 }
 
