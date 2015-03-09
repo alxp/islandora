@@ -19,7 +19,13 @@
  *   The drupal form definition.
  */
 function islandora_delete_datastream_form(array $form, array &$form_state, AbstractDatastream $datastream) {
+  // XXX: Stashed version of datastream is deprecated... Use object and
+  // datastream IDs to acquire.
   $form_state['datastream'] = $datastream;
+  $form_state['datastream_info'] = array(
+    'object_id' => $datastream->parent->id,
+    'datastream_id' => $datastream->id,
+  );
   $object = $datastream->parent;
   $dsid = $datastream->id;
   $derivs = implode(', ', islandora_datastream_to_purge($object, $dsid));
@@ -87,9 +93,10 @@ function islandora_datastream_derivatives_purged(AbstractObject $object, $dsid) 
  *   The Drupal form state.
  */
 function islandora_delete_datastream_form_submit(array $form, array &$form_state) {
-  $datastream = $form_state['datastream'];
-  $datastream_id = $datastream->id;
-  $object = $datastream->parent;
+  $object = islandora_object_load($form_state['datastream_info']['object_id']);
+  $datastream_id = $form_state['datastream_info']['datastream_id'];
+  $datastream = $object[$datastream_id];
+
   $deleted = FALSE;
   if ($form_state['values']['delete_derivatives']) {
     islandora_datastream_derivatives_purged($object, $datastream_id);
