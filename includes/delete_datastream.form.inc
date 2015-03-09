@@ -35,9 +35,28 @@ function islandora_delete_datastream_form(array $form, array &$form_state, Abstr
     '#title' => t('Delete Derviatives'),
     '#type' => 'checkbox',
     '#default_value' => 0,
-    '#description' => t('Derivatives can be regenerated at a later time. <p><strong>Datastream(s) to be purged: </strong></p>@dsids', array(
-      '@dsids' => implode(', ', $dsids),
-    )),
+    '#description' => t('Derivatives can be regenerated at a later time.'),
+  );
+  $form['base_info'] = array(
+    '#type' => 'item',
+    '#title' => t('Datastream to be purged'),
+    '#markup' => $dsid,
+    '#states' => array(
+      'invisible' => array(
+        ':input[name="delete_derivatives"]' => array('checked' => TRUE),
+      ),
+    ),
+  );
+  $form['derivative_info'] = array(
+    '#type' => 'item',
+    '#title' => t('Datastream(s) to be purged'),
+    '#description' => t('Including detectable derivatives.'),
+    '#markup' => implode(', ', $dsids),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="delete_derivatives"]' => array('checked' => TRUE),
+      ),
+    ),
   );
   return confirm_form($form,
     t('Are you sure you want to delete the %dsid datastream?', array('%dsid' => $datastream->id)),
