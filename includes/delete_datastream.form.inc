@@ -20,20 +20,24 @@
  */
 function islandora_delete_datastream_form(array $form, array &$form_state, AbstractDatastream $datastream) {
   // XXX: Stashed version of datastream is deprecated... Use object and
-  // datastream IDs to acquire.
+  // datastream IDs from 'datastream_info' to acquire.
   $form_state['datastream'] = $datastream;
+
   $form_state['datastream_info'] = array(
     'object_id' => $datastream->parent->id,
     'datastream_id' => $datastream->id,
   );
   $object = $datastream->parent;
   $dsid = $datastream->id;
-  $derivs = implode(', ', islandora_datastream_to_purge($object, $dsid));
+  $dsids = array_merge(array($dsid), islandora_datastream_to_purge($object, $dsid));
+  $dsids = array_unique($dsids);
   $form['delete_derivatives'] = array(
     '#title' => t('Delete Derviatives'),
     '#type' => 'checkbox',
     '#default_value' => 0,
-    '#description' => t('Derivatives can be regenerated at a later time. <p><strong>Datastream(s) to be purged: </strong></p>@dsid, @derivs', array('@dsid' => $datastream->id, '@derivs' => $derivs)),
+    '#description' => t('Derivatives can be regenerated at a later time. <p><strong>Datastream(s) to be purged: </strong></p>@dsids', array(
+      '@dsids' => implode(', ', $dsids),
+    )),
   );
   return confirm_form($form,
     t('Are you sure you want to delete the %dsid datastream?', array('%dsid' => $datastream->id)),
