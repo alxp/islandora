@@ -47,6 +47,13 @@ function islandora_uninstall() {
   $variables = array(
     'islandora_ds_replace_exclude_enforced',
     'islandora_defer_derivatives_on_ingest',
+    'islandora_base_url',
+    'islandora_repository_pid',
+    'islandora_use_datastream_cache_headers',
+    'islandora_show_print_option',
+    'islandora_render_drupal_breadcrumbs',
+    'islandora_namespace_restriction_enforced',
+    'islandora_pids_allowed',
   );
   array_walk($variables, 'variable_del');
 }
