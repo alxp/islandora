@@ -245,7 +245,7 @@ function hook_cmodel_pid_islandora_object_ingested(AbstractObject $object) {
  * modifications, where as manipulating an object's datstreams are not.
  *
  * @param AbstractObject $object
- *   The object that was ingested.
+ *   The object that was modified.
  *
  * @todo We should also include what changes were made in a additional
  *   parameter.
@@ -254,7 +254,7 @@ function hook_islandora_object_modified(AbstractObject $object) {
 }
 
 /**
- * Notify modules that the given object was ingested.
+ * Notify modules that the given object was modified.
  *
  * @see hook_islandora_object_modified()
  */
