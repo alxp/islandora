@@ -245,7 +245,7 @@ function hook_cmodel_pid_islandora_object_ingested(AbstractObject $object) {
  * modifications, where as manipulating an object's datstreams are not.
  *
  * @param AbstractObject $object
- *   The object that was ingested.
+ *   The object that was modified.
  *
  * @todo We should also include what changes were made in a additional
  *   parameter.
@@ -254,7 +254,7 @@ function hook_islandora_object_modified(AbstractObject $object) {
 }
 
 /**
- * Notify modules that the given object was ingested.
+ * Notify modules that the given object was modified.
  *
  * @see hook_islandora_object_modified()
  */
@@ -361,9 +361,22 @@ function hook_cmodel_pid_islandora_datastream_purged(AbstractObject $object, $ds
  * @param AbstractObject $object
  *   The object to check.
  * @param string $dsid
- *   todo
+ *   A string indicating the datastream for which to get the registry.
+ *
+ * @return array
+ *   An array of associative arrays, each mapping:
+ *   - name: A string containg a human-readable name for the entry.
+ *   - url: A string containing the URL to which to the user will be routed.
  */
 function hook_islandora_edit_datastream_registry($object, $dsid) {
+  $routes = array();
+
+  $routes[] = array(
+    'name' => t('My Awesome Edit Route'),
+    'url' => "go/edit/here/{$object->id}/{$dsid}",
+  );
+
+  return $routes;
 }
 
 /**

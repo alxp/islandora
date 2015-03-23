@@ -25,10 +25,13 @@
  *   drupal_set_breadcrumb().
  */
 function islandora_get_breadcrumbs($object) {
-  $breadcrumbs = islandora_get_breadcrumbs_recursive($object->id, $object->repository);
-  array_pop($breadcrumbs);
-  $context = 'islandora';
-  drupal_alter('islandora_breadcrumbs', $breadcrumbs, $context, $object);
+  $breadcrumbs = array();
+  if (variable_get('islandora_render_drupal_breadcrumbs', TRUE)) {
+    $breadcrumbs = islandora_get_breadcrumbs_recursive($object->id, $object->repository);
+    array_pop($breadcrumbs);
+    $context = 'islandora';
+    drupal_alter('islandora_breadcrumbs', $breadcrumbs, $context, $object);
+  }
   return $breadcrumbs;
 }
 
