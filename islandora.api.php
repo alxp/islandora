@@ -601,7 +601,7 @@ function hook_cmodel_pid_islandora_overview_object(AbstractObject $object) {
  * Lets one alter the overview tab in object management.
  */
 function hook_islandora_overview_object_alter(AbstractObject &$object, &$output) {
-  $output = $output . drupal_render(drupal_get_form('some_form', $object));
+  $output = $output . drupal_render(drupal_get_form('some_form', $object)));
 }
 
 /**
@@ -610,7 +610,12 @@ function hook_islandora_overview_object_alter(AbstractObject &$object, &$output)
  * Content model specific.
  */
 function hook_cmodel_pid_islandora_overview_object_alter(AbstractObject &$object, &$output) {
-  $output = $output . drupal_render(drupal_get_form('some_form', $object));
+  $view = views_embed_view('usage_collection');
+  $form['islandora_manage_overview_object'] = array(
+    '#type' => 'item',
+    '#markup' => $view,
+  );
+  $output = $output . $form . drupal_render(drupal_get_form('some_form', $object)));
 }
 
 /**
