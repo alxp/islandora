@@ -713,5 +713,3 @@ function hook_islandora_metadata_display_info() {
     ),
   );
 }
-Status API Training Shop Blog About
-© 2015 GitHub, Inc. Terms Privacy Security Contact
