@@ -2104,7 +2104,7 @@ function islandora_conditionally_clear_cache() {
 
   $functions = array(
     // Object changes in response to a form.
-    'form_execute_handlers' => 'islandora_clear_cache_all',
+    'form_execute_handlers' => 'islandora_cache_clear_all',
     // Object changes in response to a batch. Note that this will not match on
     // a drush batch, as drush uses a different set of functions to run
     // batches. We intentionally do not clear batches in response to drush
