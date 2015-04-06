@@ -2096,8 +2096,9 @@ function islandora_conditionally_clear_cache() {
     $clear =& drupal_static(__FUNCTION__, FALSE);
   }
 
-  if ($clear) {
-    // Already set, no need to do so again.
+  if ($clear || !variable_get('cache', 0)) {
+    // Already set, no need to do so again, or page caching is disabled... Let's
+    // avoid a call to attempt to clear it.
     return;
   }
 
@@ -2144,9 +2145,10 @@ function islandora_schedule_cache_clear_for_batch() {
 
   $scheduled = isset($scheduled) || isset($batch['islandora_cache_clear_scheduled']);
 
-  if ($scheduled || !isset($batch['id'])) {
+  if ($scheduled || !isset($batch['id']) || drupal_is_cli()) {
     // We do not wish to do anything if we are either already scheduled or the
-    // batch is not running.
+    // batch is not running. Also, if the batch is running on the CLI (via drush
+    // or otherwise).
     return;
   }
 
