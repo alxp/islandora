@@ -74,12 +74,6 @@ function islandora_repository_admin(array $form, array &$form_state) {
           '#description' => t('Displays an extra print tab, allowing an object to be printed'),
           '#default_value' => variable_get('islandora_show_print_option', FALSE),
         ),
-        'islandora_render_drupal_breadcrumbs' => array(
-          '#type' => 'checkbox',
-          '#title' => t('Render Drupal breadcrumbs'),
-          '#description' => t('Larger sites may experience a notable performance improvement when disabled due to how breadcrumbs are constructed.'),
-          '#default_value' => variable_get('islandora_render_drupal_breadcrumbs', TRUE),
-        ),
       ),
       'islandora_namespace' => array(
         '#type' => 'fieldset',
