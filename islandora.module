@@ -1775,6 +1775,14 @@ function islandora_islandora_object_ingested(AbstractObject $object) {
     return;
   }
   islandora_run_derivatives($object, NULL);
+  islandora_conditionally_clear_cache();
+}
+
+/**
+ * Implements hook_islandora_object_modified().
+ */
+function islandora_islandora_object_modified(AbstractObject $object) {
+  islandora_conditionally_clear_cache();
 }
 
 /**
@@ -1790,6 +1798,7 @@ function islandora_islandora_datastream_ingested(AbstractObject $object, Abstrac
     return;
   }
   islandora_run_derivatives($object, $datastream->id);
+  islandora_conditionally_clear_cache();
 }
 
 /**
@@ -1806,6 +1815,22 @@ function islandora_islandora_datastream_modified(AbstractObject $object, Abstrac
     'force' => TRUE,
   ));
   islandora_derivative_logging($logging_results);
+  islandora_conditionally_clear_cache();
+}
+
+/**
+ * Implements hook_islandora_object_purged().
+ */
+function islandora_islandora_object_purged($pid) {
+  islandora_conditionally_clear_cache();
+}
+
+
+/**
+ * Implements hook_islandora_datastream_purged().
+ */
+function islandora_islandora_datastream_purged(AbstractObject $object, $dsid) {
+  islandora_conditionally_clear_cache();
 }
 
 /**
@@ -2056,4 +2081,87 @@ function islandora_entity_set_property(&$data, $name, $value, $langcode) {
   if (is_object($data)) {
     $data->$name = $value;
   }
+}
+
+/**
+ * Conditionally clear cache to alleviate cache thrashing.
+ *
+ * If we are responding to form submission or during a batch which ingested,
+ * modified or purged an object or datastream, we want to be sure to clear the
+ * cache at the end of the process.
+ */
+function islandora_conditionally_clear_cache() {
+  static $clear;
+  if (!isset($clear)) {
+    $clear =& drupal_static(__FUNCTION__, FALSE);
+  }
+
+  if ($clear || !variable_get('cache', 0)) {
+    // Already set, no need to do so again, or page caching is disabled... Let's
+    // avoid a call to attempt to clear it.
+    return;
+  }
+
+  $functions = array(
+    // Object changes in response to a form.
+    'form_execute_handlers' => 'islandora_cache_clear_all',
+    // Object changes in response to a batch. Note that this will not match on
+    // a drush batch, as drush uses a different set of functions to run
+    // batches. We intentionally do not clear batches in response to drush
+    // batches, since they are not in response to GUI actions.
+    '_batch_process' => 'islandora_schedule_cache_clear_for_batch',
+  );
+
+  foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS & ~DEBUG_BACKTRACE_PROVIDE_OBJECT) as $frame) {
+    $function_name = strtolower($frame['function']);
+    if (isset($functions[$function_name])) {
+      $clear = TRUE;
+      $function = $functions[$function_name];
+      $function();
+      return;
+    }
+  }
+}
+
+/**
+ * Clear the page and block caches at the end of the request.
+ */
+function islandora_cache_clear_all() {
+  // Advanced "static" handling, as this may be called fairly often.
+  static $clear;
+  if (isset($clear)) {
+    $clear =& drupal_static(__FUNCTION__, FALSE);
+  }
+
+  if (!$clear) {
+    $clear = TRUE;
+    drupal_register_shutdown_function('cache_clear_all');
+  }
+}
+
+/**
+ * Set a batch to clear the page and block caches.
+ */
+function islandora_schedule_cache_clear_for_batch() {
+  $batch =& batch_get();
+  static $scheduled;
+
+  $scheduled = isset($scheduled) || isset($batch['islandora_cache_clear_scheduled']);
+
+  if ($scheduled || !isset($batch['id'])) {
+    // We do not wish to do anything if we are either already scheduled or the
+    // batch is not running.
+    return;
+  }
+
+  $clear_batch = array(
+    'operations' => array(
+      array('islandora_cache_clear_all', array()),
+    ),
+  );
+  batch_set($clear_batch);
+
+  // Set our flag, to avoid setting the batch multiple times during multiple
+  // iterations/operations of a single batch.
+  $batch['islandora_cache_clear_scheduled'] = TRUE;
 }
