@@ -33,6 +33,7 @@ function hook_islandora_view_object($object, $user, $page_number, $page_size) {
   }
   return $output;
 }
+
 /**
  * Generate a print friendly page for the given object.
  *
@@ -40,7 +41,9 @@ function hook_islandora_view_object($object, $user, $page_number, $page_size) {
  *   The object form to print.
  */
 function hook_islandora_view_print_object($object) {
+
 }
+
 /**
  * Generate an object's display for the given content model.
  *
@@ -54,7 +57,9 @@ function hook_islandora_view_print_object($object) {
  *   An array whose values are markup.
  */
 function hook_cmodel_pid_islandora_view_object($object) {
+
 }
+
 /**
  * Alter display output after it has been generated.
  *
@@ -64,7 +69,9 @@ function hook_cmodel_pid_islandora_view_object($object) {
  *   The array of rendered views.
  */
 function hook_islandora_view_object_alter(&$object, &$rendered) {
+
 }
+
 /**
  * Alter display output if the object has the given model.
  *
@@ -76,7 +83,9 @@ function hook_islandora_view_object_alter(&$object, &$rendered) {
  *   The array of rendered views.
  */
 function hook_cmodel_pid_islandora_view_object_alter(&$object, &$rendered) {
+
 }
+
 /**
  * Generate an object's datastreams management display.
  *
@@ -87,7 +96,9 @@ function hook_cmodel_pid_islandora_view_object_alter(&$object, &$rendered) {
  *   An array whose values are markup.
  */
 function hook_islandora_edit_object($object) {
+
 }
+
 /**
  * Generate an object's datastreams management display based on content model.
  *
@@ -101,7 +112,9 @@ function hook_islandora_edit_object($object) {
  *   An array whose values are markup.
  */
 function hook_cmodel_pid_islandora_edit_object($object) {
+
 }
+
 /**
  * Allow datastreams management display output to be altered.
  *
@@ -111,7 +124,9 @@ function hook_cmodel_pid_islandora_edit_object($object) {
  *   an arr of rendered views
  */
 function hook_islandora_edit_object_alter(&$object, &$rendered) {
+
 }
+
 /**
  * Allows modules to alter the object or block/modify the given action.
  *
@@ -142,14 +157,18 @@ function hook_islandora_edit_object_alter(&$object, &$rendered) {
  * @see FedoraApiM::modifyObject()
  */
 function hook_islandora_object_alter(AbstractObject $object, array &$context) {
+
 }
+
 /**
  * Allows modules to alter the object or block/modify the given action.
  *
  * @see hook_islandora_object_alter()
  */
 function hook_cmodel_pid_islandora_object_alter(AbstractObject $object, array &$context) {
+
 }
+
 /**
  * Allows modules to alter the datastream or block/modify the given action.
  *
@@ -189,14 +208,18 @@ function hook_cmodel_pid_islandora_object_alter(AbstractObject $object, array &$
  * @see FedoraApiM::modifyDatastream()
  */
 function hook_islandora_datastream_alter(AbstractObject $object, AbstractDatastream $datastream, array &$context) {
+
 }
+
 /**
  * Allows modules to alter the datastream or block/modify the given action.
  *
  * @see hook_islandora_datastream_alter()
  */
 function hook_cmodel_pid_dsid_islandora_datastream_alter(AbstractObject $object, AbstractDatastream $datastream, array &$context) {
+
 }
+
 /**
  * Notify modules that the given object was ingested.
  *
@@ -211,14 +234,18 @@ function hook_cmodel_pid_dsid_islandora_datastream_alter(AbstractObject $object,
  *   The object that was ingested.
  */
 function hook_islandora_object_ingested(AbstractObject $object) {
+
 }
+
 /**
  * Notify modules that the given object was ingested.
  *
  * @see hook_islandora_object_ingested()
  */
 function hook_cmodel_pid_islandora_object_ingested(AbstractObject $object) {
+
 }
+
 /**
  * Notify modules that the given object was modified.
  *
@@ -234,14 +261,18 @@ function hook_cmodel_pid_islandora_object_ingested(AbstractObject $object) {
  *   parameter.
  */
 function hook_islandora_object_modified(AbstractObject $object) {
+
 }
+
 /**
  * Notify modules that the given object was modified.
  *
  * @see hook_islandora_object_modified()
  */
 function hook_cmodel_pid_islandora_object_modified(AbstractObject $object) {
+
 }
+
 /**
  * Notify modules that the given object was purged/deleted.
  *
@@ -252,14 +283,18 @@ function hook_cmodel_pid_islandora_object_modified(AbstractObject $object) {
  *   The ID of the object that was purged/deleted.
  */
 function hook_islandora_object_purged($pid) {
+
 }
+
 /**
  * Notify modules that the given object was purged/deleted.
  *
  * @see hook_islandora_object_purged()
  */
 function hook_cmodel_pid_islandora_object_purged($pid) {
+
 }
+
 /**
  * Notify modules that the given datastream was ingested.
  *
@@ -275,14 +310,18 @@ function hook_cmodel_pid_islandora_object_purged($pid) {
  *   The ingested datastream.
  */
 function hook_islandora_datastream_ingested(AbstractObject $object, AbstractDatastream $datastream) {
+
 }
+
 /**
  * Notify modules that the given datastream was ingested.
  *
  * @see hook_islandora_object_ingested()
  */
 function hook_cmodel_pid_dsid_islandora_datastream_ingested(AbstractObject $object, AbstractDatastream $datastream) {
+
 }
+
 /**
  * Notify modules that the given datastream was modified.
  *
@@ -300,14 +339,18 @@ function hook_cmodel_pid_dsid_islandora_datastream_ingested(AbstractObject $obje
  *   parameter.
  */
 function hook_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream) {
+
 }
+
 /**
  * Notify modules that the given datastream was modified.
  *
  * @see hook_islandora_datastream_modified()
  */
 function hook_cmodel_pid_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream) {
+
 }
+
 /**
  * Notify modules that the given datastream was purged/deleted.
  *
@@ -320,14 +363,18 @@ function hook_cmodel_pid_islandora_datastream_modified(AbstractObject $object, A
  *   The ID of the datastream that was purged/deleted.
  */
 function hook_islandora_datastream_purged(AbstractObject $object, $dsid) {
+
 }
+
 /**
  * Notify modules that the given datastream was purged/deleted.
  *
  * @see hook_islandora_datastream_purged()
  */
 function hook_cmodel_pid_islandora_datastream_purged(AbstractObject $object, $dsid) {
+
 }
+
 /**
  * Register a datastream edit route/form.
  *
@@ -349,6 +396,7 @@ function hook_islandora_edit_datastream_registry($object, $dsid) {
   );
   return $routes;
 }
+
 /**
  * Registry hook for required objects.
  *
@@ -361,7 +409,9 @@ function hook_islandora_edit_datastream_registry($object, $dsid) {
  * @example islandora_islandora_required_objects()
  */
 function hook_islandora_required_objects() {
+
 }
+
 /**
  * Registry hook for viewers that can be implemented by solution packs.
  *
@@ -372,7 +422,9 @@ function hook_islandora_required_objects() {
  * @see islandora_get_viewer_callback()
  */
 function hook_islandora_viewer_info() {
+
 }
+
 /**
  * Returns a list of datastreams that are determined to be undeletable.
  *
@@ -387,6 +439,7 @@ function hook_islandora_viewer_info() {
 function hook_islandora_undeletable_datastreams(array $models) {
   return array('DC', 'MODS');
 }
+
 /**
  * Define steps used in the islandora_ingest_form() ingest process.
  *
@@ -446,6 +499,7 @@ function hook_islandora_ingest_steps(array $form_state) {
     ),
   );
 }
+
 /**
  * Alter the generated ingest steps.
  *
@@ -456,7 +510,9 @@ function hook_islandora_ingest_steps(array $form_state) {
  *   An array containing the Drupal form_state.
  */
 function hook_islandora_ingest_steps_alter(array &$steps, array &$form_state) {
+
 }
+
 /**
  * Content model specific version of hook_islandora_ingest_steps().
  *
@@ -468,7 +524,9 @@ function hook_islandora_ingest_steps_alter(array &$steps, array &$form_state) {
  * @see hook_islandora_ingest_steps()
  */
 function hook_cmodel_pid_islandora_ingest_steps(array $form_state) {
+
 }
+
 /**
  * Alter the generated ingest steps for the given content model.
  *
@@ -479,7 +537,9 @@ function hook_cmodel_pid_islandora_ingest_steps(array $form_state) {
  *   An array containing the Drupal form_state.
  */
 function hook_cmodel_pid_islandora_ingest_steps_alter(array &$steps, array &$form_state) {
+
 }
+
 /**
  * Object-level access callback hook.
  *
@@ -507,13 +567,16 @@ function hook_islandora_object_access($op, $object, $user) {
       return NULL;
   }
 }
+
 /**
  * Content model specific version of hook_islandora_object_access().
  *
  * @see hook_islandora_object_access()
  */
 function hook_cmodel_pid_islandora_object_access($op, $object, $user) {
+
 }
+
 /**
  * Datastream-level access callback hook.
  *
@@ -541,19 +604,23 @@ function hook_islandora_datastream_access($op, $object, $user) {
       return NULL;
   }
 }
+
 /**
  * Content model specific version of hook_islandora_datastream_access().
  *
  * @see hook_islandora_datastream_access()
  */
 function hook_cmodel_pid_islandora_datastream_access($op, $object, $user) {
+
 }
+
 /**
  * Lets one add to the overview tab in object management.
  */
 function hook_islandora_overview_object(AbstractObject $object) {
   return drupal_render(drupal_get_form('some_form', $object));
 }
+
 /**
  * Lets one add to the overview tab in object management.
  *
@@ -562,12 +629,14 @@ function hook_islandora_overview_object(AbstractObject $object) {
 function hook_cmodel_pid_islandora_overview_object(AbstractObject $object) {
   return drupal_render(drupal_get_form('some_form', $object));
 }
+
 /**
  * Lets one alter the overview tab in object management.
  */
 function hook_islandora_overview_object_alter(AbstractObject &$object, &$output) {
   $output = $output . drupal_render(drupal_get_form('some_form', $object));
 }
+
 /**
  * Lets one alter the overview tab in object management.
  *
@@ -576,6 +645,7 @@ function hook_islandora_overview_object_alter(AbstractObject &$object, &$output)
 function hook_cmodel_pid_islandora_overview_object_alter(AbstractObject &$object, &$output) {
   $output = $output . drupal_render(drupal_get_form('some_form', $object));
 }
+
 /**
  * Defines derivative functions to be executed based on certain conditions.
  *
@@ -648,13 +718,16 @@ function hook_islandora_derivative(AbstractObject $object = NULL) {
   );
   return $derivatives;
 }
+
 /**
  * Content model specific version of hook_islandora_derivative().
  *
  * @see hook_islandora_derivative()
  */
 function hook_cmodel_pid_islandora_derivative() {
+
 }
+
 /**
  * Retrieves PIDS of related objects for property updating.
  *
@@ -669,6 +742,7 @@ function hook_islandora_update_related_objects_properties(AbstractObject $object
   }
   return $pids_to_return;
 }
+
 /**
  * Alters breadcrumbs used on Solr search results and within Islandora views.
  *
@@ -680,7 +754,9 @@ function hook_islandora_update_related_objects_properties(AbstractObject $object
  *   (Optional) AbstractObject representing object providing breadcrumb path
  */
 function hook_islandora_breadcrumbs_alter(&$breadcrumbs, $context, $object = NULL) {
+
 }
+
 /**
  * Registry hook for metadata display viewers.
  *
