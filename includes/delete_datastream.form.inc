@@ -34,7 +34,7 @@ function islandora_delete_datastream_form(array $form, array &$form_state, Abstr
     '#title' => t('Delete Derivatives'),
     '#type' => 'checkbox',
     '#default_value' => 0,
-        '#description' => t('Derivatives can be regenerated at a later time.'),
+    '#description' => t('Derivatives can be regenerated at a later time.'),
   );
   $form['base_info'] = array(
     '#type' => 'item',
