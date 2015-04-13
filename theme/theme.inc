@@ -263,6 +263,7 @@ function islandora_objects_object_mapper($object_id) {
 
   $module_path = drupal_get_path('module', 'islandora');
 
+  $url = "islandora/object/{$object_id}";
   $img = array(
     '#theme' => 'image',
     '#path' => ($o && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $o['TN']) ?
@@ -273,7 +274,6 @@ function islandora_objects_object_mapper($object_id) {
   $img = drupal_render($img);
 
   if ($o) {
-    $url = "islandora/object/{$o->id}";
     $link_options = array('html' => TRUE, 'attributes' => array('title' => $o->label));
     $description = NULL;
     if (isset($o['DC']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $o['DC'])) {
@@ -292,7 +292,6 @@ function islandora_objects_object_mapper($object_id) {
     );
   }
   else {
-    $url = "islandora/object/$object_id";
     $link_options = array('html' => TRUE, 'attributes' => array('title' => t('(Unknown)')));
     return array(
       'label' => t('(Unknown)'),
