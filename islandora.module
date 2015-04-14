@@ -474,6 +474,18 @@ function islandora_theme() {
         'limit' => 10,
       ),
     ),
+    // Render a bunch of objects as either a grid or a list.
+    'islandora_objects_subset' => array(
+      'file' => 'theme/theme.inc',
+      'template' => 'theme/islandora-objects',
+      'variables' => array(
+        'objects' => NULL,
+        'display' => 'grid',
+        'limit' => 10,
+        'total' => NULL,
+        'pager_element' => 0,
+      ),
+    ),
     // Render a bunch of objects as a grid.
     'islandora_objects_grid' => array(
       'file' => 'theme/theme.inc',

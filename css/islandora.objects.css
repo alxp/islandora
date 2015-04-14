@@ -2,11 +2,26 @@
  * @file
  * Styles for rendering grids/lists of objects.
  */
-.islandora-objects-display-switch {
-  float: right;
+
+.islandora-objects-list-item {
+  clear: both;
+  width: 100%;
 }
-.islandora-objects-grid-item {
-  display: inline-block;
+
+.islandora-objects-list-item dl dt {
+  clear: left;
+  float: left;
+  padding: 3px 0 0;
+  text-align: center;
+  width: 100px;
+}
+
+.islandora-objects-list-item dl dd {
+  margin: 0 0 0 130px;
+}
+
+/*Grid - Displays grid using dl formatted inline */
+.islandora-objects-grid dl {
   width: 20%;
   min-width: 100px;
   min-height: 180px;
@@ -18,22 +33,16 @@
   *display: inline;
   _height: 180px;
 }
-.islandora-objects-list-item {
-  padding-bottom: 1.5em;
-  border-bottom: 1px solid #ddd;
+
+.islandora-objects-grid-item {
+  display: inline;
 }
-.islandora-objects-list-item .islandora-object-thumb {
-  clear: left;
-  float: left;
-  padding: 3px 0 0;
-  text-align: center;
-  width: 100px;
+
+.islandora-objects-grid dd {
+  margin: 0;
+  padding: 0;
 }
-.islandora-objects-list-item .islandora-object-caption, .islandora-objects-list-item .islandora-object-description {
-  margin: 0 0 0 130px;
-  padding-top: 2px;
-  padding-bottom: 2px;
-}
-.islandora-object-thumb img {
-  width: 100%;
+
+.islandora-objects-display-switch {
+  float: right;
 }

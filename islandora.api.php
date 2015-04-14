@@ -3,6 +3,7 @@
  * @file
  * This file documents all available hook functions to manipulate data.
  */
+
 /**
  * Generate a repository objects view.
  *
@@ -561,8 +562,10 @@ function hook_islandora_object_access($op, $object, $user) {
   switch ($op) {
     case 'create stuff':
       return TRUE;
+
     case 'break stuff':
       return FALSE;
+
     case 'do a barrel roll!':
       return NULL;
   }
@@ -598,8 +601,10 @@ function hook_islandora_datastream_access($op, $object, $user) {
   switch ($op) {
     case 'create stuff':
       return TRUE;
+
     case 'break stuff':
       return FALSE;
+
     case 'do a barrel roll!':
       return NULL;
   }

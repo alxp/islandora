@@ -202,7 +202,7 @@ function theme_islandora_object_print(array &$variables) {
 /**
  * Implements hook_preprocess_theme().
  */
-function islandora_preprocess_islandora_objects(array &$variables) {
+function template_preprocess_islandora_objects(array &$variables) {
   $display = (empty($_GET['display'])) ? 'grid' : $_GET['display'];
   $grid_display = $display == 'grid';
   $list_display = !$grid_display;
@@ -210,17 +210,21 @@ function islandora_preprocess_islandora_objects(array &$variables) {
   $variables['display_links'] = array(
     array(
       'title' => t('Grid view'),
-      'href' => url($_GET['q'], array('absolute' => TRUE)),
+      'href' => current_path(),
       'attributes' => array(
-        'class' => $grid_display ? 'active' : '',
+        'class' => array(
+          $grid_display ? 'active' : '',
+        ),
       ),
       'query' => array('display' => 'grid') + $query_params,
     ),
     array(
       'title' => t('List view'),
-      'href' => url($_GET['q'], array('absolute' => TRUE)),
+      'href' => current_path(),
       'attributes' => array(
-        'class' => $list_display ? 'active' : '',
+        'class' => array(
+          $list_display ? 'active' : '',
+        ),
       ),
       'query' => array('display' => 'list') + $query_params,
     ),
@@ -228,18 +232,49 @@ function islandora_preprocess_islandora_objects(array &$variables) {
   // Pager.
   $objects = $variables['objects'];
   $limit = $variables['limit'];
-  $page_size = $variables['page_size'];
   $page = pager_default_initialize(count($objects), $limit);
   $objects = array_slice($objects, $page * $limit, $limit);
   $variables['pager'] = theme('pager', array('quantity' => 10));
-  // Content.
-  $map_objects = function($o) {
-    $o = islandora_object_load($o);
-    $url = "islandora/object/{$o->id}";
+
+  $objects = array_map('islandora_objects_object_mapper', $objects);
+  $theme = $grid_display ? 'islandora_objects_grid' : 'islandora_objects_list';
+  $variables['content'] = theme($theme, array('objects' => $objects));
+  $module_path = drupal_get_path('module', 'islandora');
+  drupal_add_css("$module_path/css/islandora.objects.css");
+}
+
+/**
+ * Helper function to map objects to their values to be used in templates.
+ *
+ * @param string $object_id
+ *   The ID of the object for which to produce a list of values.
+ *
+ * @return array
+ *   An associative array of values, including:
+ *   - label: A string containing object's label.
+ *   - class: A string containing an HTML class to add to markup representing
+ *     the object.
+ *   - link: A string containing a textual HTML link to the object.
+ *   - thumb: A string containing an image HTML link to the object.
+ *   - description: A string containing a description of the object.
+ */
+function islandora_objects_object_mapper($object_id) {
+  $o = islandora_object_load($object_id);
+
+  $module_path = drupal_get_path('module', 'islandora');
+
+  $url = "islandora/object/{$object_id}";
+  $img = array(
+    '#theme' => 'image',
+    '#path' => ($o && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $o['TN']) ?
+      "$url/datastream/TN/view" :
+      "$module_path/images/folder.png"),
+    '#attributes' => array(),
+  );
+  $img = drupal_render($img);
+
+  if ($o) {
     $link_options = array('html' => TRUE, 'attributes' => array('title' => $o->label));
-    $img = islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $o['TN']) ?
-      theme('image', array('path' => url("$url/datastream/TN/view"), 'attributes' => array())) :
-      '';
     $description = NULL;
     if (isset($o['DC']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $o['DC'])) {
       $dc = DublinCore::importFromXMLString($o['DC']->content);
@@ -255,12 +290,107 @@ function islandora_preprocess_islandora_objects(array &$variables) {
       'thumb' => l($img, $url, $link_options),
       'description' => $description,
     );
-  };
-  $objects = array_map($map_objects, $objects);
-  $theme = $grid_display ? 'islandora_objects_grid' : 'islandora_objects_list';
-  $variables['content'] = theme($theme, array('objects' => $objects));
+  }
+  else {
+    $link_options = array('html' => TRUE, 'attributes' => array('title' => t('(Unknown)')));
+    return array(
+      'label' => t('(Unknown)'),
+      'class' => drupal_strtolower(preg_replace('/[^A-Za-z0-9]/', '-', $object_id)),
+      'link' => l(t('(Unknown)'), $url, $link_options),
+      'thumb' => '',
+      'description' => '',
+    );
+  }
+}
+
+/**
+ * Prepares variables for islandora_objects_subset templates.
+ *
+ * A variant of "islandora_objects" which accepts a subset of object to theme.
+ *
+ * @see template_preprocess_islandora_objects()
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - objects: An array of PIDs to render for the given page.
+ *   - limit: An integer indicating the number of items per page, so we can
+ *     render a pager.
+ *   - total: An integer indicating the total number of items in the set, so
+ *     can render a pager.
+ *   - pager_element: An integer identifying which "pager" this display should
+ *     use. Defaults to 0.
+ *   - display: The default display to use when one is not provided in the URL.
+ *     One of:
+ *     - 'grid'
+ *     - 'list'
+ *   This function sets:
+ *   - display_links: An array containing link structure, to allow the view to
+ *     be toggled between a "grid" and "list" view.
+ *   - pager: A renderable array for the pager.
+ *   - content: A renderable array for the main content of the page.
+ */
+function template_preprocess_islandora_objects_subset(&$variables) {
+  $display = (empty($_GET['display'])) ? $variables['display'] : $_GET['display'];
+  $grid_display = $display == 'grid';
+  $list_display = !$grid_display;
+  $query_params = drupal_get_query_parameters($_GET);
+
+  // XXX: In l(), Drupal automatically adds the "active" class if it looks like
+  // you are generating a link to the same page, based on the path and language.
+  // Here, we use the "language" side of things to assert our links belong to a
+  // non-existent language, so we can take control of adding our "active" class.
+  $language_hack = new stdClass();
+  $language_hack->language = 'a-non-existent-language';
+
+  $variables['display_links'] = array(
+    array(
+      'title' => t('Grid view'),
+      'href' => current_path(),
+      'attributes' => array(
+        'class' => array(
+          $grid_display ? 'active' : '',
+        ),
+      ),
+      'query' => array('display' => 'grid') + $query_params,
+      'language' => $language_hack,
+    ),
+    array(
+      'title' => t('List view'),
+      'href' => current_path(),
+      'attributes' => array(
+        'class' => array(
+          $list_display ? 'active' : '',
+        ),
+      ),
+      'query' => array('display' => 'list') + $query_params,
+      'language' => $language_hack,
+    ),
+  );
+
+  $variables['pager'] = array(
+    '#theme' => 'pager',
+    '#element' => $variables['pager_element'],
+  );
   $module_path = drupal_get_path('module', 'islandora');
-  drupal_add_css("$module_path/css/islandora.objects.css");
+  $variables['content'] = array(
+    '#attached' => array(
+      'css' => array(
+        "$module_path/css/islandora.objects.css",
+      ),
+    ),
+    '#theme' => $grid_display ? 'islandora_objects_grid' : 'islandora_objects_list',
+    '#objects' => $variables['objects'],
+  );
+}
+
+/**
+ * Process variables for islandora_objects_subset templates.
+ */
+function template_process_islandora_objects_subset(&$variables) {
+  pager_default_initialize($variables['total'], $variables['limit'], $variables['pager_element']);
+  $variables['pager'] = drupal_render($variables['pager']);
+  $variables['content']['#objects'] = array_map('islandora_objects_object_mapper', $variables['content']['#objects']);
+  $variables['content'] = drupal_render($variables['content']);
 }
 
 /**
