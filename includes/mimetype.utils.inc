@@ -22,7 +22,11 @@ function islandora_get_extension_for_mimetype($mimetype) {
   $mimetype_mapping = file_mimetype_mapping();
   $extension_index = array_search($mimetype, $mimetype_mapping['mimetypes']);
   if ($extension_index !== FALSE) {
-    $extension = array_search($extension_index, $mimetype_mapping['extensions']);
+    // Reversing such that any altered values take precedence over the default
+    // mappings. As such we need to handle the case of application/xml mapping
+    // to .xml.
+    $mime_array_flipped = array_reverse($mimetype_mapping['extensions']);
+    $extension = array_search($extension_index, $mime_array_flipped);
   }
 
   // We can only have one mapping in drupal for 'xml'.
