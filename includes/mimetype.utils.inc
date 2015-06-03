@@ -22,6 +22,8 @@ function islandora_get_extension_for_mimetype($mimetype) {
   $mimetype_mapping = file_mimetype_mapping();
   $extension_index = array_search($mimetype, $mimetype_mapping['mimetypes']);
   if ($extension_index !== FALSE) {
+    // Reversing such that any altered values take precedence over the default
+    // mappings.
     $mime_array_flipped = array_reverse($mimetype_mapping['extensions']);
     $extension = array_search($extension_index, $mime_array_flipped);
   }
