@@ -14,9 +14,8 @@
  *   The rendered JSON results.
  */
 function islandora_mime_type_autocomplete($string) {
-  module_load_include('inc', 'islandora', 'includes/mime_detect');
-  $mime_detect = new MimeDetect();
-  $mime_types = $mime_detect->getMimeTypes();
+  require_once DRUPAL_ROOT . "/includes/file.mimetypes.inc";
+  $mime_types = file_mimetype_mapping();
   $output = array();
   foreach ($mime_types as $mime_type) {
     if (preg_match("/{$string}/i", $mime_type) !== 0) {
