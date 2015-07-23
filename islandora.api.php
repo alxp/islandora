@@ -805,6 +805,6 @@ function hook_islandora_metadata_display_info() {
 function hook_islandora_get_breadcrumb_query_predicates() {
   return array(
     'somepredicate',
-    'someotherpredicate,'
+    'someotherpredicate',
   );
 }
