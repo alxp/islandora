@@ -794,3 +794,25 @@ function hook_islandora_metadata_display_info() {
     ),
   );
 }
+
+/**
+ * Allows modifications to the object whose metadata is being rendered.
+ *
+ * @param AbstractObject $object
+ *   An AbstractObject representing an object within Fedora.
+ */
+function hook_islandora_metadata_object_alter(AbstractObject &$object) {
+  $this_other_object = islandora_object_load('awild:indirectionappears');
+  $object = $this_other_object;
+}
+
+/**
+ * Allows modifications to the object whose metadata is being rendered.
+ *
+ * @param AbstractObject $object
+ *   An AbstractObject representing an object within Fedora.
+ */
+function hook_islandora_metadata_object_description_alter(AbstractObject &$object) {
+  $this_other_object = islandora_object_load('awild:indirectionappears');
+  $object = $this_other_object;
+}
