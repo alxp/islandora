@@ -794,3 +794,17 @@ function hook_islandora_metadata_display_info() {
     ),
   );
 }
+
+/**
+ * Defines predicates to be searched for when constructing breadcrumbs.
+ *
+ * @return array
+ *   An array containing strings of predicates to be ORed together to be
+ *   matched on in SPARQL.
+ */
+function hook_islandora_get_breadcrumb_query_predicates() {
+  return array(
+    'somepredicate',
+    'someotherpredicate',
+  );
+}

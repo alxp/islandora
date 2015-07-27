@@ -49,6 +49,7 @@ define('ISLANDORA_POST_INGEST_HOOK', 'islandora_ingest_post_ingest');
 define('ISLANDORA_PRE_PURGE_OBJECT_HOOK', 'islandora_pre_purge_object');
 define('ISLANDORA_POST_PURGE_OBJECT_HOOK', 'islandora_post_purge_object');
 define('ISLANDORA_UPDATE_RELATED_OBJECTS_PROPERTIES_HOOK', 'islandora_update_related_objects_properties');
+define('ISLANDORA_BREADCRUMB_FILTER_PREDICATE_HOOK', 'islandora_get_breadcrumb_query_predicates');
 
 // @todo Add Documentation.
 define('ISLANDORA_OBJECT_INGESTED_HOOK', 'islandora_object_ingested');
@@ -2185,4 +2186,15 @@ function islandora_schedule_cache_clear_for_batch() {
   // Set our flag, to avoid setting the batch multiple times during multiple
   // iterations/operations of a single batch.
   $batch['islandora_cache_clear_scheduled'] = TRUE;
+}
+
+/**
+ * Implements hook_islandora_get_breadcrumb_query_predicates().
+ */
+function islandora_islandora_get_breadcrumb_query_predicates(AbstractObject $object) {
+  return array(
+    'fedora-rels-ext:isPartOf',
+    'fedora-rels-ext:isMemberOfCollection',
+    'fedora-rels-ext:isMemberOf',
+  );
 }
