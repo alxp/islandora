@@ -20,6 +20,8 @@ function islandora_retrieve_metadata_markup(AbstractObject $object, $print = FAL
   $viewer = variable_get('islandora_metadata_display', 'dublin_core');
   $markup = '';
   if (isset($viewers[$viewer]['metadata callback'])) {
+    $hooks = islandora_build_hook_list(ISLANDORA_METADATA_OBJECT_ALTER, $object->models);
+    drupal_alter($hooks, $object);
     $markup = call_user_func($viewers[$viewer]['metadata callback'], $object, $print);
     // The callback doesn't have any markup provided for this particular object,
     // default back to the dublin_core display.
@@ -44,6 +46,8 @@ function islandora_retrieve_description_markup(AbstractObject $object) {
   $viewer = variable_get('islandora_metadata_display', 'dublin_core');
   $markup = '';
   if (isset($viewers[$viewer]['description callback'])) {
+    $hooks = islandora_build_hook_list(ISLANDORA_METADATA_OBJECT_DESCRIPTION_ALTER, $object->models);
+    drupal_alter($hooks, $object);
     $markup = call_user_func($viewers[$viewer]['description callback'], $object);
     // The callback doesn't have any markup provided for this particular object,
     // default back to the dublin_core display.
