@@ -816,3 +816,17 @@ function hook_islandora_metadata_object_description_alter(AbstractObject &$objec
   $this_other_object = islandora_object_load('awild:indirectionappears');
   $object = $this_other_object;
 }
+
+/**
+ * Defines predicates to be searched for when constructing breadcrumbs.
+ *
+ * @return array
+ *   An array containing strings of predicates to be ORed together to be
+ *   matched on in SPARQL.
+ */
+function hook_islandora_get_breadcrumb_query_predicates() {
+  return array(
+    'somepredicate',
+    'someotherpredicate',
+  );
+}
