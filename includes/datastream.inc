@@ -441,8 +441,9 @@ function islandora_view_datastream_deliver_chunks(AbstractDatastream $datastream
  *   The URI of the file.
  */
 function islandora_view_datastream_retrieve_file_uri(AbstractDatastream $datastream) {
-  $mime_detect = new MimeDetect();
-  $extension = $mime_detect->getExtension($datastream->mimetype);
+  module_load_include('inc', 'islandora', 'includes/mimetype.utils');
+
+  $extension = islandora_get_extension_for_mimetype($datastream->mimetype);
   $file_uri = 'temporary://chunk_' . $datastream->parent->id . '_' . $datastream->id . '_' . $datastream->createdDate->getTimestamp() . '.' . $extension;
   if (!file_exists($file_uri)) {
     $file = new stdClass();
