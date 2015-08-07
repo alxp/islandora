@@ -474,7 +474,7 @@ function islandora_theme() {
         'objects' => NULL,
         'display' => NULL,
         'page_size' => 20,
-        'limit' => 10,
+        'limit' => 12,
       ),
     ),
     // Render a bunch of objects as either a grid or a list.
