@@ -5,3 +5,4 @@ package = Testing
 hidden = TRUE
 dependencies[] = islandora
 files[] = islandora_hooks_test.module
+version = 7.x-dev
