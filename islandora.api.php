@@ -734,6 +734,25 @@ function hook_cmodel_pid_islandora_derivative() {
 }
 
 /**
+ * Allows for the altering of defined derivative functions.
+ */
+function hook_islandora_derivative_alter(&$derivatives, AbstractObject $object) {
+  foreach ($derivatives as $key => $derivative) {
+    if ($derivative['destination_dsid'] == 'TN') {
+      unset($derivatives[$key]);
+    }
+  }
+}
+
+/**
+ * Content model specific version of hook_islandora_derivative_alter().
+ *
+ * @see hook_islandora_derivative_alter()
+ */
+function hook_cmodel_pid_islandora_derivative_alter() {
+}
+
+/**
  * Retrieves PIDS of related objects for property updating.
  *
  * @param AbstractObject $object

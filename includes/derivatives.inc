@@ -79,28 +79,26 @@ function islandora_run_derivatives(AbstractObject $object, $dsid) {
  *       watchdog if not defined.
  */
 function islandora_do_derivatives(AbstractObject $object, array $options) {
-  module_load_include('inc', 'islandora', 'includes/utilities');
-  $options += array(
-    'force' => FALSE,
-  );
-  $hooks = islandora_invoke_hook_list(ISLANDORA_DERIVATIVE_CREATION_HOOK, $object->models, array($object));
-  uasort($hooks, 'drupal_sort_weight');
   $results = array();
-  $hooks = islandora_filter_derivatives($hooks, $options, $object);
-
-  foreach ($hooks as $hook) {
-    if (isset($hook['file'])) {
-      require_once $hook['file'];
+  $derivatives = islandora_get_derivative_list($object, $options);
+  foreach ($derivatives as $derivative) {
+    if (isset($derivative['file'])) {
+      require_once $derivative['file'];
     }
-    foreach ($hook['function'] as $function) {
+    foreach ($derivative['function'] as $function) {
       if (function_exists($function)) {
-        $logging = call_user_func($function, $object, $options['force'], $hook);
+        $logging = call_user_func($function, $object, $options['force'], $derivative);
         if (!empty($logging)) {
           $results[] = $logging;
         }
       }
       else {
-        watchdog('islandora', 'Unable to call derivative function @function as it was not found!', array('@function' => $function), WATCHDOG_ERROR);
+        watchdog(
+          'islandora',
+          'Unable to call derivative function @function as it was not found!',
+          array('@function' => $function),
+          WATCHDOG_ERROR
+        );
       }
     }
   }
@@ -172,21 +170,14 @@ function islandora_derivative_logging(array $logging_results) {
  *   An array of operations to be called from within a batch.
  */
 function islandora_do_batch_derivatives(AbstractObject $object, array $options) {
-  module_load_include('inc', 'islandora', 'includes/utilities');
-  $options += array(
-    'force' => FALSE,
-  );
-  $hooks = islandora_invoke_hook_list(ISLANDORA_DERIVATIVE_CREATION_HOOK, $object->models, array($object));
-  uasort($hooks, 'drupal_sort_weight');
   $operations = array();
-
-  $hooks = islandora_filter_derivatives($hooks, $options, $object);
-  foreach ($hooks as $hook) {
+  $derivatives = islandora_get_derivative_list($object, $options);
+  foreach ($derivatives as $derivative) {
     $file = FALSE;
-    if (isset($hook['file'])) {
-      $file = $hook['file'];
+    if (isset($derivative['file'])) {
+      $file = $derivative['file'];
     }
-    foreach ($hook['function'] as $function) {
+    foreach ($derivative['function'] as $function) {
       $operations[] = array(
         'islandora_derivative_perform_batch_operation',
         array(
@@ -194,7 +185,7 @@ function islandora_do_batch_derivatives(AbstractObject $object, array $options) 
           $file,
           $object->id,
           $options['force'],
-          $hook,
+          $derivative,
         ),
       );
     }
@@ -283,4 +274,33 @@ function islandora_remove_defer_derivatives_flag(AbstractObject $object) {
     'true',
     RELS_TYPE_PLAIN_LITERAL
   );
+}
+
+/**
+ * Get the list of derivatives.
+ *
+ * @param AbstractObject $object
+ *   The object to find derivatives for.
+ * @param &array $options
+ *   Options for derivatives, will be updated to default force to FALSE.
+ */
+function islandora_get_derivative_list(AbstractObject $object, &$options) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
+
+  $options += array(
+    'force' => FALSE,
+  );
+
+  $derivatives = islandora_invoke_hook_list(
+    ISLANDORA_DERIVATIVE_CREATION_HOOK,
+    $object->models,
+    array($object)
+  );
+
+  foreach (islandora_build_hook_list(ISLANDORA_DERIVATIVE_CREATION_HOOK, $object->models) as $hook) {
+    drupal_alter($hook, $derivatives, $object);
+  }
+
+  uasort($derivatives, 'drupal_sort_weight');
+  return islandora_filter_derivatives($derivatives, $options, $object);
 }
