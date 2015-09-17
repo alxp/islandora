@@ -432,6 +432,11 @@ function islandora_admin_paths() {
 
 /**
  * Implements hook_theme().
+ * 
+ * The following theme entrys 'islandora_objects' and 'islandora_objects_subset'
+ * utilize the same template file, 'theme/islandora-objects'. The templates should match the theme name.
+ * This work is API breaking, but the consensus is that is unavoidable. Needs to be in release notes.
+ * @link https://jira.duraspace.org/browse/ISLANDORA-934. @endlink
  */
 function islandora_theme() {
   return array(
