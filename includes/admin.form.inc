@@ -80,11 +80,11 @@ function islandora_repository_admin(array $form, array &$form_state) {
           '#description' => t('Larger sites may experience a notable performance improvement when disabled due to how breadcrumbs are constructed.'),
           '#default_value' => variable_get('islandora_render_drupal_breadcrumbs', TRUE),
         ),
-        'islandora_risearch_use_itql_for_walking' => array(
+        'islandora_risearch_use_itql_when_necessary' => array(
           '#type' => 'checkbox',
-          '#title' => t('Use iTQL For Transitive Queries'),
-          '#description' => t('Sparql is the preferred language for querying the resource index; however, the implementation of Sparql in Mulgara may not completely support transitive queries. On by default to maintain legacy behaviour.'),
-          '#default_value' => variable_get('islandora_risearch_use_itql_for_walking', TRUE),
+          '#title' => t('Use iTQL for particular queries'),
+          '#description' => t('Sparql is the preferred language for querying the resource index; however, some features in the implementation of Sparql in Mulgara may not work properly. If you are using the default triple store with Fedora this should be left on to maintain legacy behaviour.'),
+          '#default_value' => variable_get('islandora_risearch_use_itql_when_necessary', TRUE),
         ),
       ),
       'islandora_namespace' => array(
