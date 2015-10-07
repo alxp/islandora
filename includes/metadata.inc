@@ -20,6 +20,7 @@ function islandora_retrieve_metadata_markup(AbstractObject $object, $print = FAL
   $viewer = variable_get('islandora_metadata_display', 'dublin_core');
   $markup = '';
   if (isset($viewers[$viewer]['metadata callback'])) {
+    module_load_include('inc', 'islandora', 'includes/utilities');
     $hooks = islandora_build_hook_list(ISLANDORA_METADATA_OBJECT_ALTER, $object->models);
     drupal_alter($hooks, $object);
     $markup = call_user_func($viewers[$viewer]['metadata callback'], $object, $print);
