@@ -25,6 +25,7 @@ export CATALINA_HOME='.'
 export JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=512m -XX:+CMSClassUnloadingEnabled -Djavax.net.ssl.trustStore=$CATALINA_HOME/fedora/server/truststore -Djavax.net.ssl.trustStorePassword=tomcat"
 # TODO: roll a Fedora 3.8.1 islandora_tomcat that doesn't require a rebuild.
 if [ $FEDORA_VERSION = "3.8.1" ]; then
+  export FEDORA_HOME=fedora
   ./fedora/server/bin/fedora-rebuild.sh -r org.fcrepo.server.utilities.rebuild.SQLRebuilder
 fi
 ./bin/startup.sh
