@@ -1385,9 +1385,9 @@ function islandora_islandora_required_objects(IslandoraTuque $connection) {
   $root_collection->label = 'Top-level Collection';
   $root_collection->models = 'islandora:collectionCModel';
   // Collection Policy Datastream.
-  $datastream = $root_collection->constructDatastream('COLLECTION_POLICY', 'X');
+  $datastream = $root_collection->constructDatastream('COLLECTION_POLICY', 'M');
   $datastream->label = 'Collection policy';
-  $datastream->mimetype = 'text/xml';
+  $datastream->mimetype = 'application/xml';
   $datastream->setContentFromFile("$module_path/xml/islandora_collection_policy.xml", FALSE);
   $root_collection->ingestDatastream($datastream);
   // TN Datastream.
