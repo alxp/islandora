@@ -703,7 +703,7 @@ function islandora_ingest_form_ingest_button(array &$form_state) {
  */
 function islandora_ingest_form_ingest_button_process(array $element) {
   $settings['spinner'][$element['#id']] = array(
-    'message' => t('Please be patient while the the page loads.'),
+    'message' => t('Please be patient while the page loads.'),
     'options' => array(
       'lines' => 10,
       'length' => 20,
