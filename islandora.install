@@ -54,6 +54,7 @@ function islandora_uninstall() {
     'islandora_render_drupal_breadcrumbs',
     'islandora_namespace_restriction_enforced',
     'islandora_pids_allowed',
+    'islandora_risearch_use_itql_when_necessary',
   );
   array_walk($variables, 'variable_del');
 }
