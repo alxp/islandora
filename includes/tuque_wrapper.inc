@@ -125,6 +125,29 @@ class IslandoraFedoraRepository extends FedoraRepository {
       throw $e;
     }
   }
+
+  /**
+   * Constructs a Fedora Object.
+   * @see FedoraRepository::constructObject
+   */
+  public function constructObject($id = NULL, $create_uuid = NULL) {
+    // Enforces uuid when set, but allows to override if called
+    // with $create_uuid set to bool.
+    $create_uuid = is_null($create_uuid) ? variable_get('islandora_basic_collection_generate_uuid', FALSE) : $create_uuid;
+    return parent::constructObject($id, $create_uuid);
+  }
+
+  /**
+   * Get the next PID(s) from Repo.
+   *
+   * @see FedoraRepository::getNextIdentifier()
+   */
+  public function getNextIdentifier($namespace = NULL, $create_uuid = NULL, $count = 1) {
+    // Enforces uuid when set, but allows to override if called
+    // with $create_uuid set to bool.
+    $create_uuid = is_null($create_uuid) ? variable_get('islandora_basic_collection_generate_uuid', FALSE) : $create_uuid;
+    return parent::getNextIdentifier($namespace, $create_uuid, $count);
+  }
 }
 
 class IslandoraRepositoryQuery extends RepositoryQuery {}
