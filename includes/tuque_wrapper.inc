@@ -128,13 +128,13 @@ class IslandoraFedoraRepository extends FedoraRepository {
 
   /**
    * Constructs a Fedora Object.
+   *
    * @see FedoraRepository::constructObject
    */
   public function constructObject($id = NULL, $create_uuid = NULL) {
-    // Enforces uuid when set, but allows to override if called
+    // Enforces UUID when set, but allows to override if called
     // with $create_uuid set to bool.
-    $create_uuid = is_null($create_uuid) ? variable_get('islandora_basic_collection_generate_uuid', FALSE) : $create_uuid;
-    return parent::constructObject($id, $create_uuid);
+    return parent::constructObject($id, static::useUUIDs($create_uuid));
   }
 
   /**
@@ -143,10 +143,26 @@ class IslandoraFedoraRepository extends FedoraRepository {
    * @see FedoraRepository::getNextIdentifier()
    */
   public function getNextIdentifier($namespace = NULL, $create_uuid = NULL, $count = 1) {
-    // Enforces uuid when set, but allows to override if called
+    // Enforces UUID when set, but allows to override if called
     // with $create_uuid set to bool.
-    $create_uuid = is_null($create_uuid) ? variable_get('islandora_basic_collection_generate_uuid', FALSE) : $create_uuid;
-    return parent::getNextIdentifier($namespace, $create_uuid, $count);
+    return parent::getNextIdentifier($namespace, static::useUUIDs($create_uuid), $count);
+  }
+
+  /**
+   * Helper for three-valued logic with UUIDs.
+   *
+   * @param bool|NULL $to_create
+   *   The variable to test.
+   *
+   * @return bool
+   *   If $to_create is NULL, the value of the
+   *   'islandora_basic_collection_generate_uuid' Drupal variable; otherwise,
+   *   the value of $to_create itself.
+   */
+  protected static function useUUIDs($to_create) {
+    return is_null($to_create) ?
+      variable_get('islandora_basic_collection_generate_uuid', FALSE) :
+      $to_create;
   }
 }
 
