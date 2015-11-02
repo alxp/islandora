@@ -125,6 +125,45 @@ class IslandoraFedoraRepository extends FedoraRepository {
       throw $e;
     }
   }
+
+  /**
+   * Constructs a Fedora Object.
+   *
+   * @see FedoraRepository::constructObject
+   */
+  public function constructObject($id = NULL, $create_uuid = NULL) {
+    // Enforces UUID when set, but allows to override if called
+    // with $create_uuid set to bool.
+    return parent::constructObject($id, static::useUUIDs($create_uuid));
+  }
+
+  /**
+   * Get the next PID(s) from Repo.
+   *
+   * @see FedoraRepository::getNextIdentifier()
+   */
+  public function getNextIdentifier($namespace = NULL, $create_uuid = NULL, $count = 1) {
+    // Enforces UUID when set, but allows to override if called
+    // with $create_uuid set to bool.
+    return parent::getNextIdentifier($namespace, static::useUUIDs($create_uuid), $count);
+  }
+
+  /**
+   * Helper for three-valued logic with UUIDs.
+   *
+   * @param bool|NULL $to_create
+   *   The variable to test.
+   *
+   * @return bool
+   *   If $to_create is NULL, the value of the
+   *   'islandora_basic_collection_generate_uuid' Drupal variable; otherwise,
+   *   the value of $to_create itself.
+   */
+  protected static function useUUIDs($to_create) {
+    return is_null($to_create) ?
+      variable_get('islandora_basic_collection_generate_uuid', FALSE) :
+      $to_create;
+  }
 }
 
 class IslandoraRepositoryQuery extends RepositoryQuery {}
