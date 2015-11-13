@@ -295,6 +295,12 @@ function islandora_datastream_get_url(AbstractDatastream $datastream, $type = 'd
  */
 function islandora_edit_datastream(AbstractDatastream $datastream) {
   $edit_registry = module_invoke_all('islandora_edit_datastream_registry', $datastream->parent, $datastream);
+  $context = array(
+    'datastream_parent' => $datastream->parent,
+    'datastream' => $datastream,
+    'original_edit_registry' => $edit_registry,
+  );
+  drupal_alter(ISLANDORA_EDIT_DATASTREAM_MODIFY_REGISTRY_HOOK, $edit_registry, $context);
   $edit_count = count($edit_registry);
   switch ($edit_count) {
     case 0:
@@ -305,7 +311,8 @@ function islandora_edit_datastream(AbstractDatastream $datastream) {
 
     case 1:
       // One registry implementation, go there.
-      drupal_goto($edit_registry[0]['url']);
+      $edit_registry = reset($edit_registry);
+      drupal_goto($edit_registry['url']);
       break;
 
     default:

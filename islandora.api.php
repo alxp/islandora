@@ -849,3 +849,28 @@ function hook_islandora_get_breadcrumb_query_predicates() {
     'someotherpredicate',
   );
 }
+
+/**
+ * Use alter hook to modify registry paths before the paths are rendered.
+ *
+ * @param array $edit_registry
+ *   The array of registry paths.
+ * @param array $context
+ *   An associative array containing:
+ *   - datastream_parent: The datastream parent.
+ *   - datastream: The datastream being edited.
+ *   - original_edit_registry: The original edit_registry prior to any
+ *     modifications.
+ */
+function hook_islandora_edit_datastream_modify_registry_alter(&$edit_registry, $context) {
+  // Example: Remove xml form builder edit registry.
+  if (isset($edit_registry['xml_form_builder_edit_form_registry'])) {
+    unset($edit_registry['xml_form_builder_edit_form_registry']);
+  }
+  // Add custom form to replace the removed form builder edit_form.
+  $edit_registry['somemodule_custom_form'] =  array(
+    'name' => t('Somemodule Custom Form'),
+    'url' => "islandora/custom_form/{$context['datastream_parent']->id}/{$context['datastream']->id}",
+    'weight' => 1,
+  );
+}
