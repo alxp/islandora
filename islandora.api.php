@@ -857,12 +857,12 @@ function hook_islandora_get_breadcrumb_query_predicates() {
  *   The array of registry paths.
  * @param array $context
  *   An associative array containing:
- *   - datastream_parent: The datastream parent.
+ *   - object: The object that owns the datastream being edited.
  *   - datastream: The datastream being edited.
  *   - original_edit_registry: The original edit_registry prior to any
  *     modifications.
  */
-function hook_islandora_edit_datastream_modify_registry_alter(&$edit_registry, $context) {
+function hook_islandora_edit_datastream_registry_alter(&$edit_registry, $context) {
   // Example: Remove xml form builder edit registry.
   if (isset($edit_registry['xml_form_builder_edit_form_registry'])) {
     unset($edit_registry['xml_form_builder_edit_form_registry']);
@@ -870,7 +870,6 @@ function hook_islandora_edit_datastream_modify_registry_alter(&$edit_registry, $
   // Add custom form to replace the removed form builder edit_form.
   $edit_registry['somemodule_custom_form'] =  array(
     'name' => t('Somemodule Custom Form'),
-    'url' => "islandora/custom_form/{$context['object']->id}/{$context['datastream']->id}",
-    'weight' => 1,
+    'url' => "islandora/custom_form/{$context['object']->id}/{$context['datastream']->id}"
   );
 }

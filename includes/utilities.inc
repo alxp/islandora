@@ -959,12 +959,12 @@ function islandora_deployed_on_windows() {
  *   The built edit registry array.
  */
 function islandora_build_datastream_edit_registry($object, $datastream) {
-  $edit_registry = module_invoke_all('islandora_edit_datastream_registry', $object, $datastream);
+  $edit_registry = module_invoke_all(ISLANDORA_EDIT_DATASTREAM_REGISTRY_HOOK, $object, $datastream);
   $context = array(
     'object' => $object,
     'datastream' => $datastream,
     'original_edit_registry' => $edit_registry,
   );
-  drupal_alter(ISLANDORA_EDIT_DATASTREAM_MODIFY_REGISTRY_HOOK, $edit_registry, $context);
+  drupal_alter(ISLANDORA_EDIT_DATASTREAM_REGISTRY_HOOK, $edit_registry, $context);
   return $edit_registry;
 }
