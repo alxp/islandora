@@ -307,8 +307,8 @@ function islandora_edit_datastream(AbstractDatastream $datastream) {
 
     case 1:
       // One registry implementation, go there.
-      $edit_registry = reset($edit_registry);
-      drupal_goto($edit_registry['url']);
+      $entry = reset($edit_registry);
+      drupal_goto($entry['url']);
       break;
 
     default:
