@@ -870,7 +870,7 @@ function hook_islandora_edit_datastream_modify_registry_alter(&$edit_registry, $
   // Add custom form to replace the removed form builder edit_form.
   $edit_registry['somemodule_custom_form'] =  array(
     'name' => t('Somemodule Custom Form'),
-    'url' => "islandora/custom_form/{$context['datastream_parent']->id}/{$context['datastream']->id}",
+    'url' => "islandora/custom_form/{$context['object']->id}/{$context['datastream']->id}",
     'weight' => 1,
   );
 }
