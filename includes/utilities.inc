@@ -950,18 +950,16 @@ function islandora_deployed_on_windows() {
 /**
  * Build the edit registry for a given datastream.
  *
- * @param AbstractObject $object
- *   The object being edited.
  * @param AbstractDatastream $datastream
  *   The datastream being edited.
  *
  * @return array
  *   The built edit registry array.
  */
-function islandora_build_datastream_edit_registry($object, $datastream) {
-  $edit_registry = module_invoke_all(ISLANDORA_EDIT_DATASTREAM_REGISTRY_HOOK, $object, $datastream);
+function islandora_build_datastream_edit_registry(AbstractDatastream $datastream) {
+  $edit_registry = module_invoke_all(ISLANDORA_EDIT_DATASTREAM_REGISTRY_HOOK, $datastream->parent, $datastream);
   $context = array(
-    'object' => $object,
+    'object' => $datastream->parent,
     'datastream' => $datastream,
     'original_edit_registry' => $edit_registry,
   );

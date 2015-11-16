@@ -296,7 +296,7 @@ function islandora_datastream_get_url(AbstractDatastream $datastream, $type = 'd
 function islandora_edit_datastream(AbstractDatastream $datastream) {
   module_load_include('inc', 'islandora', 'includes/utilities');
 
-  $edit_registry = islandora_build_datastream_edit_registry($datastream->parent, $datastream);
+  $edit_registry = islandora_build_datastream_edit_registry($datastream);
   $edit_count = count($edit_registry);
   switch ($edit_count) {
     case 0:
