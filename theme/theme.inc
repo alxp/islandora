@@ -533,8 +533,9 @@ function theme_islandora_datastream_revert_link(array $vars) {
  */
 function theme_islandora_datastream_edit_link(array $vars) {
   $datastream = $vars['datastream'];
+  module_load_include('inc', 'islandora', 'includes/utilities');
 
-  $edit_registry = module_invoke_all('islandora_edit_datastream_registry', $datastream->parent, $datastream);
+  $edit_registry = islandora_build_datastream_edit_registry($datastream);
 
   $can_edit = count($edit_registry) > 0 && islandora_datastream_access(ISLANDORA_METADATA_EDIT, $datastream);
 

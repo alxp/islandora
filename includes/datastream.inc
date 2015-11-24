@@ -294,7 +294,9 @@ function islandora_datastream_get_url(AbstractDatastream $datastream, $type = 'd
  *   The datastream to edit.
  */
 function islandora_edit_datastream(AbstractDatastream $datastream) {
-  $edit_registry = module_invoke_all('islandora_edit_datastream_registry', $datastream->parent, $datastream);
+  module_load_include('inc', 'islandora', 'includes/utilities');
+
+  $edit_registry = islandora_build_datastream_edit_registry($datastream);
   $edit_count = count($edit_registry);
   switch ($edit_count) {
     case 0:
@@ -305,7 +307,8 @@ function islandora_edit_datastream(AbstractDatastream $datastream) {
 
     case 1:
       // One registry implementation, go there.
-      drupal_goto($edit_registry[0]['url']);
+      $entry = reset($edit_registry);
+      drupal_goto($entry['url']);
       break;
 
     default:

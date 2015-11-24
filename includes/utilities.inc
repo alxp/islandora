@@ -946,3 +946,23 @@ function islandora_deployed_on_windows() {
   }
   return FALSE;
 }
+
+/**
+ * Build the edit registry for a given datastream.
+ *
+ * @param AbstractDatastream $datastream
+ *   The datastream being edited.
+ *
+ * @return array
+ *   The built edit registry array.
+ */
+function islandora_build_datastream_edit_registry(AbstractDatastream $datastream) {
+  $edit_registry = module_invoke_all(ISLANDORA_EDIT_DATASTREAM_REGISTRY_HOOK, $datastream->parent, $datastream);
+  $context = array(
+    'object' => $datastream->parent,
+    'datastream' => $datastream,
+    'original_edit_registry' => $edit_registry,
+  );
+  drupal_alter(ISLANDORA_EDIT_DATASTREAM_REGISTRY_HOOK, $edit_registry, $context);
+  return $edit_registry;
+}
