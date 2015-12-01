@@ -61,6 +61,24 @@ function islandora_repository_admin(array $form, array &$form_state) {
           '#description' => t('HTTP caching can reduce network traffic, by allowing clients to used cached copies.'),
           '#default_value' => variable_get('islandora_use_datastream_cache_headers', TRUE),
         ),
+        'islandora_use_object_semaphores' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Make Processes Claim Objects for Modification'),
+          '#description' => t('Enabling this will increase stability of Fedora at high concurrency but will incur a heavy performance hit.'),
+          '#default_value' => variable_get('islandora_use_object_semaphores', FALSE),
+        ),
+        'islandora_semaphore_period' => array(
+          '#type' => 'textfield',
+          '#title' => t('Time to Claim Objects for'),
+          '#default_value' => variable_get('islandora_semaphore_period', 600),
+          '#description' => t('Time in seconds to claim objects for modification.'),
+          '#required' => TRUE,
+          '#states' => array(
+            'invisible' => array(
+              ':input[name="islandora_use_object_semaphores"]' => array('checked' => FALSE),
+            ),
+          ),
+        ),
         'islandora_defer_derivatives_on_ingest' => array(
           '#type' => 'checkbox',
           '#title' => t('Defer derivative generation during ingest'),

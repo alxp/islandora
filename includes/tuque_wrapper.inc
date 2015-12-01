@@ -371,7 +371,7 @@ class IslandoraFedoraApiM extends FedoraApiM {
     if ($context['block']) {
       throw new Exception('Modify Datastream was blocked.');
     }
-    return parent::modifyDatastream($pid, $dsid, $params);
+    return $this->callParentWithLocking('modifyDatastream', $pid, $pid, $dsid, $params);
   }
 
   /**
@@ -391,7 +391,7 @@ class IslandoraFedoraApiM extends FedoraApiM {
     if ($context['block']) {
       throw new Exception('Modify Object was blocked.');
     }
-    return parent::modifyObject($pid, $params);
+    return $this->callParentWithLocking('modifyObject', $pid, $pid, $params);
   }
 
   /**
@@ -422,7 +422,7 @@ class IslandoraFedoraApiM extends FedoraApiM {
           return '';
 
         default:
-          $ret = parent::purgeObject($pid, $log_message);
+          $ret = $this->callParentWithLocking('purgeObject', $pid, $pid, $log_message);
           islandora_invoke_object_hooks(ISLANDORA_OBJECT_PURGED_HOOK, $models, $pid);
           return $ret;
       }
@@ -436,6 +436,88 @@ class IslandoraFedoraApiM extends FedoraApiM {
     }
   }
 
+  /**
+   * Wraps purgeDatastream for semaphore locking.
+   *
+   * @see FedoraApiM::purgeDatastream
+   */
+  public function purgeDatastream($pid, $dsid, $params = array()) {
+    return $this->callParentWithLocking('purgeDatastream', $pid, $pid, $dsid, $params);
+  }
+
+  /**
+   * Wraps ingest for semaphore locking.
+   *
+   * @see FedoraApiM::ingest
+   */
+  public function ingest($params = array()) {
+    if (isset($params['pid'])) {
+      return $this->callParentWithLocking('ingest', $params['pid'], $params);
+    }
+    else {
+      return parent::ingest($params);
+    }
+  }
+
+  /**
+   * Wraps addDatastream for semaphore locking.
+   *
+   * @see FedoraApiM::addDatastream
+   */
+  public function addDatastream($pid, $dsid, $type, $file, $params) {
+    return $this->callParentWithLocking('addDatastream', $pid, $pid, $dsid, $type, $file, $params);
+  }
+
+  /**
+   * Wraps addRelationship for semaphore locking.
+   *
+   * @see FedoraApiM::addRelationship
+   */
+  public function addRelationship($pid, $relationship, $is_literal, $datatype = NULL) {
+    return $this->callParentWithLocking('addRelationship', $pid, $pid, $relationship, $is_literal, $datatype);
+  }
+
+  /**
+   * Call a parent function while using semaphores as configured.
+   *
+   * All extra arguments are passed along to the callback.
+   *
+   * @param callable $callback
+   *   The method we are wrapping.
+   * @param string $pid
+   *   The PID to create a semaphore for.
+   */
+  protected function callParentWithLocking($callback, $pid) {
+    $args = array_slice(func_get_args(), 2);
+    $locked = FALSE;
+
+    if (variable_get('islandora_use_object_semaphores', FALSE)) {
+      $lock_period = variable_get('islandora_semaphore_period', 600);
+      if (!lock_acquire($pid, $lock_period)) {
+        // Waiting forever.
+        while (!lock_wait($pid) && lock_acquire($pid, $lock_period)) {
+          break;
+        }
+      }
+      $locked = TRUE;
+    }
+
+    if ($locked) {
+      try {
+        $to_return = call_user_func_array(array($this, "parent::$callback"), $args);
+      }
+      catch (Exception $e) {
+        // Release the lock in event of exception.
+        lock_release($pid);
+        throw $e;
+      }
+      lock_release($pid);
+      return $to_return;
+    }
+    else {
+      return call_user_func_array(array($this, "parent::$callback"), $args);
+    }
+  }
 }
 
 class IslandoraSimpleCache extends SimpleCache {}
