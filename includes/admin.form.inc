@@ -72,7 +72,6 @@ function islandora_repository_admin(array $form, array &$form_state) {
           '#title' => t('Time to Claim Objects for'),
           '#default_value' => variable_get('islandora_semaphore_period', 600),
           '#description' => t('Time in seconds to claim objects for modification.'),
-          '#required' => TRUE,
           '#states' => array(
             'invisible' => array(
               ':input[name="islandora_use_object_semaphores"]' => array('checked' => FALSE),
@@ -139,6 +138,21 @@ function islandora_repository_admin(array $form, array &$form_state) {
     ),
   );
   return system_settings_form($form);
+}
+
+/**
+ * Validate the admin form.
+ */
+function islandora_repository_admin_validate($form, &$form_state) {
+  // Only validate semaphore period if semaphores are enabled.
+  if ($form_state['values']['islandora_use_object_semaphores']) {
+    if ($form_state['values']['islandora_semaphore_period']) {
+      element_validate_integer_positive($form['islandora_tabs']['islandora_general']['islandora_semaphore_period'], $form_state);
+    }
+    else {
+      form_set_error('islandora_semaphore_period', t('<em>Time to Claim Objects for</em> must not be empty if <em>Make Processes Claim Objects for Modification</em> is checked.'));
+    }
+  }
 }
 
 /**
