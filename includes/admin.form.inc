@@ -71,7 +71,7 @@ function islandora_repository_admin(array $form, array &$form_state) {
           '#type' => 'textfield',
           '#title' => t('Time to Claim Objects for'),
           '#default_value' => variable_get('islandora_semaphore_period', 600),
-          '#description' => t('Time in seconds to claim objects for modification.'),
+          '#description' => t('Maximum time in seconds to claim objects for modification.'),
           '#states' => array(
             'invisible' => array(
               ':input[name="islandora_use_object_semaphores"]' => array('checked' => FALSE),
