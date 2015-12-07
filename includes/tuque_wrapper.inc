@@ -493,10 +493,9 @@ class IslandoraFedoraApiM extends FedoraApiM {
 
     if (variable_get('islandora_use_object_semaphores', FALSE)) {
       $lock_period = variable_get('islandora_semaphore_period', 600);
-      if (!lock_acquire($pid, $lock_period)) {
-        // Waiting forever.
-        while (!lock_wait($pid) && lock_acquire($pid, $lock_period)) {
-          break;
+      while (!lock_acquire($pid, $lock_period)) {
+        // Wait for the lock to be free. In the worst case forever.
+        while (lock_wait($pid)) {
         }
       }
       $locked = TRUE;
