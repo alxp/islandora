@@ -55,6 +55,8 @@ function islandora_uninstall() {
     'islandora_namespace_restriction_enforced',
     'islandora_pids_allowed',
     'islandora_risearch_use_itql_when_necessary',
+    'islandora_use_object_semaphores',
+    'islandora_semaphore_period',
   );
   array_walk($variables, 'variable_del');
 }
