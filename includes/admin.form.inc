@@ -103,6 +103,12 @@ function islandora_repository_admin(array $form, array &$form_state) {
           '#description' => t('Sparql is the preferred language for querying the resource index; however, some features in the implementation of Sparql in Mulgara may not work properly. If you are using the default triple store with Fedora this should be left on to maintain legacy behaviour.'),
           '#default_value' => variable_get('islandora_risearch_use_itql_when_necessary', TRUE),
         ),
+        'islandora_require_obj_upload' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Require a file upload during ingest'),
+          '#description' => t('During the ingest workflow, make the OBJ file upload step mandatory.'),
+          '#default_value' => variable_get('islandora_require_obj_upload', TRUE),
+        ),
       ),
       'islandora_namespace' => array(
         '#type' => 'fieldset',
