@@ -61,6 +61,23 @@ function islandora_repository_admin(array $form, array &$form_state) {
           '#description' => t('HTTP caching can reduce network traffic, by allowing clients to used cached copies.'),
           '#default_value' => variable_get('islandora_use_datastream_cache_headers', TRUE),
         ),
+        'islandora_use_object_semaphores' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Make Processes Claim Objects for Modification'),
+          '#description' => t('Enabling this will increase stability of Fedora at high concurrency but will incur a heavy performance hit.'),
+          '#default_value' => variable_get('islandora_use_object_semaphores', FALSE),
+        ),
+        'islandora_semaphore_period' => array(
+          '#type' => 'textfield',
+          '#title' => t('Time to Claim Objects for'),
+          '#default_value' => variable_get('islandora_semaphore_period', 600),
+          '#description' => t('Maximum time in seconds to claim objects for modification.'),
+          '#states' => array(
+            'invisible' => array(
+              ':input[name="islandora_use_object_semaphores"]' => array('checked' => FALSE),
+            ),
+          ),
+        ),
         'islandora_defer_derivatives_on_ingest' => array(
           '#type' => 'checkbox',
           '#title' => t('Defer derivative generation during ingest'),
@@ -127,6 +144,21 @@ function islandora_repository_admin(array $form, array &$form_state) {
     ),
   );
   return system_settings_form($form);
+}
+
+/**
+ * Validate the admin form.
+ */
+function islandora_repository_admin_validate($form, &$form_state) {
+  // Only validate semaphore period if semaphores are enabled.
+  if ($form_state['values']['islandora_use_object_semaphores']) {
+    if ($form_state['values']['islandora_semaphore_period']) {
+      element_validate_integer_positive($form['islandora_tabs']['islandora_general']['islandora_semaphore_period'], $form_state);
+    }
+    else {
+      form_set_error('islandora_semaphore_period', t('<em>Time to Claim Objects for</em> must not be empty if <em>Make Processes Claim Objects for Modification</em> is checked.'));
+    }
+  }
 }
 
 /**
