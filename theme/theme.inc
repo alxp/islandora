@@ -289,6 +289,7 @@ function islandora_objects_object_mapper($object_id) {
       'link' => l($o->label, $url, $link_options),
       'thumb' => l($img, $url, $link_options),
       'description' => $description,
+      'pid' => $o->id,
     );
   }
   else {
@@ -299,6 +300,7 @@ function islandora_objects_object_mapper($object_id) {
       'link' => l(t('(Unknown)'), $url, $link_options),
       'thumb' => '',
       'description' => '',
+      'pid' => $object_id,
     );
   }
 }
