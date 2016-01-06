@@ -257,6 +257,7 @@ function template_preprocess_islandora_objects(array &$variables) {
  *   - link: A string containing a textual HTML link to the object.
  *   - thumb: A string containing an image HTML link to the object.
  *   - description: A string containing a description of the object.
+ *   - pid: The object's PID.
  */
 function islandora_objects_object_mapper($object_id) {
   $o = islandora_object_load($object_id);
