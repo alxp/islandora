@@ -873,3 +873,16 @@ function hook_islandora_edit_datastream_registry_alter(&$edit_registry, $context
     'url' => "islandora/custom_form/{$context['object']->id}/{$context['datastream']->id}"
   );
 }
+
+/**
+ * Permit configuration of connection parameters.
+ *
+ * @param IslandoraRepositoryConnection $instance
+ *   The connection being constructed. See the relevant Tuque ancestor classes
+ *   for the particulars.
+ *
+ * @see https://github.com/Islandora/tuque/blob/1.x/HttpConnection.php
+ */
+function hook_islandora_repository_connection_construction_alter($instance) {
+  $instance->userAgent = "Tuque/cURL";
+}
