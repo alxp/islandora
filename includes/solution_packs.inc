@@ -386,7 +386,6 @@ function islandora_install_solution_pack($module, $op = 'install', $force = FALS
     drupal_set_message(filter_xss($msg), 'error');
     return;
   }
-  $connection = islandora_get_tuque_connection();
   $required_objects = islandora_solution_packs_get_required_objects($module);
   $objects = $required_objects['objects'];
   $status_messages = array(
@@ -474,13 +473,10 @@ function islandora_uninstall_solution_pack($module, $force = FALSE) {
     drupal_set_message(filter_xss($msg), 'error');
     return;
   }
-  $connection = islandora_get_tuque_connection();
   $required_objects = islandora_solution_packs_get_required_objects($module);
   $objects = $required_objects['objects'];
-  $filter = function($o) use($connection) {
-    $param = "pid={$o->id}";
-    $query = $connection->api->a->findObjects('query', $param);
-    return !empty($query['results']);
+  $filter = function ($o) {
+    return islandora_object_load($o->id);
   };
   $existing_objects = array_filter($objects, $filter);
 
