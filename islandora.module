@@ -979,8 +979,6 @@ function islandora_default_islandora_manage_overview_object(AbstractObject $obje
 function islandora_edit_object(AbstractObject $object) {
   module_load_include('inc', 'islandora', 'includes/breadcrumb');
   module_load_include('inc', 'islandora', 'includes/utilities');
-  drupal_set_title($object->label);
-  drupal_set_breadcrumb(islandora_get_breadcrumbs($object));
   $output = array();
   foreach (islandora_build_hook_list(ISLANDORA_EDIT_HOOK, $object->models) as $hook) {
     $temp = module_invoke_all($hook, $object);
@@ -1043,9 +1041,6 @@ function islandora_view_default_object() {
 function islandora_view_object(AbstractObject $object) {
   module_load_include('inc', 'islandora', 'includes/breadcrumb');
   module_load_include('inc', 'islandora', 'includes/utilities');
-
-  drupal_set_title($object->label);
-  drupal_set_breadcrumb(islandora_get_breadcrumbs($object));
 
   // Optional pager parameters.
   $page_number = (empty($_GET['page'])) ? '1' : $_GET['page'];
