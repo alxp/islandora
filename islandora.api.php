@@ -877,12 +877,12 @@ function hook_islandora_edit_datastream_registry_alter(&$edit_registry, $context
 /**
  * Permit configuration of connection parameters.
  *
- * @param IslandoraRepositoryConnection $instance
+ * @param RepositoryConnection $instance
  *   The connection being constructed. See the relevant Tuque ancestor classes
  *   for the particulars.
  *
  * @see https://github.com/Islandora/tuque/blob/1.x/HttpConnection.php
  */
-function hook_islandora_repository_connection_construction_alter($instance) {
+function hook_islandora_repository_connection_construction_alter(RepositoryConnection $instance) {
   $instance->userAgent = "Tuque/cURL";
 }
