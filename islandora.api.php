@@ -868,8 +868,21 @@ function hook_islandora_edit_datastream_registry_alter(&$edit_registry, $context
     unset($edit_registry['xml_form_builder_edit_form_registry']);
   }
   // Add custom form to replace the removed form builder edit_form.
-  $edit_registry['somemodule_custom_form'] =  array(
+  $edit_registry['somemodule_custom_form'] = array(
     'name' => t('Somemodule Custom Form'),
-    'url' => "islandora/custom_form/{$context['object']->id}/{$context['datastream']->id}"
+    'url' => "islandora/custom_form/{$context['object']->id}/{$context['datastream']->id}",
   );
+}
+
+/**
+ * Permit configuration of connection parameters.
+ *
+ * @param RepositoryConnection $instance
+ *   The connection being constructed. See the relevant Tuque ancestor classes
+ *   for the particulars.
+ *
+ * @see https://github.com/Islandora/tuque/blob/1.x/HttpConnection.php
+ */
+function hook_islandora_repository_connection_construction_alter(RepositoryConnection $instance) {
+  $instance->userAgent = "Tuque/cURL";
 }
