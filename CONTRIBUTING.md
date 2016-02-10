@@ -80,7 +80,7 @@ Contributions to the Islandora codebase should be sent as GitHub pull requests. 
 * For _small patches_, feel free to submit pull requests directly for those patches.
 * For _larger code contributions_, please use the following process. The idea behind this process is to prevent any wasted work and catch design issues early on.
 
-    1. [Open an issue](https://github.com/Islandora-Labs/islandora/issues) and assign it the label of "New Feature" or "Improvement", if a similar issue does not exist already. If a similar issue does exist, then you may consider participating in the work on the existing issue.
+    1. [Open an issue](https://jira.duraspace.org/secure/CreateIssue!default.jspa) and assign it the label of "New Feature" or "Improvement", if a similar issue does not exist already. If a similar issue does exist, then you may consider participating in the work on the existing issue.
     2. Comment on the issue with your plan for implementing the issue. Explain what pieces of the codebase you are going to touch and how everything is going to fit together.
     3. Islandora committers will work with you on the design to make sure you are on the right track.
     4. Implement your issue, create a pull request (see below), and iterate from there.
