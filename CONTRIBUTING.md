@@ -60,7 +60,7 @@ Islandora releases occur twice yearly, at the end of April and October. Two to t
 
 To join an Islandora Release Team, sign up for one or more modules in any of the following roles:
 
-* **Component Manager** (Very familiar with module code; reviews and merges commits)
+* **Component Manager** (Very familiar with module code; reviews commits)
 * **Tester** (Tests JIRA tickets marked "Ready for test" and does a general workover of the module)
 * **Documentor** (Reviews and updates existing documentation or writes new documentation for new modules)
 * **Auditor** (Reviews and updates README and LICENSE files to ensure complaince with templates and standards)
