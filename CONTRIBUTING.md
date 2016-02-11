@@ -73,7 +73,7 @@ _If you are interested in contributing code to Islandora but do not know where t
 
 In this case you should [browse open issues](https://jira.duraspace.org/issues/?jql=project%20%3D%20ISLANDORA%20AND%20resolution%20%3D%20Unresolved%20ORDER%20BY%20priority%20DESC).
 
-If you are contributing Drupal code, it must adhere to [Drupal Coding Standards](https://www.drupal.org/coding-standards); Travis CI will check for this on pull requests. You should also follow the Islandora community's [Git Guidelines and Best Praftices](https://github.com/Islandora/islandora/wiki/Git-Guidelines-and-Best-Practices). 
+If you are contributing Drupal code, it must adhere to [Drupal Coding Standards](https://www.drupal.org/coding-standards); Travis CI will check for this on pull requests. You should also follow the Islandora community's [Git Guidelines and Best Practices](https://github.com/Islandora/islandora/wiki/Git-Guidelines-and-Best-Practices). 
 
 Contributions to the Islandora codebase should be sent as GitHub pull requests. See section _Create a pull request_ below for details. If there is any problem with the pull request we can work through it using the commenting features of GitHub.
 
