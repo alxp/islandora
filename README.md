@@ -34,7 +34,7 @@ You will also have to remove some default policies if you want full functionalit
 
 Remove `deny-purge-datastream-if-active-or-inactive.xml` to allow for purging of datastream versions.
 
-More detailed information can be found in the 'Set XACML Policies' in the [Installing Fedora](https://wiki.duraspace.org/display/ISLANDORA/milestone+1+-+Installing+Fedoraa) chapter of the documentation.
+More detailed information can be found in the 'Set XACML Policies' in the [Installing Fedora](https://wiki.duraspace.org/display/ISLANDORA/milestone+1+-+Installing+Fedora) chapter of the documentation.
 
 ## Configuration
 
