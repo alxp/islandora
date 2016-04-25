@@ -1615,31 +1615,6 @@ function islandora_entity_property_info() {
 }
 
 /**
- * Menu callback downloads the given clip.
- */
-function islandora_download_clip(AbstractObject $object) {
-  if (isset($_GET['clip'])) {
-    $url = $_GET['clip'];
-    if (!preg_match('/^https?:\/\//', $url)) {
-      $is_https = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on';
-      $http_protocol = $is_https ? 'https' : 'http';
-      $url = $http_protocol . '://' . $_SERVER['HTTP_HOST'] . $url;
-    }
-    $filename = $object->label;
-    header("Content-Disposition: attachment; filename=\"{$filename}.jpg\"");
-    header("Content-type: image/jpeg");
-    header("Content-Transfer-Encoding: binary");
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    curl_setopt($ch, CURLOPT_URL, $url);
-    $response = curl_exec($ch);
-    curl_close($ch);
-  }
-  exit();
-}
-
-/**
  * Implements hook_file_mimetype_mapping_alter().
  *
  * Grab custom Islandora mime type list
