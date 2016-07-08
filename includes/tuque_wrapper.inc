@@ -594,7 +594,7 @@ class IslandoraFedoraDatastream extends FedoraDatastream {
   protected function modifyDatastream(array $args) {
     try {
       parent::modifyDatastream($args);
-      islandora_invoke_datastream_hooks(ISLANDORA_DATASTREAM_MODIFIED_HOOK, $this->parent->models, $this->id, $this->parent, $this);
+      islandora_invoke_datastream_hooks(ISLANDORA_DATASTREAM_MODIFIED_HOOK, $this->parent->models, $this->id, $this->parent, $this, $args);
       if ($this->state == 'D') {
         islandora_invoke_datastream_hooks(ISLANDORA_DATASTREAM_PURGED_HOOK, $this->parent->models, $this->id, $this->parent, $this->id);
       }
