@@ -340,7 +340,12 @@ function hook_cmodel_pid_dsid_islandora_datastream_ingested(AbstractObject $obje
  *   datastream.
  */
 function hook_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream, array $params) {
-
+  // Sample of sanitizing a label.
+  $datastream->label = trim($datastream->label);
+  // Sample of using modifyDatastream parameters.
+  if (isset($params['mimetype'])) {
+    $datastream->label .= " ({$params['mimetype']})";
+  }
 }
 
 /**
@@ -662,8 +667,9 @@ function hook_cmodel_pid_islandora_overview_object_alter(AbstractObject &$object
  *   Optional object to which derivatives will be added
  * @param array $ds_modified_params
  *   An array that will contain the properties changed on the datastream if
- *   derivatives were triggered from a datastream_modified hook. Can be
- *   populated manually, but likely empty otherwise.
+ *   derivatives were triggered from a datastream_modified hook, as well as a
+ *   'dsid' key naming the datastream that was modified. Can be populated
+ *   manually, but likely empty otherwise.
  *
  * @return array
  *   An array containing an entry for each derivative to be created. Each entry
@@ -745,6 +751,16 @@ function hook_islandora_derivative_alter(&$derivatives, AbstractObject $object, 
     if ($derivative['destination_dsid'] == 'TN') {
       unset($derivatives[$key]);
     }
+  }
+  // Example of altering out derivative generation if only a specified set of
+  // datastream parameters have been modified.
+  $mask = array(
+    'label' => NULL,
+    'dateLastModified' => NULL,
+    'dsid' => NULL,
+  );
+  if (empty(array_diff_key($ds_modified_params, $mask))) {
+    $derivatives = array();
   }
 }
 

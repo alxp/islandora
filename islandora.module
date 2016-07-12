@@ -1800,6 +1800,9 @@ function islandora_islandora_datastream_ingested(AbstractObject $object, Abstrac
  */
 function islandora_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream, $params) {
   module_load_include('inc', 'islandora', 'includes/derivatives');
+  $params += array(
+    'dsid' => $datastream->id,
+  );
   $logging_results = islandora_do_derivatives($object, array(
     'source_dsid' => $datastream->id,
     'force' => TRUE,

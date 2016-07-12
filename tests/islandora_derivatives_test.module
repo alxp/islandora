@@ -34,7 +34,34 @@ function islandora_derivatives_test_some_cmodel_islandora_derivative() {
         'islandora_derivatives_test_create_nosource_datastream',
       ),
     ),
+    array(
+      'source_dsid' => 'SOMEOTHERDATASTREAM',
+      'destination_dsid' => 'SOMEWEIRDDERIV',
+      'weight' => '0',
+      'function' => array(
+        'islandora_derivatives_test_derive_other_datastream',
+      ),
+    ),
   );
+}
+
+/**
+ * Implements hook_islandora_CMODEL_PID_derivative_alter().
+ */
+function islandora_derivatives_test_some_cmodel_islandora_derivative_alter(&$derivatives, AbstractObject $object, $ds_modified_params) {
+  // Use a mask to determine if only the label has been modified.
+  $diff = array_diff_key($ds_modified_params, array(
+    'label' => NULL,
+    'dateLastModified' => NULL,
+  ));
+  // If that's the case, don't proceed.
+  if (empty($diff)) {
+    foreach ($derivatives as $key => $derivative) {
+      if ($derivative['source_dsid'] == 'SOMEOTHERDATASTREAM') {
+        unset($derivatives[$key]);
+      }
+    }
+  }
 }
 
 /**
@@ -137,6 +164,22 @@ function islandora_derivatives_test_create_nosource_datastream(AbstractObject $o
       );
     }
     return $return;
+  }
+}
+
+/**
+ * Derives the SOMEWEIRDDERIV datastream.
+ *
+ * @param AbstractObject $object
+ *   An AbstractObject representing a Fedora object.
+ * @param bool $force
+ *   Whether or not derivative generation is to be forced.
+ */
+function islandora_derivatives_test_derive_other_datastream(AbstractObject $object, $force = FALSE) {
+  global $_islandora_derivative_test_derivative_functions;
+  $_islandora_derivative_test_derivative_functions[] = 'islandora_derivatives_test_derive_other_datastream';
+  if (!isset($object['SOMEWEIRDDERIV']) || isset($object['SOMEWEIRDDERIV']) && $force === TRUE) {
+    islandora_derivatives_test_add_datastream($object, 'SOMEWEIRDDERIV', 'wat');
   }
 }
 
