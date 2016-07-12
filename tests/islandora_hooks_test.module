@@ -147,7 +147,7 @@ function islandora_hooks_test_islandora_datastream_modified(AbstractObject $obje
       $new_label = 'New Label! + ' . $_SESSION['islandora_hooks']['iteration'][ISLANDORA_DATASTREAM_MODIFIED_HOOK];
       $datastream->label = $new_label;
     }
-    if (isset($params['mimetype'] && $params['mimetype'] == 'mr/mime')) {
+    if (isset($params['mimeType']) && $params['mimeType'] == 'mr/mime') {
       $new_label = 'New Label! (Mr. Mime)';
       $object->label = $new_label;
     }
