@@ -759,7 +759,8 @@ function hook_islandora_derivative_alter(&$derivatives, AbstractObject $object, 
     'dateLastModified' => NULL,
     'dsid' => NULL,
   );
-  if (empty(array_diff_key($ds_modified_params, $mask))) {
+  $param_diff = array_diff_key($ds_modified_params, $mask);
+  if (empty($param_diff)) {
     $derivatives = array();
   }
 }
