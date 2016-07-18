@@ -62,6 +62,9 @@ function islandora_run_derivatives(AbstractObject $object, $dsid) {
  *     from or NULL if it's the object itself.
  *   - destination_dsid: (Optional) String of the datastream id that is being
  *     created. To be used in the UI.
+ *   - ds_modified_params: (Optional, typically internally used) The array of
+ *     parameters originally sent to FedoraDatastream::modifyDatastream(). Used
+ *     to refine the derivative list; typically should't be passed in manually.
  *
  * @return array
  *   An array of messages describing the outcome of the derivative events.
@@ -287,6 +290,7 @@ function islandora_remove_defer_derivatives_flag(AbstractObject $object) {
 function islandora_get_derivative_list(AbstractObject $object, &$options) {
   module_load_include('inc', 'islandora', 'includes/utilities');
 
+  $ds_modified_params = isset($options['ds_modified_params']) ? $options['ds_modified_params'] : array();
   $options += array(
     'force' => FALSE,
   );
@@ -294,11 +298,12 @@ function islandora_get_derivative_list(AbstractObject $object, &$options) {
   $derivatives = islandora_invoke_hook_list(
     ISLANDORA_DERIVATIVE_CREATION_HOOK,
     $object->models,
-    array($object)
+    array($object),
+    $ds_modified_params
   );
 
   foreach (islandora_build_hook_list(ISLANDORA_DERIVATIVE_CREATION_HOOK, $object->models) as $hook) {
-    drupal_alter($hook, $derivatives, $object);
+    drupal_alter($hook, $derivatives, $object, $ds_modified_params);
   }
 
   uasort($derivatives, 'drupal_sort_weight');

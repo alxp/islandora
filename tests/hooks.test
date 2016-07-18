@@ -214,6 +214,18 @@ class IslandoraHooksTestCase extends IslandoraWebTestCase {
     }
     $this->repository->purgeObject($object->id);
 
+    // Test modifying a datastream conditionally on the modification parameters.
+    $object = $this->repository->constructObject('test:testModifiedDatastreamHook');
+    $this->repository->ingestObject($object);
+    $ds = $object->constructDatastream('TEST');
+    $object->ingestDatastream($ds);
+    $_SESSION['islandora_hooks']['hook'][ISLANDORA_DATASTREAM_MODIFIED_HOOK] = FALSE;
+    $_SESSION['islandora_hooks']['iteration'][ISLANDORA_DATASTREAM_MODIFIED_HOOK] = 0;
+    $_SESSION['islandora_hooks']['alter'][ISLANDORA_DATASTREAM_MODIFIED_HOOK] = FALSE;
+    $object->label = "New Label!";
+    $ds->mimetype = "mr/mime";
+    $this->assertEqual('New Label! (Mr. Mime)', $object->label, 'Modified object conditionally on datastream modification.');
+
     // Test purging with FedoraRepository::purgeObject().
     $object = $this->repository->constructObject('test:testPurgedDatastreamHook');
     $this->repository->ingestObject($object);

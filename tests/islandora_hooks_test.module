@@ -140,12 +140,16 @@ function islandora_hooks_test_islandora_datastream_ingested(AbstractObject $obje
 /**
  * Implements hook_islandora_datastream_modified().
  */
-function islandora_hooks_test_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream) {
+function islandora_hooks_test_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream, array $params) {
   if ($object->id == 'test:testModifiedDatastreamHook' && $datastream->id == "TEST") {
     $_SESSION['islandora_hooks']['hook'][ISLANDORA_DATASTREAM_MODIFIED_HOOK] = TRUE;
     if ($_SESSION['islandora_hooks']['iteration'][ISLANDORA_DATASTREAM_MODIFIED_HOOK]++ < 3) {
       $new_label = 'New Label! + ' . $_SESSION['islandora_hooks']['iteration'][ISLANDORA_DATASTREAM_MODIFIED_HOOK];
       $datastream->label = $new_label;
+    }
+    if (isset($params['mimeType']) && $params['mimeType'] == 'mr/mime') {
+      $new_label = 'New Label! (Mr. Mime)';
+      $object->label = $new_label;
     }
   }
 }

@@ -1798,11 +1798,15 @@ function islandora_islandora_datastream_ingested(AbstractObject $object, Abstrac
  * equal to the current ingested datastream's id. Force is set to TRUE such that
  * existing derivatives will be updated to reflect the change in the source.
  */
-function islandora_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream) {
+function islandora_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream, $params) {
   module_load_include('inc', 'islandora', 'includes/derivatives');
+  $params += array(
+    'dsid' => $datastream->id,
+  );
   $logging_results = islandora_do_derivatives($object, array(
     'source_dsid' => $datastream->id,
     'force' => TRUE,
+    'ds_modified_params' => $params,
   ));
   islandora_derivative_logging($logging_results);
   islandora_conditionally_clear_cache();

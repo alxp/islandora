@@ -249,6 +249,22 @@ class IslandoraDerivativesTestCase extends IslandoraWebTestCase {
   }
 
   /**
+   * Tests that a derivative can be conditional on the source_dsid modification.
+   */
+  public function testConditionalDerivative() {
+    $object = $this->constructBaseObject();
+    // Derivatives should fire.
+    $ds = $object->constructDatastream('SOMEOTHERDATASTREAM');
+    $ds->label = 'Some Label';
+    $ds->mimetype = 'some/mime';
+    $object->ingestDatastream($ds);
+    $this->assertEqual(1, count($object['SOMEWEIRDDERIV']), 'Expected one version of SOMEWEIDDERIV when unconditionally creating derivatives, got ' . count($object['SOMEWEIRDDERIV']));
+    // Derivatives should not fire.
+    $object['SOMEOTHERDATASTREAM']->label = 'Changed Label';
+    $this->assertEqual(1, count($object['SOMEWEIRDDERIV']), 'Expected the version count of SOMEWEIRDDERIV to remain the same when only changing the label of its source, got ' . count($object['SOMEWEIRDDERIV']));
+  }
+
+  /**
    * Helper function that will construct a base object.
    */
   public function constructBaseObject() {
