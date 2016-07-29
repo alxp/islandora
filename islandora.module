@@ -2187,6 +2187,6 @@ function islandora_islandora_overview_object(AbstractObject $object) {
   $table = theme('table', array(
     'header' => array($header),
     'rows' => $rows,
-    'empty' => t('No content model associated woith this object.')));
+    'empty' => t('No content model associated with this object.')));
   return array('cmodels' => $table);
 }
