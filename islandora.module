@@ -2188,13 +2188,13 @@ function islandora_islandora_overview_object(AbstractObject $object) {
       }
     }
   }
-  $header = count($rows) > 1 ? t('Content Models') : t('Content Model');
+  $header = format_plural(count($rows), 'Content Model', 'Content Models');
   $table = array(
-    '#theme' => 'table',
-    '#header' => array($header),
-    '#rows' => $rows,
-    '#empty' => t('No Islandora content model associated with this object.'),
-  );
-  $rendered_table = drupal_render($table);
-  return array('cmodels' => $rendered_table);
+  '#type' => 'markup',
+  '#theme' => 'table',
+  '#header' => array($header),
+  '#rows' => $rows,
+  '#empty' => t('No Islandora content model associated with this object.')
+    );
+  return array('cmodels' => $table);
 }
