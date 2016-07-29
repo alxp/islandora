@@ -2175,22 +2175,24 @@ function islandora_islandora_get_breadcrumb_query_predicates(AbstractObject $obj
  * Implements hook_islandora_overview_object().
  */
 function islandora_islandora_overview_object(AbstractObject $object) {
-  if (is_object($object)) {
-    $cmodels = $object->models;
-    $rows = array();
-    foreach ($cmodels as $cmodel) {
-      if ($cmodel != 'fedora-system:FedoraObject-3.0') {
-        $o = islandora_object_load($cmodel);
-        if(is_object($o)) {
-          $rows[] = array(l($o->label, "islandora/object/{$o->id}"));
-        }
+
+  $cmodels = $object->models;
+  $rows = array();
+  foreach ($cmodels as $cmodel) {
+    if ($cmodel != 'fedora-system:FedoraObject-3.0') {
+      $o = islandora_object_load($cmodel);
+      if (is_object($o)) {
+        $rows[] = array(l($o->label, "islandora/object/{$o->id}"));
+      }
+      else {
+        $rows[] = array(t("@cmodel  - (This content model is not in this Islandora repository.)", array('@cmodel' => $cmodel)));
       }
     }
-    $header = count($rows) > 1 ? t('Content Models') : t('Content Model');
-    $table = theme('table', array(
-      'header' => array($header),
-      'rows' => $rows,
-      'empty' => t('No Islandora content model associated with this object.')));
-    return array('cmodels' => $table);
   }
+  $header = count($rows) > 1 ? t('Content Models') : t('Content Model');
+  $table = theme('table', array(
+    'header' => array($header),
+    'rows' => $rows,
+    'empty' => t('No Islandora content model associated with this object.')));
+  return array('cmodels' => $table);
 }
