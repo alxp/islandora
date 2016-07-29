@@ -2194,7 +2194,7 @@ function islandora_islandora_overview_object(AbstractObject $object) {
   '#theme' => 'table',
   '#header' => array($header),
   '#rows' => $rows,
-  '#empty' => t('No Islandora content model associated with this object.')
+  '#empty' => t('No Islandora content model associated with this object.'),
     );
   return array('cmodels' => $table);
 }
