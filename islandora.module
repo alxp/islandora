@@ -2181,7 +2181,9 @@ function islandora_islandora_overview_object(AbstractObject $object) {
     foreach ($cmodels as $cmodel) {
       if ($cmodel != 'fedora-system:FedoraObject-3.0') {
         $o = islandora_object_load($cmodel);
-        $rows[] = array(l($o->label, "islandora/object/{$o->id}"));
+        if(is_object($o)) {
+          $rows[] = array(l($o->label, "islandora/object/{$o->id}"));
+        }
       }
     }
     $header = count($rows) > 1 ? t('Content Models') : t('Content Model');
