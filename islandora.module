@@ -2175,18 +2175,20 @@ function islandora_islandora_get_breadcrumb_query_predicates(AbstractObject $obj
  * Implements hook_islandora_overview_object().
  */
 function islandora_islandora_overview_object(AbstractObject $object) {
-  $cmodels = $object->models;
-  $rows = array();
-  foreach ($cmodels as $cmodel) {
-    if ($cmodel != 'fedora-system:FedoraObject-3.0') {
-      $o = islandora_object_load($cmodel);
-      $rows[] = array(l($o->label, "islandora/object/{$o->id}"));
+  if (is_object($object)) {
+    $cmodels = $object->models;
+    $rows = array();
+    foreach ($cmodels as $cmodel) {
+      if ($cmodel != 'fedora-system:FedoraObject-3.0') {
+        $o = islandora_object_load($cmodel);
+        $rows[] = array(l($o->label, "islandora/object/{$o->id}"));
+      }
     }
+    $header = count($rows) > 1 ? t('Content Models') : t('Content Model');
+    $table = theme('table', array(
+      'header' => array($header),
+      'rows' => $rows,
+      'empty' => t('No Islandora content model associated with this object.')));
+    return array('cmodels' => $table);
   }
-  $header = count($rows) > 1 ? t('Content Models') : t('Content Model');
-  $table = theme('table', array(
-    'header' => array($header),
-    'rows' => $rows,
-    'empty' => t('No Islandora content model associated with this object.')));
-  return array('cmodels' => $table);
 }
