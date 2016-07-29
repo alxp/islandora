@@ -2189,9 +2189,9 @@ function islandora_islandora_overview_object(AbstractObject $object) {
       }
     }
   }
-  $header = count($rows) > 1 ? t('Content Models') : t('Content Model');
+  $headers = format_plural(count($rows), t('Content Model'), t('Content Models'));
   $table = theme('table', array(
-    'header' => array($header),
+    'header' => array($headers),
     'rows' => $rows,
     'empty' => t('No Islandora content model associated with this object.')));
   return array('cmodels' => $table);
