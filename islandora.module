@@ -2175,7 +2175,6 @@ function islandora_islandora_get_breadcrumb_query_predicates(AbstractObject $obj
  * Implements hook_islandora_overview_object().
  */
 function islandora_islandora_overview_object(AbstractObject $object) {
-
   $cmodels = $object->models;
   $rows = array();
   foreach ($cmodels as $cmodel) {
@@ -2190,9 +2189,12 @@ function islandora_islandora_overview_object(AbstractObject $object) {
     }
   }
   $header = count($rows) > 1 ? t('Content Models') : t('Content Model');
-  $table = theme('table', array(
-    'header' => array($header),
-    'rows' => $rows,
-    'empty' => t('No Islandora content model associated with this object.')));
-  return array('cmodels' => $table);
+  $table = array(
+    '#theme' => 'table',
+    '#header' => array($header),
+    '#rows' => $rows,
+    '#empty' => t('No Islandora content model associated with this object.')
+  );
+  $rendered_table = drupal_render($table);
+  return array('cmodels' => $rendered_table);
 }
