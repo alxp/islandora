@@ -2190,11 +2190,11 @@ function islandora_islandora_overview_object(AbstractObject $object) {
   }
   $header = format_plural(count($rows), 'Content Model', 'Content Models');
   $table = array(
-  '#type' => 'markup',
-  '#theme' => 'table',
-  '#header' => array($header),
-  '#rows' => $rows,
-  '#empty' => t('No Islandora content model associated with this object.'),
-    );
+    '#type' => 'markup',
+    '#theme' => 'table',
+    '#header' => array($header),
+    '#rows' => $rows,
+    '#empty' => t('No Islandora content model associated with this object.')
+  );
   return array('cmodels' => $table);
 }
