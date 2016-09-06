@@ -445,17 +445,53 @@ function islandora_view_datastream_deliver_chunks(AbstractDatastream $datastream
  */
 function islandora_view_datastream_retrieve_file_uri(AbstractDatastream $datastream) {
   module_load_include('inc', 'islandora', 'includes/mimetype.utils');
+  module_load_include('inc', 'islandora', 'includes/utilities');
 
   $extension = islandora_get_extension_for_mimetype($datastream->mimetype);
   $file_uri = 'temporary://chunk_' . $datastream->parent->id . '_' . $datastream->id . '_' . $datastream->createdDate->getTimestamp() . '.' . $extension;
-  if (!file_exists($file_uri)) {
-    $file = new stdClass();
-    $file->uri = $file_uri;
-    $file->filename = drupal_basename($file_uri);
-    $file->filemime = $datastream->mimeType;
-    $file->status = 0;
-    $datastream->getContent($file_uri);
-    file_save($file);
+  touch(drupal_realpath($file_uri));
+  $fp = fopen($file_uri, 'r+b');
+  drupal_register_shutdown_function('fclose', $fp);
+  if (flock($fp, LOCK_SH)) {
+    if (feof($fp) && $datastream->size > 0) {
+      // Just opened at beginning of file, if beginning == EOF, need to grab it.
+      if (flock($fp, LOCK_EX)) {
+        // Upgrade to exclusive lock, write file.
+        $file = islandora_temp_file_entry($file_uri, $datastream->mimeType);
+        if ($file->filesize == $datastream->size) {
+          // Populated in another thread; downgrade lock and return.
+          flock($fp, LOCK_SH);
+          return $file_uri;
+        }
+
+        try {
+          $datastream->getContent($file->uri);
+          $file = file_save($file);
+          if ($file->filesize != $datastream->size) {
+            throw new RepositoryException(t('Size of file downloaded for chunking does not match: Got @apparent bytes when expecting @actual.', array(
+              '@apparent' => $file->filesize,
+              '@actual' => $datastream->size,
+            )));
+          }
+          // Downgrade to shared lock.
+          flock($fp, LOCK_SH);
+        }
+        catch (RepositoryException $e) {
+          file_delete($file);
+          throw $e;
+        }
+      }
+      else {
+        throw new Exception(t('Failed to acquire write lock when downloading @pid/@dsid for chunking.', array(
+          '@pid' => $datastream->parent->id,
+          '@dsid' => $datastream->id,
+        )));
+      }
+    }
+    return $file_uri;
   }
-  return $file_uri;
+  throw new Exception(t('Failed to acquire shared lock when chunking @pid/@dsid.', array(
+    '@pid' => $datastream->parent->id,
+    '@dsid' => $datastream->id,
+  )));
 }
