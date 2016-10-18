@@ -22,6 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the program.  If not, see <http ://www.gnu.org/licenses/>.
  */
+
 // Common datastreams.
 define('ISLANDORA_DS_COMP_STREAM', 'DS-COMPOSITE-MODEL');
 
@@ -562,7 +563,7 @@ function islandora_theme() {
       'file' => 'includes/solution_packs.inc',
       'render element' => 'form',
     ),
-    // Overview for manage tab
+    // Overview for manage tab.
     'islandora_object_overview' => array(
       'file' => 'theme/theme.inc',
       'template' => 'theme/islandora-object-overview',
@@ -749,7 +750,7 @@ function islandora_forms($form_id) {
  *   TRUE if the user is allowed to access this object/datastream, FALSE
  *   otherwise.
  */
-function islandora_user_access($object_or_datastream, array$permissions, $content_models = array(), $access_any = TRUE, $user = NULL) {
+function islandora_user_access($object_or_datastream, array $permissions, $content_models = array(), $access_any = TRUE, $user = NULL) {
 
   module_load_include('inc', 'islandora', 'includes/utilities');
   $is_repository_accessible = &drupal_static(__FUNCTION__);
@@ -1210,14 +1211,14 @@ function islandora_object_load($object_id) {
     try {
       return $tuque->repository->getObject(urldecode($object_id));
     }
-   catch (Exception $e) {
+    catch (Exception $e) {
       if ($e->getCode() == '404') {
         return FALSE;
       }
       else {
         return NULL;
       }
-    }
+   }
   }
   else {
     IslandoraTuque::getError();
