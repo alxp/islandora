@@ -139,7 +139,7 @@ function islandora_preprocess_islandora_default(&$variables) {
       $datastreams[$id]['class'] = drupal_strtolower(preg_replace('/[^A-Za-z0-9]/', '-', $id));
     }
     catch (RepositoryException $e) {
-      
+
     }
   }
   $variables['datastreams'] = $datastreams;
