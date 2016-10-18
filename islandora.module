@@ -1218,7 +1218,7 @@ function islandora_object_load($object_id) {
       else {
         return NULL;
       }
-   }
+    }
   }
   else {
     IslandoraTuque::getError();
