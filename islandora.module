@@ -1147,10 +1147,10 @@ function islandora_default_islandora_printer_object($object, $alter) {
   $metadata = islandora_retrieve_metadata_markup($object, TRUE);
   $variables = isset($dc_object) ? $dc_object->asArray() : array();
   $output = theme('islandora_object_print_object', array(
-      'object' => $object,
-      'dc_array' => $variables,
-      'metadata' => $metadata,
-      'islandora_content' => $alter));
+    'object' => $object,
+    'dc_array' => $variables,
+    'metadata' => $metadata,
+    'islandora_content' => $alter));
 
   return array('Default output' => array('#markup' => $output));
 }
@@ -2159,7 +2159,13 @@ function islandora_islandora_get_breadcrumb_query_predicates(AbstractObject $obj
 }
 
 /**
- * Implements hook_islandora_overview_object().
+ * Provides information for the object manage page.
+ *
+ * @param AbstractObject $object
+ *   The object being managed.
+ *
+ * @return array
+ *   themed output
  */
 function islandora_create_manage_overview(AbstractObject $object) {
   $output = theme('islandora_object_overview', array('islandora_object' => $object));
