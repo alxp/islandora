@@ -647,3 +647,26 @@ function islandora_preprocess_islandora_dublin_core_description(array &$variable
   }
   $variables['dc_array'] = isset($dc_object) ? $dc_object->asArray() : array();
 }
+
+/**
+ * Implements hook_preprocess().
+ */
+function islandora_preprocess_islandora_object_overview(array &$variables) {
+  $object = $variables['islandora_object'];
+  $cmodels = $object->models;
+  $links = array();
+  foreach ($cmodels as $cmodel) {
+    if ($cmodel != 'fedora-system:FedoraObject-3.0') {
+      $o = islandora_object_load($cmodel);
+      if (is_object($o)) {
+        $links[] = array(l($o->label, "islandora/object/{$o->id}"));
+      }
+      else {
+        $links[] = array(t("@cmodel  - (This content model is not in this Islandora repository.)", array('@cmodel' => $cmodel)));
+      }
+    }
+  }
+  $pluralized_identifier = format_plural(count($links), 'Islandora content model', 'Islandora content models');
+  $variables['header'] = t("This object's behavior is defined by the @identifier", array("@identifier" => $pluralized_identifier));
+  $variables['list'] = theme('item_list', array('items' => $links));
+}
