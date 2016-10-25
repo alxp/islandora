@@ -130,8 +130,8 @@ function islandora_preprocess_islandora_default(&$variables) {
       $datastreams[$id]['id'] = $id;
       $datastreams[$id]['label'] = $label;
       $datastreams[$id]['label_link'] = islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $ds) ?
-          l($label, $download_path) :
-          $label;
+        l($label, $download_path) :
+        $label;
       $datastreams[$id]['download_url'] = $download_path;
       $datastreams[$id]['mimetype'] = $ds->mimetype;
       $datastreams[$id]['size'] = islandora_datastream_get_human_readable_size($ds);
@@ -268,8 +268,8 @@ function islandora_objects_object_mapper($object_id) {
   $img = array(
     '#theme' => 'image',
     '#path' => ($o && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $o['TN']) ?
-        "$url/datastream/TN/view" :
-        "$module_path/images/folder.png"),
+      "$url/datastream/TN/view" :
+      "$module_path/images/folder.png"),
     '#attributes' => array(),
   );
   $img = drupal_render($img);
@@ -412,8 +412,8 @@ function theme_islandora_datastream_download_link(array $vars) {
 
   $label = t('download');
   return islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $datastream) ?
-      l($label, islandora_datastream_get_url($datastream, 'download')) :
-      '';
+    l($label, islandora_datastream_get_url($datastream, 'download')) :
+    '';
 }
 
 /**
@@ -543,8 +543,8 @@ function theme_islandora_datastream_edit_link(array $vars) {
   $can_edit = count($edit_registry) > 0 && islandora_datastream_access(ISLANDORA_METADATA_EDIT, $datastream);
 
   return $can_edit ?
-      l(t('edit'), "islandora/object/{$datastream->parent->id}/datastream/{$datastream->id}/edit") :
-      '';
+    l(t('edit'), "islandora/object/{$datastream->parent->id}/datastream/{$datastream->id}/edit") :
+    '';
 }
 
 /**

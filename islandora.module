@@ -1659,10 +1659,10 @@ function islandora_object_access($op, $object, $user = NULL) {
     module_load_include('inc', 'islandora', 'includes/utilities');
 
     $results = islandora_invoke_hook_list('islandora_object_access', $object->models, array(
-        $op,
-        $object,
-        $user,
-      ));
+      $op,
+      $object,
+      $user,
+    ));
 
     // Nothing returned FALSE, and something returned TRUE.
     $cache[$op][$object->id][$user->uid] = (!in_array(FALSE, $results, TRUE) && in_array(TRUE, $results, TRUE));
@@ -1704,16 +1704,16 @@ function islandora_datastream_access($op, $datastream, $user = NULL) {
   if (!isset($cache[$op][$datastream->parent->id][$datastream->id][$user->uid])) {
     module_load_include('inc', 'islandora', 'includes/utilities');
     $object_results = islandora_invoke_hook_list('islandora_object_access', $datastream->parent->models, array(
-        $op,
-        $datastream->parent,
-        $user,
-      ));
+      $op,
+      $datastream->parent,
+      $user,
+    ));
 
     $datastream_results = islandora_invoke_hook_list('islandora_datastream_access', $datastream->parent->models, array(
-        $op,
-        $datastream,
-        $user,
-      ));
+      $op,
+      $datastream,
+      $user,
+    ));
 
     // The datastream check returned FALSE, and one in the object or datastream
     // checks returned TRUE.
@@ -1792,10 +1792,10 @@ function islandora_islandora_datastream_modified(AbstractObject $object, Abstrac
     'dsid' => $datastream->id,
   );
   $logging_results = islandora_do_derivatives($object, array(
-      'source_dsid' => $datastream->id,
-      'force' => TRUE,
-      'ds_modified_params' => $params,
-    ));
+    'source_dsid' => $datastream->id,
+    'force' => TRUE,
+    'ds_modified_params' => $params,
+  ));
   islandora_derivative_logging($logging_results);
   islandora_conditionally_clear_cache();
 }
@@ -1826,22 +1826,22 @@ function islandora_form_simpletest_test_form_alter(array &$form) {
   if ($filter_status) {
     $filter_status_message = theme_image(array('path' => 'misc/watchdog-ok.png', 'attributes' => array())) . " ";
     $filter_status_message .= t("Drupal filter at <strong>@filter_path</strong> is writable by the server.", array(
-        '@filter_path' => $filter_path,
-      ));
+      '@filter_path' => $filter_path,
+    ));
   }
   else {
     $filter_status_message = theme_image(array('path' => 'misc/watchdog-error.png', 'attributes' => array())) . " ";
     $filter_status_message .= t("Drupal filter at <strong>@filter_path</strong> is not writable by the server. Please make sure your webserver has permission to write to the Drupal filter. If the path given is incorrect, you will need to change it in your server's test config file, located in the Islandora module's 'tests' folder as test_config.ini or default.test_config.ini.", array(
-        '@filter_path' => $filter_path,
-      ));
+      '@filter_path' => $filter_path,
+    ));
   }
 
   $form['tests'] = array(
     '#type' => 'fieldset',
     '#title' => t('Tests'),
     '#description' => t("Select the test(s) or test group(s) you would like to run, and click <em>Run tests</em>.<p>NOTE: Tests in groups prefixed with <em>Islandora</em> generally require a configuration file, found in the Islandora module 'tests' folder, as well as the use of the Islandora Drupal filter. Before any tests are run, please ensure that your web server has the appropriate permissions to alter the drupal-filter.xml file in your Fedora config folder. Your original Islandora Drupal filter configuration will NOT be overwritten by tests; HOWEVER, if PHP exits abnormally before the filter is reset, please use the 'Repair Drupal Filter' button below.</p><p><em>Drupal Filter Write Status:</em> !filter_status_message</p>", array(
-        '!filter_status_message' => $filter_status_message,
-      )),
+      '!filter_status_message' => $filter_status_message,
+    )),
   );
 
   $form['tests']['table'] = array(
@@ -2019,12 +2019,12 @@ function islandora_menu_local_tasks_alter(&$data, $router_item, $root_path) {
             $tab['#suffix'] = '</li>';
             $tab['#theme'] = 'link';
             $tab['#text'] = theme('image', array(
-                'path' => "$islandora_path/images/print-icon.png",
-                'alt' => t('Print Object'),
-                'attributes' => array(
-                  'id' => 'print_btn',
-                ),
-              ));
+              'path' => "$islandora_path/images/print-icon.png",
+              'alt' => t('Print Object'),
+              'attributes' => array(
+                'id' => 'print_btn',
+              ),
+            ));
             $tab['#path'] = "{$router_item['href']}/print_object";
             $tab['#options'] = array(
               'attributes' => array(),
