@@ -459,7 +459,8 @@ function islandora_theme() {
       'variables' => array(
         'object' => NULL,
         'content' => NULL,
-        'islandora_content' => NULL),
+        'islandora_content' => NULL,
+      ),
     ),
     // Render a bunch of objects as either a grid or a list.
     'islandora_objects' => array(
@@ -561,6 +562,12 @@ function islandora_theme() {
     'islandora_solution_pack_table' => array(
       'file' => 'includes/solution_packs.inc',
       'render element' => 'form',
+    ),
+    // Overview for manage tab.
+    'islandora_object_overview' => array(
+      'file' => 'theme/theme.inc',
+      'template' => 'theme/islandora-object-overview',
+      'variables' => array('islandora_object' => NULL),
     ),
   );
 }
@@ -919,38 +926,19 @@ function islandora_object_manage_access_callback($perms, $object = NULL) {
  */
 function islandora_manage_overview_object(AbstractObject $object) {
   module_load_include('inc', 'islandora', 'includes/utilities');
-  $output = array();
+  $output = islandora_create_manage_overview($object);
   $hooks = islandora_build_hook_list(ISLANDORA_OVERVIEW_HOOK, $object->models);
   foreach ($hooks as $hook) {
     $temp = module_invoke_all($hook, $object);
     islandora_as_renderable_array($temp);
     if (!empty($temp)) {
+      arsort($temp);
       $output = array_merge_recursive($output, $temp);
     }
   }
-  if (empty($output)) {
-    // Add in the default, if we did not get any results.
-    $output = islandora_default_islandora_manage_overview_object($object);
-  }
-  arsort($output);
   drupal_alter($hooks, $object, $output);
   islandora_as_renderable_array($output);
   return $output;
-}
-
-/**
- * Renders the default manage object page for the given object.
- *
- * @param AbstractObject $object
- *   The object used to render the manage object page.
- *
- * @return array
- *   The default rendering of the object manage page, indexed at
- *   'Default Edit output'.
- */
-function islandora_default_islandora_manage_overview_object(AbstractObject $object) {
-  $output = theme('islandora_default_overview', array('islandora_object' => $object));
-  return array('Default overview output' => array('#markup' => $output));
 }
 
 /**
@@ -1730,9 +1718,9 @@ function islandora_datastream_access($op, $datastream, $user = NULL) {
     // The datastream check returned FALSE, and one in the object or datastream
     // checks returned TRUE.
     $cache[$op][$datastream->parent->id][$datastream->id][$user->uid] = (
-        !in_array(FALSE, $datastream_results, TRUE) &&
-        (in_array(TRUE, $object_results, TRUE) || in_array(TRUE, $datastream_results, TRUE))
-        );
+      !in_array(FALSE, $datastream_results, TRUE) &&
+      (in_array(TRUE, $object_results, TRUE) || in_array(TRUE, $datastream_results, TRUE))
+    );
   }
 
   return $cache[$op][$datastream->parent->id][$datastream->id][$user->uid];
@@ -1818,7 +1806,6 @@ function islandora_islandora_datastream_modified(AbstractObject $object, Abstrac
 function islandora_islandora_object_purged($pid) {
   islandora_conditionally_clear_cache();
 }
-
 
 /**
  * Implements hook_islandora_datastream_purged().
@@ -2169,4 +2156,18 @@ function islandora_islandora_get_breadcrumb_query_predicates(AbstractObject $obj
     'fedora-rels-ext:isMemberOfCollection',
     'fedora-rels-ext:isMemberOf',
   );
+}
+
+/**
+ * Provides information for the object manage page.
+ *
+ * @param AbstractObject $object
+ *   The object being managed.
+ *
+ * @return array
+ *   themed output
+ */
+function islandora_create_manage_overview(AbstractObject $object) {
+  $output = theme('islandora_object_overview', array('islandora_object' => $object));
+  return array('cmodels' => $output);
 }
