@@ -440,6 +440,9 @@ function islandora_view_datastream_deliver_chunks(AbstractDatastream $datastream
  * File locks are used to ensure the datastream is completely downloaded before
  * attempting to serve up chunks from the file.
  *
+ * @throws RepositoryException|Exception
+ *   Exceptions may be thrown if the file was unable to be reliably acquired.
+ *
  * @param AbstractDatastream $datastream
  *   An AbstractDatastream representing a datastream on a Fedora object.
  *
