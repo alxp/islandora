@@ -459,7 +459,8 @@ function islandora_view_datastream_retrieve_file_uri(AbstractDatastream $datastr
   $fp = fopen($file_uri, 'r+b');
   if (flock($fp, LOCK_SH)) {
     try {
-      if (feof($fp) && $datastream->size > 0) {
+      fseek($fp, 0, SEEK_END);
+      if (ftell($fp) === 0 && $datastream->size > 0) {
         // Just opened at beginning of file, if beginning == EOF, need to grab
         // it.
         if (!flock($fp, LOCK_EX | LOCK_NB)) {
@@ -482,6 +483,7 @@ function islandora_view_datastream_retrieve_file_uri(AbstractDatastream $datastr
 
           try {
             $datastream->getContent($file->uri);
+            clearstatcache($file->uri);
             $file = file_save($file);
             if ($file->filesize != $datastream->size) {
               throw new RepositoryException(t('Size of file downloaded for chunking does not match: Got @apparent bytes when expecting @actual.', array(
