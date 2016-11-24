@@ -437,6 +437,9 @@ function islandora_view_datastream_deliver_chunks(AbstractDatastream $datastream
 /**
  * Creates/returns the file URI for the content of a datastream for chunking.
  *
+ * File locks are used to ensure the datastream is completely downloaded before
+ * attempting to serve up chunks from the file.
+ *
  * @param AbstractDatastream $datastream
  *   An AbstractDatastream representing a datastream on a Fedora object.
  *
@@ -451,44 +454,60 @@ function islandora_view_datastream_retrieve_file_uri(AbstractDatastream $datastr
   $file_uri = 'temporary://chunk_' . $datastream->parent->id . '_' . $datastream->id . '_' . $datastream->createdDate->getTimestamp() . '.' . $extension;
   touch(drupal_realpath($file_uri));
   $fp = fopen($file_uri, 'r+b');
-  drupal_register_shutdown_function('fclose', $fp);
   if (flock($fp, LOCK_SH)) {
-    if (feof($fp) && $datastream->size > 0) {
-      // Just opened at beginning of file, if beginning == EOF, need to grab it.
-      if (flock($fp, LOCK_EX)) {
-        // Upgrade to exclusive lock, write file.
-        $file = islandora_temp_file_entry($file_uri, $datastream->mimeType);
-        if ($file->filesize == $datastream->size) {
-          // Populated in another thread; downgrade lock and return.
-          flock($fp, LOCK_SH);
-          return $file_uri;
+    try {
+      if (feof($fp) && $datastream->size > 0) {
+        // Just opened at beginning of file, if beginning == EOF, need to grab
+        // it.
+        if (!flock($fp, LOCK_EX | LOCK_NB)) {
+          // Hypothetically, two threads could have a "shared" lock with an
+          // unpopulated file, so to avoid deadlock on the "exclusive" lock,
+          // drop the "shared" lock before blocking to obtain the "exclusive"
+          // lock.
+          flock($fp, LOCK_UN);
         }
-
-        try {
-          $datastream->getContent($file->uri);
-          $file = file_save($file);
-          if ($file->filesize != $datastream->size) {
-            throw new RepositoryException(t('Size of file downloaded for chunking does not match: Got @apparent bytes when expecting @actual.', array(
-              '@apparent' => $file->filesize,
-              '@actual' => $datastream->size,
-            )));
+        if (flock($fp, LOCK_EX)) {
+          // Get exclusive lock, write file.
+          $file = islandora_temp_file_entry($file_uri, $datastream->mimeType);
+          if ($file->filesize == $datastream->size) {
+            // Populated in another thread while we were waiting for the
+            // "exclusive" lock; drop lock and return.
+            flock($fp, LOCK_UN);
+            fclose($fp);
+            return $file_uri;
           }
-          // Downgrade to shared lock.
-          flock($fp, LOCK_SH);
+
+          try {
+            $datastream->getContent($file->uri);
+            $file = file_save($file);
+            if ($file->filesize != $datastream->size) {
+              throw new RepositoryException(t('Size of file downloaded for chunking does not match: Got @apparent bytes when expecting @actual.', array(
+                '@apparent' => $file->filesize,
+                '@actual' => $datastream->size,
+              )));
+            }
+          }
+          catch (RepositoryException $e) {
+            file_delete($file);
+            throw $e;
+          }
         }
-        catch (RepositoryException $e) {
-          file_delete($file);
-          throw $e;
+        else {
+          throw new Exception(t('Failed to acquire write lock when downloading @pid/@dsid for chunking.', array(
+            '@pid' => $datastream->parent->id,
+            '@dsid' => $datastream->id,
+          )));
         }
       }
-      else {
-        throw new Exception(t('Failed to acquire write lock when downloading @pid/@dsid for chunking.', array(
-          '@pid' => $datastream->parent->id,
-          '@dsid' => $datastream->id,
-        )));
-      }
+      flock($fp, LOCK_UN);
+      fclose($fp);
+      return $file_uri;
     }
-    return $file_uri;
+    catch (Exception $e) {
+      flock($fp, LOCK_UN);
+      fclose($fp);
+      throw $e;
+    }
   }
   throw new Exception(t('Failed to acquire shared lock when chunking @pid/@dsid.', array(
     '@pid' => $datastream->parent->id,
