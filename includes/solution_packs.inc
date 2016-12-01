@@ -343,7 +343,7 @@ function islandora_solution_pack_batch_operation_reingest_object(AbstractObject 
  * This is to be called from the solution pack's hook_install() and
  * hook_uninstall() functions.
  *
- * It provides a convient way to have a solution pack's required objects
+ * It provides a convenient way to have a solution pack's required objects
  * ingested at install time.
  *
  * @param string $module
