@@ -476,9 +476,72 @@ function islandora_ingest_form_stepify(array $form, array &$form_state, array $s
     $form['hidden_next']['#prefix'] = '<div style="display:none;">';
     $form['hidden_next']['#suffix'] = '</div>';
   }
+
+  // Add active CModel header to the form.
+  islandora_ingest_form_add_step_context($form, $form_state);
+
   // Allow for a hook_form_FORM_ID_alter().
   drupal_alter(array('form_' . $step['form_id'], 'form'), $form, $form_state, $step['form_id']);
   return $form;
+}
+
+/**
+ * Append CModel label(s) to the top of the step's form.
+ *
+ * @param array $form
+ *   The Drupal form.
+ * @param array $form_state
+ *   The Drupal form state.
+ */
+function islandora_ingest_form_add_step_context(array &$form, array $form_state) {
+  $items = array();
+  $get_label = function(AbstractObject $collection, AbstractObject $fedora_cmodel) {
+    if (isset($collection['COLLECTION_POLICY'])) {
+      $policy = new CollectionPolicy($collection['COLLECTION_POLICY']->content);
+      $policy_content_models = $policy->getContentModels();
+    }
+    return isset($policy_content_models[$fedora_cmodel->id]) ?
+      $policy_content_models[$fedora_cmodel->id]['name'] :
+      $fedora_cmodel->label;
+  };
+  $shared_storage = islandora_ingest_form_get_shared_storage($form_state);
+  foreach ($shared_storage['models'] as $key => $value) {
+    $fedora_cmodel = islandora_object_load($value);
+    if ($fedora_cmodel) {
+      if (is_array($shared_storage['collection'])) {
+        // Form state config allows for multiple collection objects.
+        foreach ($shared_storage['collection'] as $collection) {
+          $items[$value] = $get_label($collection, $fedora_cmodel);
+        }
+      }
+      else {
+        $items[$value] = $get_label($shared_storage['collection'], $fedora_cmodel);
+      }
+    }
+  }
+
+  switch (count($items)) {
+    case 0:
+      // No-op; no element.
+      break;
+
+    case 1:
+      $label = reset($items);
+      $form["islandora-ingest-form-step-context"] = array(
+        '#markup' => "<h3>$label</h3>",
+        '#weight' => -1000,
+      );
+      break;
+
+    default:
+      $form["islandora-ingest-form-step-context"] = array(
+        '#title' => t("Applicable Content Models"),
+        '#theme' => 'item_list',
+        '#items' => array_values($items),
+        '#weight' => -1000,
+      );
+      break;
+  }
 }
 
 /**
