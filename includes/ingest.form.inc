@@ -477,9 +477,10 @@ function islandora_ingest_form_stepify(array $form, array &$form_state, array $s
     $form['hidden_next']['#suffix'] = '</div>';
   }
 
-  // Add active CModel header to the form.
-  islandora_ingest_form_add_step_context($form, $form_state);
-
+  if (variable_get('islandora_render_context_ingeststep', FALSE)) {
+    // Add active CModel header to the form.
+    islandora_ingest_form_add_step_context($form, $form_state);
+  }
   // Allow for a hook_form_FORM_ID_alter().
   drupal_alter(array('form_' . $step['form_id'], 'form'), $form, $form_state, $step['form_id']);
   return $form;
@@ -495,7 +496,7 @@ function islandora_ingest_form_stepify(array $form, array &$form_state, array $s
  */
 function islandora_ingest_form_add_step_context(array &$form, array $form_state) {
   $items = array();
-  $get_label = function(AbstractObject $collection, AbstractObject $fedora_cmodel) {
+  $get_label = function(AbstractObject $collection = NULL, AbstractObject $fedora_cmodel) {
     if (isset($collection['COLLECTION_POLICY'])) {
       $policy = new CollectionPolicy($collection['COLLECTION_POLICY']->content);
       $policy_content_models = $policy->getContentModels();
@@ -505,6 +506,13 @@ function islandora_ingest_form_add_step_context(array &$form, array $form_state)
       $fedora_cmodel->label;
   };
   $shared_storage = islandora_ingest_form_get_shared_storage($form_state);
+
+  // Ingest steps also work for newspaper children and
+  // pages of books which don't pass a collection object
+  // and of course don't use collection policies.
+  if (!isset($shared_storage['collection'])) {
+    $shared_storage['collection'] = NULL;
+  }
   foreach ($shared_storage['models'] as $key => $value) {
     $fedora_cmodel = islandora_object_load($value);
     if ($fedora_cmodel) {

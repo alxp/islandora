@@ -96,6 +96,12 @@ function islandora_repository_admin(array $form, array &$form_state) {
             useful if derivatives are to be created by an external service.'),
           '#default_value' => variable_get('islandora_defer_derivatives_on_ingest', FALSE),
         ),
+        'islandora_render_context_ingeststep' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Render applicable Content Model label(s) during ingest steps'),
+          '#description' => t('This enables contextual titles, displaying Content Model label(s), to be added on top of ingest forms.'),
+          '#default_value' => variable_get('islandora_render_context_ingeststep', FALSE),
+        ),
         'islandora_show_print_option' => array(
           '#type' => 'checkbox',
           '#title' => t('Show print option on objects'),
