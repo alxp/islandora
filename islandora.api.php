@@ -152,7 +152,7 @@ function hook_islandora_edit_object_alter(&$object, &$rendered) {
  *     If 'block' is set to TRUE, it will take precedence.
  *     Defaults to FALSE,
  *   - params: An associative array, only present when the action is 'modify'.
- *     The key value pairs repersent what values will be changed. The params
+ *     The key value pairs represent what values will be changed. The params
  *     will match the same params as passed to FedoraApiM::modifyObject().
  *
  * @see FedoraApiM::modifyObject()
@@ -203,7 +203,7 @@ function hook_cmodel_pid_islandora_object_alter(AbstractObject $object, array &$
  *     If 'block' is set to TRUE, it will take precedence.
  *     Defaults to FALSE,
  *   - params: An associative array, only present when the action is 'modify'.
- *     The key value pairs repersent what values will be changed. The params
+ *     The key value pairs represent what values will be changed. The params
  *     will match the same params as passed to FedoraApiM::modifyDatastream().
  *
  * @see FedoraApiM::modifyDatastream()
