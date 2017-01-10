@@ -10,6 +10,17 @@ div.islandora-objects > div {
   display: inline-block;
 }
 
+/* img styling (max-width) - Setting a max width to ensure a thumbnails width
+ * does not exceed that of its parent container (ex: 20%).
+ *
+ * img styling (max-height) - Avoid making assumptions on max height here, allowing auto
+ * height based on max-width of 100%. Consider overriding this file in your theme,
+ * or adding your own CSS to address a maximum thumbnail height.
+ */
+.islandora-object img {
+  max-width: 100%;
+}
+
 .islandora-objects-list-item {
   clear: both;
   width: 100%;
