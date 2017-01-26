@@ -437,6 +437,12 @@ function islandora_view_datastream_deliver_chunks(AbstractDatastream $datastream
 /**
  * Creates/returns the file URI for the content of a datastream for chunking.
  *
+ * File locks are used to ensure the datastream is completely downloaded before
+ * attempting to serve up chunks from the file.
+ *
+ * @throws RepositoryException|Exception
+ *   Exceptions may be thrown if the file was unable to be reliably acquired.
+ *
  * @param AbstractDatastream $datastream
  *   An AbstractDatastream representing a datastream on a Fedora object.
  *
@@ -445,17 +451,71 @@ function islandora_view_datastream_deliver_chunks(AbstractDatastream $datastream
  */
 function islandora_view_datastream_retrieve_file_uri(AbstractDatastream $datastream) {
   module_load_include('inc', 'islandora', 'includes/mimetype.utils');
+  module_load_include('inc', 'islandora', 'includes/utilities');
 
   $extension = islandora_get_extension_for_mimetype($datastream->mimetype);
   $file_uri = 'temporary://chunk_' . $datastream->parent->id . '_' . $datastream->id . '_' . $datastream->createdDate->getTimestamp() . '.' . $extension;
-  if (!file_exists($file_uri)) {
-    $file = new stdClass();
-    $file->uri = $file_uri;
-    $file->filename = drupal_basename($file_uri);
-    $file->filemime = $datastream->mimeType;
-    $file->status = 0;
-    $datastream->getContent($file_uri);
-    file_save($file);
+  touch(drupal_realpath($file_uri));
+  $fp = fopen($file_uri, 'r+b');
+  if (flock($fp, LOCK_SH)) {
+    try {
+      fseek($fp, 0, SEEK_END);
+      if (ftell($fp) === 0 && $datastream->size > 0) {
+        // Just opened at beginning of file, if beginning == EOF, need to grab
+        // it.
+        if (!flock($fp, LOCK_EX | LOCK_NB)) {
+          // Hypothetically, two threads could have a "shared" lock with an
+          // unpopulated file, so to avoid deadlock on the "exclusive" lock,
+          // drop the "shared" lock before blocking to obtain the "exclusive"
+          // lock.
+          flock($fp, LOCK_UN);
+        }
+        if (flock($fp, LOCK_EX)) {
+          // Get exclusive lock, write file.
+          $file = islandora_temp_file_entry($file_uri, $datastream->mimeType);
+          if ($file->filesize == $datastream->size) {
+            // Populated in another thread while we were waiting for the
+            // "exclusive" lock; drop lock and return.
+            flock($fp, LOCK_UN);
+            fclose($fp);
+            return $file_uri;
+          }
+
+          try {
+            $datastream->getContent($file->uri);
+            clearstatcache($file->uri);
+            $file = file_save($file);
+            if ($file->filesize != $datastream->size) {
+              throw new RepositoryException(t('Size of file downloaded for chunking does not match: Got @apparent bytes when expecting @actual.', array(
+                '@apparent' => $file->filesize,
+                '@actual' => $datastream->size,
+              )));
+            }
+          }
+          catch (RepositoryException $e) {
+            file_delete($file);
+            throw $e;
+          }
+        }
+        else {
+          throw new Exception(t('Failed to acquire write lock when downloading @pid/@dsid for chunking.', array(
+            '@pid' => $datastream->parent->id,
+            '@dsid' => $datastream->id,
+          )));
+        }
+      }
+      flock($fp, LOCK_UN);
+      fclose($fp);
+      return $file_uri;
+    }
+    catch (Exception $e) {
+      flock($fp, LOCK_UN);
+      fclose($fp);
+      throw $e;
+    }
   }
-  return $file_uri;
+  throw new Exception(t('Failed to acquire shared lock when chunking @pid/@dsid.', array(
+    '@pid' => $datastream->parent->id,
+    '@dsid' => $datastream->id,
+  )));
 }
