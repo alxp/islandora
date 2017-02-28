@@ -28,7 +28,7 @@ script:
   - $ISLANDORA_DIR/tests/scripts/line_endings.sh sites/all/modules/islandora
   - drush coder-review --reviews=production,security,style,i18n,potx,sniffer islandora
   - phpcpd --names *.module,*.inc,*.test sites/all/modules/islandora
-  - php /var/www/drupal7/scripts/run-tests.sh "Islandora"
+  - php scripts/run-tests.sh --php `phpenv which php` --url http://localhost:8081 --verbose "Islandora"
 after_failure:
   - $ISLANDORA_DIR/tests/scripts/travis_after_failure.sh
 notifications:
