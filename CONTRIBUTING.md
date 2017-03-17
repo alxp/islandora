@@ -4,7 +4,8 @@ If you are reading this document then you are interested in contributing to Isla
 
 We also have an irc channel -- #islandora -- on freenode.net. Feel free to hang out there, ask questions, and help others out if you can.
 
-Please note that this project is released with a [Contributor Code of Conduct](http://islandora.ca/codeofconduct). By participating in this project you agree to abide by its terms.
+Please note that this project operates under the [Islandora Community Code of Conduct](http://islandora.ca/codeofconduct). By participating in this project you agree to abide by its terms.
+
 
 ## Workflows
 
