@@ -53,13 +53,20 @@ function islandora_preprocess_islandora_default_edit(array &$variables) {
       'class' => 'datastream-size',
       'data' => islandora_datastream_get_human_readable_size($ds),
     );
+    if (user_access(ISLANDORA_VIEW_DATASTREAM_HISTORY)) {
+      if (islandora_datastream_access(ISLANDORA_VIEW_DATASTREAM_HISTORY, $ds)) {
+        $row[] = array(
+          'class' => 'datastream-versions',
+          'data' => theme('islandora_datastream_version_link', array(
+            'datastream' => $ds,
+          )),
+        );
+      }
+      else {
+        $row[] = array();
+      }
+    }
     if (islandora_datastream_access(ISLANDORA_VIEW_DATASTREAM_HISTORY, $ds)) {
-      $row[] = array(
-        'class' => 'datastream-versions',
-        'data' => theme('islandora_datastream_version_link', array(
-          'datastream' => $ds,
-        )),
-      );
       // Add new datastream content as the lastest version.
       $row[] = array(
         'class' => 'datastream-replace',
@@ -67,6 +74,9 @@ function islandora_preprocess_islandora_default_edit(array &$variables) {
           'datastream' => $ds,
         )),
       );
+    }
+    else {
+      $row[] = array();
     }
     $row[] = array(
       'class' => 'datastream-download',
