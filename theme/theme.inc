@@ -60,6 +60,11 @@ function islandora_preprocess_islandora_default_edit(array &$variables) {
           'datastream' => $ds,
         )),
       );
+    }
+    elseif (user_access(ISLANDORA_VIEW_DATASTREAM_HISTORY)) {
+      $row[] = array();
+    }
+    if (islandora_datastream_access(ISLANDORA_VIEW_DATASTREAM_HISTORY, $ds)) {
       // Add new datastream content as the lastest version.
       $row[] = array(
         'class' => 'datastream-replace',
@@ -67,6 +72,9 @@ function islandora_preprocess_islandora_default_edit(array &$variables) {
           'datastream' => $ds,
         )),
       );
+    }
+    else {
+      $row[] = array();
     }
     $row[] = array(
       'class' => 'datastream-download',
