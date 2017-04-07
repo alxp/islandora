@@ -61,7 +61,7 @@ function islandora_preprocess_islandora_default_edit(array &$variables) {
         )),
       );
     }
-    else if (user_access(ISLANDORA_VIEW_DATASTREAM_HISTORY)) {
+    elseif (user_access(ISLANDORA_VIEW_DATASTREAM_HISTORY)) {
       $row[] = array();
     }
     if (islandora_datastream_access(ISLANDORA_VIEW_DATASTREAM_HISTORY, $ds)) {
