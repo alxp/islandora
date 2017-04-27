@@ -48,7 +48,7 @@ function islandora_derivatives_test_some_cmodel_islandora_derivative() {
 /**
  * Implements hook_islandora_CMODEL_PID_derivative_alter().
  */
-function islandora_derivatives_test_some_cmodel_islandora_derivative_alter(&$derivatives, AbstractObject $object, $ds_modified_params) {
+function islandora_derivatives_test_some_cmodel_islandora_derivative_alter(&$derivatives, AbstractObject $object = NULL, $ds_modified_params = array()) {
   // Use a mask to determine if only the label has been modified.
   $diff = array_diff_key($ds_modified_params, array(
     'label' => NULL,
