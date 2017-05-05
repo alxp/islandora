@@ -1024,7 +1024,7 @@ function islandora_view_object(AbstractObject $object) {
   module_load_include('inc', 'islandora', 'includes/breadcrumb');
   module_load_include('inc', 'islandora', 'includes/utilities');
 
-  // Warn if object is unpublished
+  // Warn if object is inactive or deleted. 
   if ($object->state != 'A') {
     drupal_set_message(t('This object is not active. Metadata may not display correctly.'), 'warning');
   }
