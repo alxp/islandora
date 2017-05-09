@@ -2094,8 +2094,8 @@ function islandora_conditionally_clear_cache() {
     // batches, since they are not in response to GUI actions.
     '_batch_process' => 'islandora_schedule_cache_clear_for_batch',
   );
-
-  foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS & ~DEBUG_BACKTRACE_PROVIDE_OBJECT) as $frame) {
+  $options = (version_compare(PHP_VERSION, '5.3.6', '>=') ? DEBUG_BACKTRACE_IGNORE_ARGS & ~DEBUG_BACKTRACE_PROVIDE_OBJECT : FALSE);
+  foreach (debug_backtrace($options) as $frame) {
     $function_name = strtolower($frame['function']);
     if (isset($functions[$function_name])) {
       $clear = TRUE;

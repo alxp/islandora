@@ -353,7 +353,7 @@ function hook_islandora_datastream_modified(AbstractObject $object, AbstractData
  *
  * @see hook_islandora_datastream_modified()
  */
-function hook_cmodel_pid_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream, array $params) {
+function hook_cmodel_pid_dsid_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream, array $params) {
 
 }
 
@@ -377,7 +377,7 @@ function hook_islandora_datastream_purged(AbstractObject $object, $dsid) {
  *
  * @see hook_islandora_datastream_purged()
  */
-function hook_cmodel_pid_islandora_datastream_purged(AbstractObject $object, $dsid) {
+function hook_cmodel_pid_dsid_islandora_datastream_purged(AbstractObject $object, $dsid) {
 
 }
 
@@ -746,7 +746,7 @@ function hook_cmodel_pid_islandora_derivative() {
 /**
  * Allows for the altering of defined derivative functions.
  */
-function hook_islandora_derivative_alter(&$derivatives, AbstractObject $object, $ds_modified_params = array()) {
+function hook_islandora_derivative_alter(&$derivatives, AbstractObject $object = NULL, $ds_modified_params = array()) {
   foreach ($derivatives as $key => $derivative) {
     if ($derivative['destination_dsid'] == 'TN') {
       unset($derivatives[$key]);
