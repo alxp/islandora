@@ -3,22 +3,67 @@ dist: trusty
 language: php
 matrix:
   include:
+   #5.3.3 Precise block
     - php: 5.3.3
       dist: precise
+      env: FEDORA_VERSION="3.5"
+    - php: 5.3.3
+      dist: precise
+      env: FEDORA_VERSION="3.6.2"
+    - php: 5.3.3
+      dist: precise
+      env: FEDORA_VERSION="3.7.0"
+    - php: 5.3.3
+      dist: precise
+      env: FEDORA_VERSION="3.8.1"
+   # 5.4 Trusty block      
     - php: 5.4
+      env: FEDORA_VERSION="3.5"
+    - php: 5.4
+      env: FEDORA_VERSION="3.6.2"
+    - php: 5.4
+      env: FEDORA_VERSION="3.7.0"
+    - php: 5.4
+      env: FEDORA_VERSION="3.8.1"  
+  # 5.5 Trusty block      
     - php: 5.5
+      env: FEDORA_VERSION="3.5"
+    - php: 5.5
+      env: FEDORA_VERSION="3.6.2"
+    - php: 5.5
+      env: FEDORA_VERSION="3.7.0"
+    - php: 5.5
+      env: FEDORA_VERSION="3.8.1"
+  # 5.6 Trusty block      
     - php: 5.6
+      env: FEDORA_VERSION="3.5"
+    - php: 5.6
+      env: FEDORA_VERSION="3.6.2"
+    - php: 5.6
+      env: FEDORA_VERSION="3.7.0"
+    - php: 5.6
+      env: FEDORA_VERSION="3.8.1"
+  # 7.0 Trusty block      
     - php: 7.0
+      env: FEDORA_VERSION="3.5"
+    - php: 7.0
+      env: FEDORA_VERSION="3.6.2"
+    - php: 7.0
+      env: FEDORA_VERSION="3.7.0"
+    - php: 7.0
+      env: FEDORA_VERSION="3.8.1"
+  # 7.1 Trusty block      
     - php: 7.1
+      env: FEDORA_VERSION="3.5"
+    - php: 7.1
+      env: FEDORA_VERSION="3.6.2"
+    - php: 7.1
+      env: FEDORA_VERSION="3.7.0"
+    - php: 7.1
+      env: FEDORA_VERSION="3.8.1"    
 branches:
   only:
     - /^7.x/
-env:
-  matrix:
-    - FEDORA_VERSION="3.5"
-    - FEDORA_VERSION="3.6.2"
-    - FEDORA_VERSION="3.7.0"
-    - FEDORA_VERSION="3.8.1"
   global:
     # This key is unique to the Islandora/islandora repository; logging will
     # fail on forked repositories unless a new unique key is generated for them.
