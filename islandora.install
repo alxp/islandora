@@ -60,6 +60,7 @@ function islandora_uninstall() {
     'islandora_require_obj_upload',
     'islandora_breadcrumbs_backends',
     'islandora_render_context_ingeststep',
+    'islandora_deny_inactive_and_deleted',
   );
   array_walk($variables, 'variable_del');
 }
