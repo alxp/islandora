@@ -65,6 +65,11 @@ function islandora_view_datastream(AbstractDatastream $datastream, $download = F
     }
     header("Content-Disposition: attachment; filename=\"$filename\"");
   }
+  else {
+    if ($datastream->controlGroup == 'R') {
+      drupal_goto($datastream->url);
+    }
+  }
 
   $cache_check = islandora_view_datastream_cache_check($datastream);
   if ($cache_check !== 200) {
