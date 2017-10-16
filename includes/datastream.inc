@@ -65,11 +65,6 @@ function islandora_view_datastream(AbstractDatastream $datastream, $download = F
     }
     header("Content-Disposition: attachment; filename=\"$filename\"");
   }
-  else {
-    if ($datastream->controlGroup == 'R') {
-      drupal_goto($datastream->url);
-    }
-  }
 
   $cache_check = islandora_view_datastream_cache_check($datastream);
   if ($cache_check !== 200) {
@@ -91,6 +86,11 @@ function islandora_view_datastream(AbstractDatastream $datastream, $download = F
     // to receive content for playback.
     $chunk_headers = FALSE;
     if (isset($_SERVER['HTTP_RANGE'])) {
+      // XXX: Can't make assertions on byte ranging of redirect datastreams.
+      // @see https://jira.duraspace.org/browse/ISLANDORA-2084.
+      if (!$download && $datastream->controlGroup == 'R') {
+        drupal_goto($datastream->url);
+      }
       // Set headers specific to chunking.
       $chunk_headers = islandora_view_datastream_set_chunk_headers($datastream);
     }
