@@ -21,7 +21,7 @@ function template_preprocess_islandora_default_edit(array &$variables) {
   $header[] = array('data' => t('Type'));
   $header[] = array('data' => t('Mime type'));
   $header[] = array('data' => t('Size'));
-  if (user_access(ISLANDORA_VIEW_DATASTREAM_HISTORY)) {
+  if (islandora_object_access(ISLANDORA_VIEW_DATASTREAM_HISTORY, $islandora_object)) {
     $header[] = array('data' => t('Versions'));
   }
 
@@ -61,7 +61,7 @@ function template_preprocess_islandora_default_edit(array &$variables) {
         )),
       );
     }
-    elseif (user_access(ISLANDORA_VIEW_DATASTREAM_HISTORY)) {
+    elseif (islandora_object_access(ISLANDORA_VIEW_DATASTREAM_HISTORY, $islandora_object)) {
       $row[] = array();
     }
     $row[] = array(
