@@ -397,7 +397,14 @@ function islandora_menu() {
     'type' => MENU_NORMAL_ITEM,
     'access arguments' => array(ISLANDORA_MANAGE_DELETED_OBJECTS),
   );
-
+  $items['admin/reports/orphaned_objects/list'] = array(
+    'title' => 'Orphaned objects',
+    'description' => 'List of orphaned objects.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_orphaned_objects_manage_form'),
+    'access arguments' => array('manage orphaned objects'),
+    'file' => 'includes/orphaned_objects.inc',
+  );
   $items['admin/islandora/restore/manage'] = array(
     'description' => 'Restore or permanantly remove objects with Deleted status',
     'title' => 'Manage Deleted Objects',
