@@ -398,8 +398,8 @@ function islandora_menu() {
     'access arguments' => array(ISLANDORA_MANAGE_DELETED_OBJECTS),
   );
   $items['admin/reports/orphaned_objects/list'] = array(
-    'title' => 'Orphaned objects',
-    'description' => 'List of orphaned objects.',
+    'title' => 'Orphaned Islandora objects',
+    'description' => 'List of orphaned Islandora objects.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('islandora_orphaned_objects_manage_form'),
     'access arguments' => array('manage orphaned objects'),

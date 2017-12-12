@@ -11,8 +11,8 @@
 function islandora_orphaned_objects_permission() {
   return array(
     'manage orphaned objects' => array(
-      'title' => t('Manage orphaned objects'),
-      'description' => t('View a list of orphaned objects.'),
+      'title' => t('Manage orphaned Islandora objects'),
+      'description' => t('View a list of orphaned Islandora objects.'),
     ),
   );
 }
