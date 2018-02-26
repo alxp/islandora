@@ -149,8 +149,10 @@ WHERE {
     UNION { ?object <islandora:isPageOf> ?liveparent } .
    ?liveparent <fedora-model:hasModel> <info:fedora/fedora-system:FedoraObject-3.0> .
   }
+  !optionals
+  !filters
   FILTER (!bound(?liveparent))
-}
+} ORDER BY ?object
 EOQ;
 
   $optionals = (array) module_invoke('islandora_xacml_api', 'islandora_basic_collection_get_query_optionals', 'view');
