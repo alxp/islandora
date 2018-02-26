@@ -6,18 +6,6 @@
  */
 
 /**
- * Implements hook_permission().
- */
-function islandora_orphaned_objects_permission() {
-  return array(
-    'manage orphaned objects' => array(
-      'title' => t('Manage orphaned Islandora objects'),
-      'description' => t('View a list of orphaned Islandora objects.'),
-    ),
-  );
-}
-
-/**
  * Builds the management form for the Orphaned Objects module.
  *
  * @param array $form
