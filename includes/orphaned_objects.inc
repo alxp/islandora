@@ -129,7 +129,7 @@ function islandora_orphaned_objects_get_orphaned_objects() {
   // SPARQL: get orphaned objects, exclude any with a living parent.
   $object_query = <<<EOQ
 PREFIX islandora: <http://islandora.ca/ontology/relsext#>
-SELECT ?object ?p ?otherobject ?title 
+SELECT DISTINCT ?object ?title 
 WHERE {
   ?object <fedora-model:hasModel> <info:fedora/fedora-system:FedoraObject-3.0> ;
                ?p ?otherobject .
