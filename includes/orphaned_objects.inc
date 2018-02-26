@@ -138,20 +138,33 @@ function islandora_orphaned_objects_manage_confirm_submit($form, &$form_state) {
  */
 function islandora_orphaned_objects_get_orphaned_objects() {
   $connection = islandora_get_tuque_connection();
-  // First query: get standard objects.
+  // SPARQL: get orphaned objects, exclude any with a living parent.
   $object_query = <<<EOQ
-SELECT ?object ?otherobject ?title ?p
+PREFIX islandora: <http://islandora.ca/ontology/relsext#>
+SELECT ?object ?p ?otherobject ?title 
 WHERE {
   ?object <fedora-model:hasModel> <info:fedora/fedora-system:FedoraObject-3.0> ;
                ?p ?otherobject .
    ?object <fedora-model:label> ?title;
-   FILTER( regex( str(?p), "/fedora-system:def/relations-external#"))
-   OPTIONAL {
-     ?otherobject <fedora-model:hasModel> ?model .
-   }
-   FILTER(!bound(?model))
+  OPTIONAL {
+    ?otherobject <fedora-model:hasModel> ?model .
+  } .
+  FILTER (!bound(?model))
+
+  # Filter by "parent" relationships - isMemberOf, isMemberOfCollection, isPageOf. 
+  FILTER (?p = <fedora-rels-ext:isMemberOfCollection> || ?p = <fedora-rels-ext:isMemberOf> || ?p = <islandora:isPageOf>)
+ 
+# Exclude objects with live parents - isMemberOf, isMemberOfCollection, isPageOf.
+ OPTIONAL {
+    {?object <fedora-rels-ext:isMemberOfCollection> ?liveparent }
+    UNION {?object <fedora-rels-ext:isMemberOf> ?liveparent } 
+    UNION { ?object <islandora:isPageOf> ?liveparent } .
+   ?liveparent <fedora-model:hasModel> <info:fedora/fedora-system:FedoraObject-3.0> .
+  }
+  FILTER (!bound(?liveparent))
 }
 EOQ;
+
   $optionals = (array) module_invoke('islandora_xacml_api', 'islandora_basic_collection_get_query_optionals', 'view');
   $filter_modules = array(
     'islandora_xacml_api',
