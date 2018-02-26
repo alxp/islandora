@@ -631,6 +631,10 @@ function islandora_permission() {
       'title' => t('Replace datastreams'),
       'description' => t('Add new datastream content as latest version.'),
     ),
+    'manage orphaned objects' => array(
+      'title' => t('Manage orphaned Islandora objects'),
+      'description' => t('View a list of orphaned Islandora objects.'),
+    ),
   );
   if (variable_get('islandora_deny_inactive_and_deleted', FALSE)) {
     $permissions[ISLANDORA_ACCESS_INACTIVE_AND_DELETED_OBJECTS] = array(
