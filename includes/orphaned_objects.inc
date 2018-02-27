@@ -6,7 +6,7 @@
  */
 
 /**
- * Builds the management form for the Orphaned Objects module.
+ * Builds the Orphaned Islandora Objects management form.
  *
  * @param array $form
  *   An array representing a form within Drupal.
@@ -37,7 +37,7 @@ function islandora_orphaned_objects_manage_form($form, $form_state) {
     );
   }
   else {
-    $orphaned_objects = islandora_orphaned_objects_get_orphaned_objects();
+    $orphaned_objects = islandora_get_orphaned_objects();
     $rows = array();
     foreach ($orphaned_objects as $orphaned_object) {
       $pid = $orphaned_object['object']['value'];
@@ -124,7 +124,7 @@ function islandora_orphaned_objects_manage_confirm_submit($form, &$form_state) {
  * @return array
  *   An array containing the results of the orphaned objects queries.
  */
-function islandora_orphaned_objects_get_orphaned_objects() {
+function islandora_get_orphaned_objects() {
   $connection = islandora_get_tuque_connection();
   // SPARQL: get orphaned objects, exclude any with a living parent.
   $object_query = <<<EOQ
@@ -196,7 +196,7 @@ function islandora_orphaned_objects_delete_create_batch($pids) {
     'progress_message' => t('Time elapsed: @elapsed <br/>Estimated time remaining @estimate.'),
     'error_message' => t('An error has occurred.'),
     'finished' => 'islandora_orphaned_objects_delete_batch_finished',
-    'file' => drupal_get_path('module', 'islandora_orphaned_objects') . '/includes/batch.inc',
+    'file' => drupal_get_path('module', 'islandora') . '/includes/orphaned_objects.inc',
   );
   return $batch;
 }
