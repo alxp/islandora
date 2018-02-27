@@ -49,6 +49,8 @@ function islandora_orphaned_objects_manage_form($form, $form_state) {
     );
   }
   else {
+    drupal_set_message(t('Some objects may intentionally have no parents. If deleting objects, please be 
+    absolutely sure that these objects are no longer required.'), 'warning');
     $orphaned_objects = islandora_get_orphaned_objects();
     $rows = array();
     foreach ($orphaned_objects as $orphaned_object) {
