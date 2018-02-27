@@ -16,7 +16,7 @@
  * @return array
  *   An array containing the form to be rendered.
  */
-function islandora_orphaned_objects_manage_form($form, $form_state) {
+function islandora_manage_orphaned_objects_form($form, $form_state) {
   if (isset($form_state['show_confirm'])) {
     $pids = $form_state['pids_to_delete'];
     if (count($form_state['pids_to_delete']) == 1) {
@@ -40,7 +40,7 @@ function islandora_orphaned_objects_manage_form($form, $form_state) {
       '#type' => 'submit',
       '#value' => t('Confirm'),
       '#weight' => 2,
-      '#submit' => array('islandora_orphaned_objects_manage_confirm_submit'),
+      '#submit' => array('islandora_manage_orphaned_objects_confirm_submit'),
     );
     $form['cancel_submit'] = array(
       '#type' => 'submit',
@@ -71,14 +71,14 @@ function islandora_orphaned_objects_manage_form($form, $form_state) {
       $form['submit_selected'] = array(
         '#type' => 'submit',
         '#name' => 'islandora-orphaned-objects-submit-selected',
-        '#validate' => array('islandora_orphaned_objects_manage_delete_selected_validate'),
-        '#submit' => array('islandora_orphaned_objects_manage_delete_submit'),
+        '#validate' => array('islandora_delete_selected_orphaned_objects_validate'),
+        '#submit' => array('islandora_delete_orphaned_objects_submit'),
         '#value' => t('Delete Selected'),
       );
       $form['submit_all'] = array(
         '#type' => 'submit',
         '#name' => 'islandora-orphaned-objects-submit-all',
-        '#submit' => array('islandora_orphaned_objects_manage_delete_submit'),
+        '#submit' => array('islandora_delete_orphaned_objects_submit'),
         '#value' => t('Delete All'),
       );
     }
@@ -93,7 +93,7 @@ function islandora_orphaned_objects_manage_form($form, $form_state) {
  * @param array $form_state
  *   An array containing the Drupal form state.
  */
-function islandora_orphaned_objects_manage_delete_selected_validate($form, $form_state) {
+function islandora_delete_selected_orphaned_objects_validate($form, $form_state) {
   $selected = array_filter($form_state['values']['management_table']);
   if (empty($selected)) {
     form_error($form['management_table'], t('At least one object must be selected to delete!'));
@@ -107,7 +107,7 @@ function islandora_orphaned_objects_manage_delete_selected_validate($form, $form
  * @param array $form_state
  *   An array containing the Drupal form state.
  */
-function islandora_orphaned_objects_manage_delete_submit(&$form, &$form_state) {
+function islandora_delete_orphaned_objects_submit(&$form, &$form_state) {
   if ($form_state['triggering_element']['#name'] == 'islandora-orphaned-objects-submit-selected') {
     $selected = array_keys(array_filter($form_state['values']['management_table']));
   }
@@ -127,8 +127,8 @@ function islandora_orphaned_objects_manage_delete_submit(&$form, &$form_state) {
  * @param array $form_state
  *   An array containing the Drupal form state.
  */
-function islandora_orphaned_objects_manage_confirm_submit($form, &$form_state) {
-  $batch = islandora_orphaned_objects_delete_create_batch($form_state['pids_to_delete']);
+function islandora_manage_orphaned_objects_confirm_submit($form, &$form_state) {
+  $batch = islandora_delete_orphaned_objects_create_batch($form_state['pids_to_delete']);
   batch_set($batch);
 }
 
@@ -199,17 +199,17 @@ EOQ;
  * @return array
  *   An array detailing the batch that is about to be run.
  */
-function islandora_orphaned_objects_delete_create_batch($pids) {
+function islandora_delete_orphaned_objects_create_batch($pids) {
   // Set up a batch operation.
   $batch = array(
     'operations' => array(
-      array('islandora_orphaned_objects_delete_batch_operation', array($pids)),
+      array('islandora_delete_orphaned_objects_batch_operation', array($pids)),
     ),
     'title' => t('Deleting the selected objects...'),
     'init_message' => t('Preparing to delete objects.'),
     'progress_message' => t('Time elapsed: @elapsed <br/>Estimated time remaining @estimate.'),
     'error_message' => t('An error has occurred.'),
-    'finished' => 'islandora_orphaned_objects_delete_batch_finished',
+    'finished' => 'islandora_delete_orphaned_objects_batch_finished',
     'file' => drupal_get_path('module', 'islandora') . '/includes/orphaned_objects.inc',
   );
   return $batch;
@@ -222,7 +222,7 @@ function islandora_orphaned_objects_delete_create_batch($pids) {
  * @param array $context
  *   The context of the Drupal batch.
  */
-function islandora_orphaned_objects_delete_batch_operation($pids, &$context) {
+function islandora_delete_orphaned_objects_batch_operation($pids, &$context) {
   if (empty($context['sandbox'])) {
     $context['sandbox'] = array();
     $context['sandbox']['progress'] = 0;
@@ -255,7 +255,7 @@ function islandora_orphaned_objects_delete_batch_operation($pids, &$context) {
  * @param array $operations
  *   The operations array that was used in the batch.
  */
-function islandora_orphaned_objects_delete_batch_finished($success, $results, $operations) {
+function islandora_delete_orphaned_objects_batch_finished($success, $results, $operations) {
   if ($success) {
     $message = format_plural(count($results['success']), 'One object deleted.', '@count objects deleted.');
   }
