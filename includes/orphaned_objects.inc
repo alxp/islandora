@@ -21,10 +21,10 @@ function islandora_manage_orphaned_objects_form($form, $form_state) {
     $pids = $form_state['pids_to_delete'];
     if (count($form_state['pids_to_delete']) == 1) {
       $pid_paths = '<a href="/islandora/object/' . $pids[0] . '" target="_blank">' . $pids[0] . '</a>';
-    } 
-   elseif (count($form_state['pids_to_delete']) <= 10) {
+    }
+    elseif (count($form_state['pids_to_delete']) <= 10) {
       $pid_paths = '<ul>';
-      foreach($pids as $pid) {
+      foreach ($pids as $pid) {
         $pid_paths = $pid_paths . '<li><a href="/islandora/object/' . $pid . '" target="_blank">' . $pid . '</a></li>';
         $pid_links[] = '<a href="/islandora/object/' . $pid . '">' . $pid . '</a>';
       }
