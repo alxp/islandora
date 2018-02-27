@@ -632,7 +632,7 @@ function islandora_permission() {
       'title' => t('Replace datastreams'),
       'description' => t('Add new datastream content as latest version.'),
     ),
-    'ISLANDORA_MANAGE_ORPHANED_OBJECTS' => array(
+    ISLANDORA_MANAGE_ORPHANED_OBJECTS => array(
       'title' => t('Manage orphaned Islandora objects'),
       'description' => t('View a list of orphaned Islandora objects.'),
     ),
