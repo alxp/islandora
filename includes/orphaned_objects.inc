@@ -19,22 +19,18 @@
 function islandora_manage_orphaned_objects_form($form, $form_state) {
   if (isset($form_state['show_confirm'])) {
     $pids = $form_state['pids_to_delete'];
-    if (count($form_state['pids_to_delete']) == 1) {
-      $pid_paths = '<a href="/islandora/object/' . $pids[0] . '" target="_blank">' . $pids[0] . '</a>';
-    }
-    elseif (count($form_state['pids_to_delete']) <= 10) {
+    if (count($form_state['pids_to_delete']) <= 10) {
       $pid_paths = '<ul>';
       foreach ($pids as $pid) {
         $pid_paths = $pid_paths . '<li><a href="/islandora/object/' . $pid . '" target="_blank">' . $pid . '</a></li>';
-        $pid_links[] = '<a href="/islandora/object/' . $pid . '">' . $pid . '</a>';
       }
       $pid_paths = $pid_paths . '</ul>';
     }
     $form['confirm_message'] = array(
       '#type' => 'item',
       '#markup' => format_plural(count($form_state['pids_to_delete']),
-      'Are you sure you want to delete the object ' . $pid_paths . '? This action cannot be reversed.',
-      'Are you sure you want to delete these @count objects? This action cannot be reversed.' . $pid_paths),
+      'Are you sure you want to delete this object? This action cannot be reversed.',
+      'Are you sure you want to delete these @count objects? This action cannot be reversed.') . $pid_paths,
     );
     $form['confirm_submit'] = array(
       '#type' => 'submit',
