@@ -19,12 +19,6 @@
 function islandora_manage_orphaned_objects_form($form, $form_state) {
   if (isset($form_state['show_confirm'])) {
     $pids = $form_state['pids_to_delete'];
-    if (count($form_state['pids_to_delete']) <= 10) {
-      $pid_paths = array();
-      foreach ($pids as $pid) {
-        $pid_paths[] = l($pid, '/islandora/object/' . $pid);
-      }
-    }
     $form['confirm_message'] = array(
       '#type' => 'item',
       '#markup' => format_plural(count($form_state['pids_to_delete']),
