@@ -20,18 +20,28 @@ function islandora_manage_orphaned_objects_form($form, $form_state) {
   if (isset($form_state['show_confirm'])) {
     $pids = $form_state['pids_to_delete'];
     if (count($form_state['pids_to_delete']) <= 10) {
-      $pid_paths = '<ul>';
+      $pid_paths = array();
       foreach ($pids as $pid) {
-        $pid_paths = $pid_paths . '<li><a href="/islandora/object/' . $pid . '" target="_blank">' . $pid . '</a></li>';
+        $pid_paths[] = l($pid, '/islandora/object/' . $pid);
       }
-      $pid_paths = $pid_paths . '</ul>';
     }
     $form['confirm_message'] = array(
       '#type' => 'item',
       '#markup' => format_plural(count($form_state['pids_to_delete']),
       'Are you sure you want to delete this object? This action cannot be reversed.',
-      'Are you sure you want to delete these @count objects? This action cannot be reversed.') . $pid_paths,
+      'Are you sure you want to delete these @count objects? This action cannot be reversed.'),
     );
+    if (count($pids) <= 10) {
+      $form['pids_to_delete'] = array(
+        '#type' => 'markup',
+        '#theme' => 'item_list',
+        '#list_type' => 'ol',
+      );
+      $options = array('attributes' => array('target' => '_blank'));
+      foreach ($pids as $pid) {
+        $form['pids_to_delete']['#items'][] = l($pid, "/islandora/object/{$pid}", $options);
+      }
+    }
     $form['confirm_submit'] = array(
       '#type' => 'submit',
       '#value' => t('Confirm'),
@@ -45,8 +55,10 @@ function islandora_manage_orphaned_objects_form($form, $form_state) {
     );
   }
   else {
-    drupal_set_message(t('Some objects may intentionally have no parents. If deleting objects, please be 
-    absolutely sure that these objects are no longer required.'), 'warning');
+    drupal_set_message(t('This page lists objects that have at least one parent, according to their RELS-EXT, that does not
+    exist in the Fedora repository. These orphans might exist due to a failed batch ingest, their parents being deleted,
+    or a variety of other reasons. Some of these orphans may exist intentionally.
+    Please be cautious when deleting, as this action is irreversible.'), 'warning');
     $orphaned_objects = islandora_get_orphaned_objects();
     $rows = array();
     foreach ($orphaned_objects as $orphaned_object) {
@@ -81,6 +93,7 @@ function islandora_manage_orphaned_objects_form($form, $form_state) {
   }
   return $form;
 }
+
 /**
  * Validation for the Islandora Orphaned Objects management form.
  *
