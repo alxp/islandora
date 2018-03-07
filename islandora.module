@@ -403,7 +403,7 @@ function islandora_menu() {
     'description' => 'List of orphaned Islandora objects.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('islandora_manage_orphaned_objects_form'),
-    'access arguments' => array('ISLANDORA_MANAGE_ORPHANED_OBJECTS'),
+    'access arguments' => array(ISLANDORA_MANAGE_ORPHANED_OBJECTS),
     'file' => 'includes/orphaned_objects.inc',
   );
   $items['admin/islandora/restore/manage'] = array(
