@@ -43,11 +43,11 @@ The `islandora_drupal_filter` passes the username of 'anonymous' through to Fedo
 Drupal's cron can be run to remove expired authentication tokens.
 
 **Breadcrumb Generation** on the configuration page, allows you to choose the default breadcrumb generation
- or a custom method (if implemented). 
+ or a custom method (if implemented).
 
 ### Customization
 
-[Customize ingest forms](http://github.com/Islandora/islandora/wiki/Multi-paged-Ingest-Forms)
+[Customize ingest forms](https://github.com/Islandora/islandora/wiki/Multi-paged-Ingest-Forms)
 
 ## Documentation
 
@@ -55,7 +55,7 @@ Further documentation for this module is available at [our wiki](https://wiki.du
 
 ## Troubleshooting/Issues
 
-NOTE: There has been a function signature change for the `ingestDatastream` function within Tuque which will be deprecated after the 7.x-1.10 release. To read about it in detail please see the [JIRA ticket](https://jira.duraspace.org/browse/ISLANDORA-1995). For the time being there is a warning stating that this will become deprecated and that code that utilizes this specific behavior should be updated. Once this code is updated the `islandora_deprecation_return_false_when_datastream_exists` variable may be set to FALSE so the warning no longer displays. An example for doing this with drush: `drush vset islandora_deprecation_return_false_when_datastream_exists FALSE`. 
+NOTE: There has been a function signature change for the `ingestDatastream` function within Tuque which will be deprecated after the 7.x-1.10 release. To read about it in detail please see the [JIRA ticket](https://jira.duraspace.org/browse/ISLANDORA-1995). For the time being there is a warning stating that this will become deprecated and that code that utilizes this specific behavior should be updated. Once this code is updated the `islandora_deprecation_return_false_when_datastream_exists` variable may be set to FALSE so the warning no longer displays. An example for doing this with drush: `drush vset islandora_deprecation_return_false_when_datastream_exists FALSE`.
 
 Having problems or solved a problem? Check out the Islandora google groups for a solution.
 
@@ -66,7 +66,7 @@ Having problems or solved a problem? Check out the Islandora google groups for a
 
 Current maintainers:
 
-* [William Panting](https://github.com/willtp87)
+* [Diego Pino](https://github.com/DiegoPino)
 
 ## Development
 
@@ -75,4 +75,3 @@ If you would like to contribute to this module, please check out [CONTRIBUTING.m
 ## License
 
 [GPLv3](http://www.gnu.org/licenses/gpl-3.0.txt)
-
