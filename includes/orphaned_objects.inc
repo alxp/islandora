@@ -243,7 +243,13 @@ function islandora_delete_orphaned_objects_batch_operation($pids, &$context) {
         '@total' => $context['sandbox']['total'],
     ));
     islandora_delete_object($target_object);
-    $context['results']['success'][] = $target_pid;
+    $object_check = islandora_object_load($target_pid);
+    if ($object_check) {
+      drupal_set_message(t('Could not delete ' . $target_pid . '. You may not have permission to manage this object.'), 'error');
+    }
+    else {
+      $context['results']['success'][] = $target_pid;
+    }
     $context['sandbox']['progress']++;
   }
   $context['finished'] = ($context['sandbox']['total'] == 0) ? 1 : ($context['sandbox']['progress'] / $context['sandbox']['total']);
