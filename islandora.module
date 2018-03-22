@@ -39,6 +39,7 @@ define('ISLANDORA_MANAGE_DELETED_OBJECTS', 'manage deleted objects');
 define('ISLANDORA_REVERT_DATASTREAM', 'revert to old datastream');
 define('ISLANDORA_REGENERATE_DERIVATIVES', 'regenerate derivatives for an object');
 define('ISLANDORA_REPLACE_DATASTREAM_CONTENT', 'replace a datastream with new content, preserving version history');
+define('ISLANDORA_MANAGE_ORPHANED_OBJECTS', 'view and delete a list of orphaned objects');
 
 // Hooks.
 define('ISLANDORA_VIEW_HOOK', 'islandora_view_object');
@@ -397,7 +398,14 @@ function islandora_menu() {
     'type' => MENU_NORMAL_ITEM,
     'access arguments' => array(ISLANDORA_MANAGE_DELETED_OBJECTS),
   );
-
+  $items['admin/reports/orphaned_objects/list'] = array(
+    'title' => 'Orphaned Islandora objects',
+    'description' => 'List of orphaned Islandora objects.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_manage_orphaned_objects_form'),
+    'access arguments' => array(ISLANDORA_MANAGE_ORPHANED_OBJECTS),
+    'file' => 'includes/orphaned_objects.inc',
+  );
   $items['admin/islandora/restore/manage'] = array(
     'description' => 'Restore or permanantly remove objects with Deleted status',
     'title' => 'Manage Deleted Objects',
@@ -623,6 +631,10 @@ function islandora_permission() {
     ISLANDORA_REPLACE_DATASTREAM_CONTENT => array(
       'title' => t('Replace datastreams'),
       'description' => t('Add new datastream content as latest version.'),
+    ),
+    ISLANDORA_MANAGE_ORPHANED_OBJECTS => array(
+      'title' => t('Manage orphaned Islandora objects'),
+      'description' => t('View a list of orphaned Islandora objects.'),
     ),
   );
   if (variable_get('islandora_deny_inactive_and_deleted', FALSE)) {
