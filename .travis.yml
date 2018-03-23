@@ -4,7 +4,7 @@ language: php
 
 matrix:
   include:
-   #5.3.3 Ubuntu Precise exceptions
+  #5.3.3 Ubuntu Precise exceptions
     - php: 5.3.3
       dist: precise
       env: FEDORA_VERSION="3.5"
