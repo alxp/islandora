@@ -12,11 +12,13 @@
  *   The Drupal form definition.
  * @param array $form_state
  *   The Drupal form state.
+ * @param string $serialized_chosen
+ *   A serialized array of chosen content models.
  *
  * @return array
  *   The Drupal form definition.
  */
-function islandora_deleted_objects_prep_form($form, $form_state, $serialized_chosen = NULL) {
+function islandora_deleted_objects_prep_form(array $form, array $form_state, $serialized_chosen = NULL) {
   module_load_include('inc', 'islandora', 'includes/utilities');
   $chosen_contentmodels = array();
   if ($serialized_chosen) {
@@ -67,9 +69,9 @@ function islandora_deleted_objects_prep_form($form, $form_state, $serialized_cho
  * @param array $form_state
  *   The form state.
  */
-function islandora_deleted_objects_prep_form_submit($form, $form_state) {
+function islandora_deleted_objects_prep_form_submit(array $form, array $form_state) {
   $content_models = $form_state['values']['contentmodels'];
-  $chosen = function($element) {
+  $chosen = function ($element) {
     return $element;
   };
   $serialized_contentmodels = serialize(array_filter($content_models, $chosen));
@@ -83,11 +85,13 @@ function islandora_deleted_objects_prep_form_submit($form, $form_state) {
  *   The Drupal form definition.
  * @param array $form_state
  *   The Drupal form state.
+ * @param string $serialized_chosen
+ *   A serialized array of chosen content models.
  *
  * @return array
  *   The Drupal form definition.
  */
-function islandora_deleted_objects_manage_form($form, $form_state, $serialized_chosen = NULL) {
+function islandora_deleted_objects_manage_form(array $form, array $form_state, $serialized_chosen = NULL) {
   $form['previous'] = array(
     '#type' => 'submit',
     '#value' => t('Previous'),
@@ -186,7 +190,7 @@ function islandora_deleted_objects_manage_form($form, $form_state, $serialized_c
  * @param array $form_state
  *   The form state.
  */
-function islandora_deleted_objects_manage_form_submit($form, $form_state) {
+function islandora_deleted_objects_manage_form_submit(array $form, array $form_state) {
   module_load_include('inc', 'islandora', 'includes/utilities');
   $serialized_chosen = isset($form_state['values']['serialized_chosen']) ? $form_state['values']['serialized_chosen'] : NULL;
 
@@ -202,6 +206,7 @@ function islandora_deleted_objects_manage_form_submit($form, $form_state) {
     $action = 'islandora_purge_object_by_pid';
   }
   $objects_to_process = array_filter($form_state['values']['objects_to_process']);
+
   $pids_to_restore = $objects_to_process;
   if ($form_state['values']['propogate']) {
     foreach ($objects_to_process as $pid) {
@@ -231,10 +236,17 @@ function islandora_deleted_objects_manage_form_submit($form, $form_state) {
 /**
  * Gets PIDS of all deleted objects.
  *
+ * @param array $content_models
+ *   Get deleted object with one of these content models.
+ * @param int $limit
+ *   Max to get at one time.
+ * @param int $offset
+ *   Where to start for paging.
+ *
  * @return array
  *   PIDS of deleted objects
  */
-function islandora_get_deleted_objects($content_models, $limit, $offset) {
+function islandora_get_deleted_objects(array $content_models, $limit, $offset) {
   $tuque = islandora_get_tuque_connection();
   $repository = $tuque->repository;
   $query = islandora_get_deleted_query($content_models, $offset);
@@ -246,7 +258,8 @@ function islandora_get_deleted_objects($content_models, $limit, $offset) {
       $cm_pid = $object['object']['value'];
       $title = $object['label']['value'];
       $deleted_objects[$pid] = array(
-        'title' => $title, 'pid' => $pid,
+        'title' => $title,
+        'pid' => $pid,
         'content_model' => $content_models[$cm_pid],
       );
     }
@@ -258,16 +271,18 @@ function islandora_get_deleted_objects($content_models, $limit, $offset) {
  * Gets PIDS of all content models associated with deleted objects.
  *
  * @return array
- *   array of content model pids
+ *   array of content model pids.
  */
 function islandora_get_contentmodels_with_deleted_members() {
   $tuque = new IslandoraTuque();
   $repository = $tuque->repository;
+  $filter = _islandora_get_manage_deleted_query_filter();
   $query = "PREFIX fm: <info:fedora/fedora-system:def/model#>
     SELECT DISTINCT ?object ?label FROM <#ri>
             WHERE {
                    {?subject fm:state fm:Deleted;
                              fm:hasModel ?object;
+                             $filter
                    }
             OPTIONAL{
                         ?object fm:label  ?label
@@ -288,7 +303,7 @@ function islandora_get_contentmodels_with_deleted_members() {
  * Restores deleted object.
  *
  * @param string $pid
- *   PID of object to be restored
+ *   PID of object to be restored.
  */
 function islandora_restore_object_by_pid($pid) {
   $fedora_object = islandora_object_load($pid);
@@ -299,7 +314,7 @@ function islandora_restore_object_by_pid($pid) {
  * Purges deleted object.
  *
  * @param string $pid
- *   PID of object to be restored
+ *   PID of object to be restored.
  */
 function islandora_purge_object_by_pid($pid) {
   $fedora_object = islandora_object_load($pid);
@@ -310,14 +325,14 @@ function islandora_purge_object_by_pid($pid) {
  * Get query to find all deleted objects by content type.
  *
  * @param array $content_models
- *   Content models to restrict search
+ *   Content models to restrict search.
  * @param int $offset
- *   offset to be added to search
+ *   Offset to be added to search.
  *
  * @return string
  *   Sparql query
  */
-function islandora_get_deleted_query($content_models, $offset = 0) {
+function islandora_get_deleted_query(array $content_models, $offset = 0) {
   $candidates = array_keys($content_models);
   $first_contentmodel = array_shift($candidates);
   $prefix = "PREFIX fm: <" . FEDORA_MODEL_URI . "> ";
@@ -336,5 +351,34 @@ function islandora_get_deleted_query($content_models, $offset = 0) {
                 ";
   }
   $optional = "OPTIONAL{?subject fm:label ?label}";
-  return "$prefix $select $where_clause $unions $optional $suffix";
+  $filter = _islandora_get_manage_deleted_query_filter();
+  return "$prefix $select $where_clause $unions $optional $filter $suffix";
+}
+
+/**
+ * Reuse namespace restriction filters for basic collection.
+ *
+ * This reuses the hook implementation function to make a local
+ * namespace filter for managing deleted objects.
+ *
+ * @return string
+ *   The Sparql filter statement.
+ */
+function _islandora_get_manage_deleted_query_filter() {
+  // Reusing the basic collection query filter.
+  $filter_modules = array(
+    'islandora_xacml_api',
+    'islandora',
+  );
+  $filters = array();
+  foreach ($filter_modules as $module) {
+    $filters = array_merge_recursive($filters, (array) module_invoke($module, 'islandora_basic_collection_get_query_filters', 'view'));
+  }
+  $filter_map = function ($filter) {
+    return "FILTER($filter)";
+  };
+  $filter = implode(' ', array_map($filter_map, $filters));
+  // Hook filters ?object we need to filter ?subject.
+  $filter = str_replace('?object', '?subject', $filter);
+  return $filter;
 }
