@@ -63,6 +63,10 @@ function islandora_view_datastream(AbstractDatastream $datastream, $download = F
     if ($duplicate_extension_position === FALSE) {
       $filename .= $extension;
     }
+
+    // Allow other modules to modify or replace the filename.
+    drupal_alter('islandora_datastream_filename', $filename, $datastream);
+
     header("Content-Disposition: attachment; filename=\"$filename\"");
   }
 

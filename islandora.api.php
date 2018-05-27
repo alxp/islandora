@@ -945,3 +945,24 @@ function callback_islandora_breadcrumbs_backends(AbstractObject $object) {
   // Do something to get an array of breadcrumb links for $object, root first.
   return array($root_link, $collection_link, $object_link);
 }
+
+/**
+ * Permit modules to alter the filename of a downloaded datastream.
+ *
+ * @param string $filename
+ *   The filename being created.
+ *
+ * @param AbstractDatastream $datastream
+ *   The datastream object being downloaded.
+ */
+function hook_islandora_datastream_filename_alter(&$filename, AbstractDatastream $datastream) {
+
+  // Example taken from islandora_datastream_filenamer.
+  $pattern = variable_get('islandora_ds_download_filename_pattern', FALSE);
+  if ($pattern) {
+    $filename = token_replace($pattern,
+      array('datastream' => $datastream),
+      array('clear' => TRUE)
+    );
+  }
+}
