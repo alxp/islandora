@@ -141,7 +141,7 @@ function islandora_repository_admin(array $form, array &$form_state) {
         'islandora_deny_inactive_and_deleted' => array(
           '#type' => 'checkbox',
           '#title' => t('Lock down inactive and deleted objects.'),
-          '#description' => t('Deny access to inactive or deleted objects using a separate permission than for active objects.'),
+          '#description' => t('Require a separate permission to access inactive and deleted objects.'),
           '#default_value' => variable_get('islandora_deny_inactive_and_deleted', FALSE),
         ),
       ),
