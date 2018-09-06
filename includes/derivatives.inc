@@ -127,8 +127,14 @@ function islandora_do_derivatives(AbstractObject $object, array $options) {
  *       watchdog if not defined.
  */
 function islandora_derivative_logging(array $logging_results) {
+  $result_messages = array(
+    'success' => l(t('Derivatives successfully created'), 'islandora/event-status'),
+    'incomplete' => l(t('Not all derivatives successfully created.  Please check log messages'), 'islandora/event-status'),
+  );
   foreach ($logging_results as $result) {
     foreach ($result['messages'] as $message) {
+      $result_message = $result_messages['success'];
+      $message_status = 'status';
       if ($message['type'] === 'dsm') {
         if (isset($message['severity']) && $message['severity'] != 'status') {
           drupal_set_message(filter_xss(format_string($message['message'], isset($message['message_sub']) ? $message['message_sub'] : array())), $message['severity']);
@@ -141,7 +147,6 @@ function islandora_derivative_logging(array $logging_results) {
             'message' => filter_xss(format_string($message['message'], isset($message['message_sub']) ? $message['message_sub'] : array())),
             'severity' => 'status',
           );
-          drupal_set_message(l(t('Derivatives successfully created.'), 'islandora/event-status'), 'status', FALSE);
         }
       }
       else {
@@ -150,6 +155,13 @@ function islandora_derivative_logging(array $logging_results) {
         // call_user_func until such time as the @ignore changes
         // are merged into the standard release for Coder.
         call_user_func('watchdog', 'islandora_derivatives', $message['message'], isset($message['message_sub']) ? $message['message_sub'] : array(), isset($message['severity']) ? $message['severity'] : WATCHDOG_NOTICE);
+        $result_message = $result_messages['incomplete'];
+        $message_status = 'warning';
+      }
+      drupal_set_message(filter_xss($result_message), filter_xss($message_status), FALSE);
+
+      if (isset($_SESSION['messages']['warning']) && isset($_SESSION['messages']['status'])) {
+        unset($_SESSION['messages']['status']);
       }
     }
   }
