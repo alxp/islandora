@@ -145,7 +145,7 @@ function islandora_get_orphaned_objects() {
   $connection = islandora_get_tuque_connection();
   // SPARQL: get orphaned objects, exclude any with a living parent.
   $object_query = <<<EOQ
-PREFIX islandora: <http://islandora.ca/ontology/relsext#>
+!prefix
 SELECT DISTINCT ?object ?title 
 WHERE {
   ?object <fedora-model:hasModel> <info:fedora/fedora-system:FedoraObject-3.0> ;
@@ -156,22 +156,26 @@ WHERE {
   } .
   FILTER (!bound(?model))
 
-  # Filter by "parent" relationships - isMemberOf, isMemberOfCollection, isPageOf. 
-  FILTER (?p = <fedora-rels-ext:isMemberOfCollection> || ?p = <fedora-rels-ext:isMemberOf> || ?p = <islandora:isPageOf>)
+  # Filter by "parent" relationships
+  FILTER (!dead_parent_relationships)
  
-# Exclude objects with live parents - isMemberOf, isMemberOfCollection, isPageOf.
- OPTIONAL {
-    {?object <fedora-rels-ext:isMemberOfCollection> ?liveparent }
-    UNION {?object <fedora-rels-ext:isMemberOf> ?liveparent } 
-    UNION { ?object <islandora:isPageOf> ?liveparent } .
-   ?liveparent <fedora-model:hasModel> <info:fedora/fedora-system:FedoraObject-3.0> .
+  # Exclude objects with live parents
+  OPTIONAL {
+    !live_parent_relationships .
+    ?liveparent <fedora-model:hasModel> <info:fedora/fedora-system:FedoraObject-3.0> .
   }
   !optionals
   !filters
   FILTER (!bound(?liveparent))
 } ORDER BY ?object
 EOQ;
-
+  $parent_relationships = module_invoke_all('islandora_solution_pack_child_relationships', 'all');
+  $parent_relationships['prefix'] = array_unique($parent_relationships['prefix']);
+  $parent_relationships['predicate'] = array_unique($parent_relationships['predicate']);
+  if (count($parent_relationships['predicate']) == 0) {
+    // No predicates to search for. Exit early.
+    return array();
+  }
   $optionals = (array) module_invoke('islandora_xacml_api', 'islandora_basic_collection_get_query_optionals', 'view');
   $filter_modules = array(
     'islandora_xacml_api',
@@ -184,10 +188,16 @@ EOQ;
   $filter_map = function ($filter) {
     return "FILTER($filter)";
   };
+  $parent_map = function ($parent) {
+    return "?object $parent ?liveparent";
+  };
   // Use separate queries for different object types.
   $sparql_query_objects = format_string($object_query, array(
     '!optionals' => !empty($optionals) ? ('OPTIONAL {{' . implode('} UNION {', $optionals) . '}}') : '',
     '!filters' => !empty($filters) ? implode(' ', array_map($filter_map, $filters)) : '',
+    '!dead_parent_relationships' => '?p = ' . implode(' || ?p = ', $parent_relationships['predicate']),
+    '!live_parent_relationships' => '{' . implode(' } UNION { ', array_map($parent_map, $parent_relationships['predicate'])) . '}',
+    '!prefix' => implode("\n", $parent_relationships['prefix']),
   ));
   $results = $connection->repository->ri->sparqlQuery($sparql_query_objects);
   return $results;
