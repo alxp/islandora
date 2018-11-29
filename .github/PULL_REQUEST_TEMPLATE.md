@@ -1,6 +1,5 @@
-:zap::zap::zap: *The text below is a template to give us the information we need to act on your pull request. Please delete or mark N/A on any questions that do not apply to your pull request. Please DO NOT leave the default text OR this text in place when you submit your pull request!* :zap::zap::zap:
+!!!!!! PLEASE NOTE: The text below is a template to give us the information we need to act on your pull request. Please delete or mark N/A on any questions that do not apply to your pull request. Please DO NOT leave the default text OR this text in place when you submit your pull request!!!!!!
 
------------------------------------------------------------------
 
 **JIRA Ticket**: (link)
 
