@@ -276,6 +276,7 @@ function islandora_datastream_version_replace_form($form, &$form_state, Abstract
   module_load_include('inc', 'islandora', 'includes/content_model');
   module_load_include('inc', 'islandora', 'includes/utilities');
   module_load_include('inc', 'islandora', 'includes/mimetype.utils');
+  form_load_include($form_state, 'inc', 'islandora', 'includes/datastream.version');
 
   $object = islandora_object_load($datastream->parent->id);
   $form_state['object_id'] = $object->id;
