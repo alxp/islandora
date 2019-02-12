@@ -9,7 +9,7 @@
  */
 
 /**
- * Dublin Core Class
+ * Dublin Core Class.
  */
 class DublinCore {
 
@@ -40,7 +40,7 @@ class DublinCore {
    */
   public function __construct($dc_xml = NULL) {
     if (!empty($dc_xml)) {
-      $this->dc = self::importFromXMLString($dc_xml);
+      $this->dc = self::importFromXmlString($dc_xml);
     }
   }
 
@@ -81,7 +81,7 @@ class DublinCore {
    * @return string
    *   The serialized XML.
    */
-  public function asXML() {
+  public function asXml() {
     $dc_xml = new DomDocument();
     $oai_dc = $dc_xml->createElementNS('http://www.openarchives.org/OAI/2.0/oai_dc/', 'oai_dc:dc');
     $oai_dc->setAttribute('xmlns:dc', 'http://purl.org/dc/elements/1.1/');
@@ -152,7 +152,7 @@ class DublinCore {
    * @return DublinCore
    *   The instantiated object.
    */
-  public static function importFromXMLString($dc_xml) {
+  public static function importFromXmlString($dc_xml) {
     $dc_doc = new DomDocument();
     if (!empty($dc_xml) && $dc_doc->loadXML($dc_xml)) {
       $oai_dc = $dc_doc->getElementsByTagNameNS('http://purl.org/dc/elements/1.1/', '*');

@@ -147,7 +147,7 @@ function template_preprocess_islandora_default(&$variables) {
   $variables['datastreams'] = $datastreams;
   // Objects in fcrepo4 don't always contain a DC datastream.
   if (isset($islandora_object['DC']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['DC'])) {
-    $dc_object = DublinCore::importFromXMLString($islandora_object['DC']->content);
+    $dc_object = DublinCore::importFromXmlString($islandora_object['DC']->content);
     $dc_array = $dc_object->asArray();
   }
   // We should eventually remove the DC object and dc_array code as it only
@@ -168,7 +168,7 @@ function template_preprocess_islandora_default(&$variables) {
  */
 function template_preprocess_islandora_object_print(array &$variables) {
   // Apply the print CSS in non print context.
-  $only_print_media = function($o) {
+  $only_print_media = function ($o) {
     return $o['media'] == 'print';
   };
   $css = array_filter(drupal_add_css(), $only_print_media);
@@ -280,7 +280,7 @@ function islandora_objects_object_mapper($object_id) {
     $link_options = array('html' => TRUE, 'attributes' => array('title' => $o->label));
     $description = NULL;
     if (isset($o['DC']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $o['DC'])) {
-      $dc = DublinCore::importFromXMLString($o['DC']->content);
+      $dc = DublinCore::importFromXmlString($o['DC']->content);
       if ($dc) {
         $dc = $dc->asArray();
         $description = $dc['dc:description']['value'];
@@ -313,8 +313,6 @@ function islandora_objects_object_mapper($object_id) {
  *
  * A variant of "islandora_objects" which accepts a subset of object to theme.
  *
- * @see template_preprocess_islandora_objects()
- *
  * @param array $variables
  *   An associative array containing:
  *   - objects: An array of PIDs to render for the given page.
@@ -333,8 +331,10 @@ function islandora_objects_object_mapper($object_id) {
  *     be toggled between a "grid" and "list" view.
  *   - pager: A renderable array for the pager.
  *   - content: A renderable array for the main content of the page.
+ *
+ * @see template_preprocess_islandora_objects()
  */
-function template_preprocess_islandora_objects_subset(&$variables) {
+function template_preprocess_islandora_objects_subset(array &$variables) {
   $display = (empty($_GET['display'])) ? $variables['display'] : $_GET['display'];
   $grid_display = $display == 'grid';
   $list_display = !$grid_display;
@@ -624,7 +624,7 @@ function template_preprocess_islandora_dublin_core_display(array &$variables) {
   if (islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['DC'])) {
     try {
       $dc = $islandora_object['DC']->content;
-      $dc_object = DublinCore::importFromXMLString($dc);
+      $dc_object = DublinCore::importFromXmlString($dc);
     }
     catch (Exception $e) {
       drupal_set_message(t('Error retrieving object %s %t', array('%s' => $islandora_object->id, '%t' => $e->getMessage())), 'error', FALSE);
@@ -641,7 +641,7 @@ function template_preprocess_islandora_dublin_core_description(array &$variables
   if (islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['DC'])) {
     try {
       $dc = $islandora_object['DC']->content;
-      $dc_object = DublinCore::importFromXMLString($dc);
+      $dc_object = DublinCore::importFromXmlString($dc);
     }
     catch (Exception $e) {
       drupal_set_message(t('Error retrieving object %s %t', array('%s' => $islandora_object->id, '%t' => $e->getMessage())), 'error', FALSE);

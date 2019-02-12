@@ -21,54 +21,71 @@
  * http://api.drupal.org/api/function/file_default_mimetype_mapping/7
  */
 
+/**
+ * Class for mime-type detection.
+ */
 class MimeDetect {
 
-  protected $protectedMimeTypes = array(
-    /*
-     * This is a shortlist of mimetypes which should catch most
-     * mimetype<-->extension lookups in the context of Islandora collections.
-     *
-     * It has been cut from a much longer list.
-     *
-     * Two types of mimetypes should be put in this list:
-     *  1) Special emerging formats which may not yet be expressed in the system
-     *     mime.types file.
-     *  2) Heavily used mimetypes of particular importance to the Islandora
-     *     project, as lookups against this list will be quicker and less
-     *     resource intensive than other methods.
-     *
-     * Lookups are first checked against this short list.  If no results are
-     * found, then the lookup function may move on to check other sources,
-     * namely the system's mime.types file.
-     *
-     * In most cases though, this short list should suffice.
-     *
-     * If modifying this list, please note that for promiscuous mimetypes
-     * (those which map to multiple extensions, such as text/plain)
-     * The function get_extension will always return the *LAST* extension in
-     * this list, so you should put your preferred extension *LAST*.
-     *
-     * e.g...
-     * "jpeg"    => "image/jpeg",
-     * "jpe"     => "image/jpeg",
-     * "jpg"     => "image/jpeg",
-     *
-     * $this->get_extension('image/jpeg') will always return 'jpg'.
-     *
-     */
-  );
+  /**
+   * Shortlist of mimetypes which catch most mimetype to extension lookups.
+   *
+   * @var array
+   *
+   * It has been cut from a much longer list.
+   *
+   * Two types of mimetypes should be put in this list:
+   * 1) Special emerging formats which may not yet be expressed in the system
+   * mime.types file.
+   * 2) Heavily used mimetypes of particular importance to the Islandora
+   * project, as lookups against this list will be quicker and less
+   * resource intensive than other methods.
+   *
+   * Lookups are first checked against this short list.  If no results are
+   * found, then the lookup function may move on to check other sources,
+   * namely the system's mime.types file.
+   *
+   * In most cases though, this short list should suffice.
+   *
+   * If modifying this list, please note that for promiscuous mimetypes
+   * (those which map to multiple extensions, such as text/plain)
+   * The function get_extension will always return the *LAST* extension in
+   * this list, so you should put your preferred extension *LAST*.
+   *
+   * e.g...
+   * "jpeg"    => "image/jpeg",
+   * "jpe"     => "image/jpeg",
+   * "jpg"     => "image/jpeg",
+   *
+   * $this->get_extension('image/jpeg') will always return 'jpg'.
+   */
+  protected $protectedMimeTypes = array();
   protected $protectedFileExtensions;
   protected $extensionExceptions = array(
     // XXX: Deprecated... Only here due to old 'tif' => 'image/tif' mapping...
     // The correct MIMEtype is 'image/tiff'.
     'image/tif' => 'tif',
   );
+  /**
+   * Array of mimetypes from the system.
+   *
+   * @var array
+   */
   protected $systemTypes;
+  /**
+   * Array of extensions from the system.
+   *
+   * @var array
+   */
   protected $systemExts;
+  /**
+   * Location of the system mime.types file.
+   *
+   * @var string
+   */
   protected $etcMimeTypes = '/etc/mime.types';
 
   /**
-   * Construtor.
+   * Constructor.
    */
   public function __construct() {
     module_load_include('inc', 'islandora', 'includes/mimetype.utils');
@@ -87,7 +104,7 @@ class MimeDetect {
    * Gets MIME type associated with the give file's extension.
    *
    * @param string $filename
-   *   The filename
+   *   The filename.
    * @param bool $debug
    *   Returns a debug array.
    *
@@ -171,7 +188,8 @@ class MimeDetect {
   /**
    * Gets an associative array of MIME type and extension associations.
    *
-   * Users the system mime.types file, or a local mime.types if one is found
+   * Users the system mime.types file, or a local mime.types if one is found.
+   *
    * @see MIMEDetect::__constuctor()
    *
    * @return array
@@ -206,7 +224,8 @@ class MimeDetect {
   /**
    * Gets a associative array of extensions and MIME types.
    *
-   * Users the system mime.types file, or a local mime.types if one is found
+   * Users the system mime.types file, or a local mime.types if one is found.
+   *
    * @see MIMEDetect::__constuctor()
    *
    * @return array
@@ -262,4 +281,5 @@ class MimeDetect {
     };
     return array_keys(array_filter($this->protectedMimeTypes, $filter));
   }
+
 }

@@ -11,6 +11,9 @@
  * To make sense of these tests reference islandora_hooked_access_test.module.
  */
 
+/**
+ * Access hook tests.
+ */
 class IslandoraHookedAccessTestCase extends IslandoraWebTestCase {
 
   /**
@@ -92,20 +95,6 @@ class IslandoraHookedAccessTestCase extends IslandoraWebTestCase {
   }
 
   /**
-   * Deny an object permission check without an object.
-   */
-  public function testDenyBadObject() {
-    $this->assertFalse(islandora_object_access($this->op, 'this is not an object'), 'Deny bad objects.');
-  }
-
-  /**
-   * Deny a datastream permission check without a datastream.
-   */
-  public function testDenyBadDatastream() {
-    $this->assertFalse(islandora_datastream_access($this->op, 'this is not a datastream'), 'Deny bad datastreams.');
-  }
-
-  /**
    * Allow operation on object.
    */
   public function testAllowObject() {
@@ -146,4 +135,5 @@ class IslandoraHookedAccessTestCase extends IslandoraWebTestCase {
   public function testDenyDatastreamExplicit() {
     $this->assertFalse(islandora_datastream_access($this->denied_op, $this->object['asdf']), 'Explicit denial of datastream access.');
   }
+
 }

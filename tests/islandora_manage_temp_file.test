@@ -5,6 +5,9 @@
  * Tests for our islandora_temp_file_entry() function.
  */
 
+/**
+ * Temporary file management tests.
+ */
 class IslandoraManageTempfileTestCase extends IslandoraWebTestCase {
 
   /**
@@ -80,4 +83,5 @@ class IslandoraManageTempfileTestCase extends IslandoraWebTestCase {
     $this->baseFileHelper($this->tempUri);
     $this->baseFileHelper($this->publicUri);
   }
+
 }

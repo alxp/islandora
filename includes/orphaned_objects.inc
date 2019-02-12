@@ -16,7 +16,7 @@
  * @return array
  *   An array containing the form to be rendered.
  */
-function islandora_manage_orphaned_objects_form($form, $form_state) {
+function islandora_manage_orphaned_objects_form(array $form, array $form_state) {
   if (isset($form_state['show_confirm'])) {
     $pids = $form_state['pids_to_delete'];
     $form['confirm_message'] = array(
@@ -96,12 +96,13 @@ function islandora_manage_orphaned_objects_form($form, $form_state) {
  * @param array $form_state
  *   An array containing the Drupal form state.
  */
-function islandora_delete_selected_orphaned_objects_validate($form, $form_state) {
+function islandora_delete_selected_orphaned_objects_validate(array $form, array $form_state) {
   $selected = array_filter($form_state['values']['management_table']);
   if (empty($selected)) {
     form_error($form['management_table'], t('At least one object must be selected to delete!'));
   }
 }
+
 /**
  * Submit handler for the delete buttons in the workflow management form.
  *
@@ -110,7 +111,7 @@ function islandora_delete_selected_orphaned_objects_validate($form, $form_state)
  * @param array $form_state
  *   An array containing the Drupal form state.
  */
-function islandora_delete_orphaned_objects_submit(&$form, &$form_state) {
+function islandora_delete_orphaned_objects_submit(array &$form, array &$form_state) {
   if ($form_state['triggering_element']['#name'] == 'islandora-orphaned-objects-submit-selected') {
     $selected = array_keys(array_filter($form_state['values']['management_table']));
   }
@@ -122,6 +123,7 @@ function islandora_delete_orphaned_objects_submit(&$form, &$form_state) {
   $form_state['rebuild'] = TRUE;
   $form_state['show_confirm'] = TRUE;
 }
+
 /**
  * Submit handler for the workflow management confirm form.
  *
@@ -130,7 +132,7 @@ function islandora_delete_orphaned_objects_submit(&$form, &$form_state) {
  * @param array $form_state
  *   An array containing the Drupal form state.
  */
-function islandora_manage_orphaned_objects_confirm_submit($form, &$form_state) {
+function islandora_manage_orphaned_objects_confirm_submit(array $form, array &$form_state) {
   $batch = islandora_delete_orphaned_objects_create_batch($form_state['pids_to_delete']);
   batch_set($batch);
 }
@@ -212,7 +214,7 @@ EOQ;
  * @return array
  *   An array detailing the batch that is about to be run.
  */
-function islandora_delete_orphaned_objects_create_batch($pids) {
+function islandora_delete_orphaned_objects_create_batch(array $pids) {
   // Set up a batch operation.
   $batch = array(
     'operations' => array(
@@ -227,6 +229,7 @@ function islandora_delete_orphaned_objects_create_batch($pids) {
   );
   return $batch;
 }
+
 /**
  * Constructs and performs the deleting batch operation.
  *
@@ -235,7 +238,7 @@ function islandora_delete_orphaned_objects_create_batch($pids) {
  * @param array $context
  *   The context of the Drupal batch.
  */
-function islandora_delete_orphaned_objects_batch_operation($pids, &$context) {
+function islandora_delete_orphaned_objects_batch_operation(array $pids, array &$context) {
   if (empty($context['sandbox'])) {
     $context['sandbox'] = array();
     $context['sandbox']['progress'] = 0;
@@ -247,10 +250,10 @@ function islandora_delete_orphaned_objects_batch_operation($pids, &$context) {
     $target_pid = array_pop($context['sandbox']['pids']);
     $target_object = islandora_object_load($target_pid);
     $context['message'] = t('Deleting @label (@pid) (@current of @total)...', array(
-        '@label' => $target_object->label,
-        '@pid' => $target_pid,
-        '@current' => $context['sandbox']['progress'],
-        '@total' => $context['sandbox']['total'],
+      '@label' => $target_object->label,
+      '@pid' => $target_pid,
+      '@current' => $context['sandbox']['progress'],
+      '@total' => $context['sandbox']['total'],
     ));
     islandora_delete_object($target_object);
     $object_check = islandora_object_load($target_pid);
@@ -267,6 +270,7 @@ function islandora_delete_orphaned_objects_batch_operation($pids, &$context) {
   }
   $context['finished'] = ($context['sandbox']['total'] == 0) ? 1 : ($context['sandbox']['progress'] / $context['sandbox']['total']);
 }
+
 /**
  * Finished function for the orphaned objects delete batch.
  *
@@ -277,7 +281,7 @@ function islandora_delete_orphaned_objects_batch_operation($pids, &$context) {
  * @param array $operations
  *   The operations array that was used in the batch.
  */
-function islandora_delete_orphaned_objects_batch_finished($success, $results, $operations) {
+function islandora_delete_orphaned_objects_batch_finished($success, array $results, array $operations) {
   if ($success) {
     $message = format_plural(count($results['success']), 'One object deleted.', '@count objects deleted.');
   }
