@@ -167,14 +167,14 @@ function islandora_derivative_perform_batch_operation($function, $file, $pid, $f
 /**
  * Finished function for derivative batch regeneration.
  *
- * @param array $success
- *   An array of success passed from the batch.
+ * @param bool $success
+ *   A boolean indicating whether the batch has completed successfully.
  * @param array $results
  *   An array of results passed from the batch.
  * @param array $operations
  *   An array of operations passed from the batch.
  */
-function islandora_regenerate_derivative_batch_finished(array $success, array $results, array $operations) {
+function islandora_regenerate_derivative_batch_finished($success, array $results, array $operations) {
   module_load_include('inc', 'islandora', 'includes/derivatives');
   if (!empty($results['logging'])) {
     islandora_derivative_logging($results['logging']);
