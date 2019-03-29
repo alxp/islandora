@@ -146,10 +146,10 @@ function islandora_regenerate_datastream_derivative_batch(AbstractDatastream $da
  *   Whether we are forcing derivative regeneration or not.
  * @param array $hook
  *   The derivative definition.
- * @param array $context
+ * @param DrushBatchContext|array $context
  *   The context of the current batch operation.
  */
-function islandora_derivative_perform_batch_operation($function, $file, $pid, $force, array $hook, array &$context) {
+function islandora_derivative_perform_batch_operation($function, $file, $pid, $force, array $hook, &$context) {
   if ($file) {
     require_once $file;
   }
