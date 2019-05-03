@@ -144,4 +144,3 @@ function islandora_update_7002() {
   // Removing as the deprecation has been removed.
   variable_del('islandora_deprecation_return_false_when_datastream_exists');
 }
-
