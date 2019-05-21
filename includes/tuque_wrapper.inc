@@ -254,11 +254,11 @@ class IslandoraFedoraObject extends FedoraObject {
     }
     catch (Exception $e) {
       if ($e instanceof DatastreamExistsException && variable_get('islandora_deprecation_return_false_when_datastream_exists', TRUE)) {
-        $message = format_string('The datastream @dsid already exists on the object: @pid.
-          Returning FALSE on ingestDatastream() is deprecated in 7.x-1.10. See https://github.com/Islandora/islandora/pull/680/.', array(
-          '@dsid' => $datastream->id,
-          '@pid' => $object->id,
-        ));
+        $message = format_string('Returning FALSE on ingestDatastream() is deprecated in 7.x-1.10. See https://github.com/Islandora/islandora/pull/680/.
+            The datastream @dsid already exists on the object: @pid.', array(
+            '@dsid' => $datastream->id,
+            '@pid' => $object->id,
+          ));
         trigger_error(filter_xss($message), E_USER_DEPRECATED);
         return FALSE;
       }
