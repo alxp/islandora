@@ -257,8 +257,8 @@ class IslandoraFedoraObject extends FedoraObject {
         @trigger_error('Expecting FALSE on ingestDatastream failing is deprecated in islandora:7.x-1.10. Throwing an EXCEPTION on failed 
           datastream ingest will be the norm in future. See https://jira.duraspace.org/browse/ISLANDORA-1995.', E_USER_DEPRECATED);
         $message_error = format_string('The datastream @dsid already exists on the object: @pid.', array(
-          '@dsid' => $datastream->id,	          '@dsid' => $datastream->id,
-          '@pid' => $object->id,	          '@pid' => $object->id,
+          '@dsid' => $datastream->id,
+          '@pid' => $object->id,
         ));
         trigger_error(filter_xss($message_error), E_USER_NOTICE);
         return FALSE;
