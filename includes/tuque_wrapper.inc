@@ -259,7 +259,8 @@ class IslandoraFedoraObject extends FedoraObject {
         $message_error = format_string('The datastream @dsid already exists on the object: @pid.', array(
           '@dsid' => $datastream->id,
           '@pid' => $object->id,
-        ));
+          )
+        );
         trigger_error(filter_xss($message_error), E_USER_NOTICE);
         return FALSE;
       }
