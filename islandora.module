@@ -663,7 +663,7 @@ function islandora_i18n_string_info() {
 }
 
 /**
- * Implements hook_islandora_i18n_string_list().
+ * Implements hook_i18n_string_list().
  */
 function islandora_i18n_string_list($group) {
   if ($group == 'islandora') {
