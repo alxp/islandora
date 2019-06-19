@@ -429,7 +429,10 @@ function islandora_admin_paths() {
   $paths['islandora/object/*/manage*'] = TRUE;
   $paths['islandora/object/*/delete*'] = TRUE;
   $paths['islandora/object/*/datastream/*/edit'] = TRUE;
-  $paths['islandora/object/*/datastream/*/version*'] = TRUE;
+  $paths['islandora/object/*/datastream/*/version'] = TRUE;
+  $paths['islandora/object/*/datastream/*/version/*/delete'] = TRUE;
+  $paths['islandora/object/*/datastream/*/version/*/revert'] = TRUE;
+  $paths['islandora/object/*/datastream/*/version/*/view'] = TRUE;
   $paths['islandora/object/*/datastream/*/replace'] = TRUE;
   $paths['islandora/object/*/datastream/*/delete'] = TRUE;
   return $paths;
