@@ -22,7 +22,7 @@ checkReturn $?
 
 # Coding standards
 echo "Drush coder-review"
-drush coder-review --reviews=production,security,style,i18n,potx $TRAVIS_BUILD_DIR
+drush coder-review --reviews=production,security,i18n,potx $TRAVIS_BUILD_DIR
 checkReturn $?
 
 # Skip code sniffer for PHP 5.3.3

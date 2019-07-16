@@ -19,10 +19,7 @@
  *
  * to test if a datastream exists isset($object['dsid'])
  *
- * to iterate over datastreams:
- * foreach ($object as $ds) {
- *   $ds->label, etc
- * }
+ * to iterate over datastreams do a "foreach ($object as $ds) {}"
  *
  * each $ds in the above loop has the following properties:
  *    $ds->label             - The label for this datastream.
@@ -49,13 +46,6 @@
  * and each element has an array of values.
  * dc.title can have none, one or many titles
  * this is the case for all dc elements.
- *
- *
- *
- * we can get a list of datastreams by doing
- * foreach ($object as $ds) {
- * do something here
- * }
  */
 ?>
 <div class="islandora-object islandora">
