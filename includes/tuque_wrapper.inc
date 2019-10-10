@@ -80,8 +80,19 @@ function islandora_invoke_datastream_hooks($hook, array $models, $dsid) {
  * Implementation of the FedoraRepository class.
  */
 class IslandoraFedoraRepository extends FedoraRepository {
+  /**
+   * {@inheritdoc}
+   */
   protected $queryClass = 'IslandoraRepositoryQuery';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $newObjectClass = 'IslandoraNewFedoraObject';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $objectClass = 'IslandoraFedoraObject';
 
   /**
@@ -179,8 +190,19 @@ class IslandoraRepositoryQuery extends RepositoryQuery {}
  * Implementation of NewFedoraObject class.
  */
 class IslandoraNewFedoraObject extends NewFedoraObject {
+  /**
+   * {@inheritdoc}
+   */
   protected $newFedoraDatastreamClass = 'IslandoraNewFedoraDatastream';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraDatastreamClass = 'IslandoraFedoraDatastream';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraRelsExtClass = 'IslandoraFedoraRelsExt';
 
 }
@@ -188,8 +210,19 @@ class IslandoraNewFedoraObject extends NewFedoraObject {
  * Implementation, magic functions for a FedoraObject class.
  */
 class IslandoraFedoraObject extends FedoraObject {
+  /**
+   * {@inheritdoc}
+   */
   protected $newFedoraDatastreamClass = 'IslandoraNewFedoraDatastream';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraDatastreamClass = 'IslandoraFedoraDatastream';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraRelsExtClass = 'IslandoraFedoraRelsExt';
 
   /**
@@ -568,7 +601,14 @@ class IslandoraSimpleCache extends SimpleCache {}
  * Implementation of NewFedoraDatastream class.
  */
 class IslandoraNewFedoraDatastream extends NewFedoraDatastream {
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraRelsIntClass = 'IslandoraFedoraRelsInt';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraDatastreamVersionClass = 'IslandoraFedoraDatastreamVersion';
 
 }
@@ -576,7 +616,14 @@ class IslandoraNewFedoraDatastream extends NewFedoraDatastream {
  * Implementation and magic functions for FedoraDatastream class.
  */
 class IslandoraFedoraDatastream extends FedoraDatastream {
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraRelsIntClass = 'IslandoraFedoraRelsInt';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraDatastreamVersionClass = 'IslandoraFedoraDatastreamVersion';
 
   /**
@@ -650,7 +697,14 @@ class IslandoraFedoraDatastream extends FedoraDatastream {
  * Implementation of FedoraDatastreamVersion class.
  */
 class IslandoraFedoraDatastreamVersion extends FedoraDatastreamVersion {
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraRelsIntClass = 'IslandoraFedoraRelsInt';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraDatastreamVersionClass = 'IslandoraFedoraDatastreamVersion';
 
 }

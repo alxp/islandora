@@ -13,6 +13,11 @@
  */
 class DublinCore {
 
+  /**
+   * The DC represented as an array.
+   *
+   * @var array
+   */
   public $dc = array(
     'dc:title' => array(),
     'dc:creator' => array(),
@@ -30,6 +35,12 @@ class DublinCore {
     'dc:coverage' => array(),
     'dc:rights' => array(),
   );
+
+  /**
+   * Doesn't appear to be used? Deprecated perhaps.
+   *
+   * @var string
+   */
   public $owner;
 
   /**
