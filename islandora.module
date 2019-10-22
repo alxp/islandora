@@ -537,7 +537,10 @@ function islandora_theme() {
     ),
     'islandora_datastream_download_link' => array(
       'file' => 'theme/theme.inc',
-      'variables' => array('datastream' => NULL),
+      'variables' => array(
+        'datastream' => NULL,
+        'label' => NULL,
+      ),
     ),
     'islandora_datastream_version_link' => array(
       'file' => 'theme/theme.inc',
