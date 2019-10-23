@@ -1,7 +1,0 @@
-{
-    "name": "islandora/islandora",
-    "description": "Core Islandora module",
-    "type": "drupal-module",
-    "license": "GPL-2.0+",
-    "require": {}
-}
