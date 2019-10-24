@@ -404,6 +404,7 @@ function template_process_islandora_objects_subset(&$variables) {
  * @param array $vars
  *   An array containing:
  *   - datastream: An AbstractDatastream for which to generate a download link.
+ *   - label: (Optional) The label for the link.
  *
  * @return string
  *   Markup containing the download url if the user has access, empty otherwise.
@@ -412,7 +413,13 @@ function theme_islandora_datastream_download_link(array $vars) {
   $datastream = $vars['datastream'];
   module_load_include('inc', 'islandora', 'includes/datastream');
 
-  $label = t('download');
+  if ($vars['label'] === NULL) {
+    $label = t('download');
+  }
+  else {
+    $label = check_plain($vars['label']);
+  }
+
   return islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $datastream) ?
     l($label, islandora_datastream_get_url($datastream, 'download')) :
     '';
