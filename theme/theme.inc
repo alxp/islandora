@@ -439,7 +439,7 @@ function theme_islandora_datastream_download_link(array $vars) {
  */
 function theme_islandora_datastream_view_link(array $vars) {
   $datastream = $vars['datastream'];
-  module_load_include('inc', 'islandora', 'includes/utilities');
+  module_load_include('inc', 'islandora', 'includes/datastream');
 
   if ($vars['label'] === NULL) {
     $label = check_plain($datastream->id);
