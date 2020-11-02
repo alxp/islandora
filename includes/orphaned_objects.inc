@@ -159,7 +159,7 @@ function islandora_get_orphaned_objects() {
   $query_method = variable_get('islandora_orphaned_objects_backend', 'Solr');
 
   if ($query_method == 'Solr') {
-    // Step 1: Solr query for the RELS_EXTs
+    // Solr query for all objects.
     $collection_field = variable_get('islandora_solr_member_of_collection_field', 'RELS_EXT_isMemberOfCollection_uri_ms');
     $label_field = variable_get('islandora_solr_object_label_field', 'fgs_label_s');
     $member_field = variable_get('islandora_solr_member_of_field', 'RELS_EXT_isMemberOf_uri_ms');
@@ -171,6 +171,7 @@ function islandora_get_orphaned_objects() {
     $qp->buildQuery($query);
     $qp->solrParams['fl'] = $params;
     $qp->solrLimit = 1000000000;
+
     // Check islandora_compound_object settings and changes query filters to include compound children if necessary.
     if (variable_get('islandora_compound_object_hide_child_objects_solr', TRUE)) {
       $fq = variable_get('islandora_compound_object_solr_fq', '-RELS_EXT_isConstituentOf_uri_mt:[* TO *]');
@@ -195,9 +196,7 @@ function islandora_get_orphaned_objects() {
 
     $orphaned_objects = array();
 
-  // Now we have $results[key]['PID'] for the pid. sparql: [key][object][value] and [key][title][value]
-  // Step 2: Check all results for PIDs that don't exist
-
+    // Check all results for PIDs that don't exist.
     foreach ($results AS $result) {
       if (array_key_exists($collection_field, $result['solr_doc'])) {
         foreach ($result['solr_doc'][$collection_field] AS $collection) {
