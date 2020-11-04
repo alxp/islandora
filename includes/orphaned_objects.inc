@@ -195,26 +195,47 @@ function islandora_get_orphaned_objects() {
     }
 
     $orphaned_objects = array();
-
+    $already_checked = array();
+    $dead_parents = array();
     // Check all results for PIDs that don't exist.
     foreach ($results AS $result) {
       if (array_key_exists($collection_field, $result['solr_doc'])) {
         foreach ($result['solr_doc'][$collection_field] AS $collection) {
-          $test = islandora_object_load($collection);
-          if (!$test) {
-            $orphaned_objects[] = $result;
+          if (in_array($collection, $dead_parents)) {
+              $orphaned_objects[] = $result;
+          }
+          elseif (!in_array($collection, $already_checked)) {
+            $test = islandora_object_load($collection);
+            if (!$test) {
+              $orphaned_objects[] = $result;
+              $dead_parents[] = $collection;
+            }
+            $already_checked[] = $collection;
           }
         }
       }
       if (array_key_exists($member_field, $result['solr_doc'])) {
         foreach ($result['solr_doc'][$member_field] AS $membership) {
-          $test = islandora_object_load($membership);
-          if (!$test) {
-            $orphaned_objects[] = $result;
+          if (in_array($membership, $dead_parents)) {
+              $orphaned_objects[] = $result;
+          }
+          elseif (!in_array($membership, $already_checked)) {
+            $test = islandora_object_load($membership);
+            if (!$test) {
+              $orphaned_objects[] = $result;
+              $dead_parents[] = $membership;
+            }
+            $already_checked[] = $membership;
           }
         }
       }
-    }  
+    }
+dd("List of orphans");
+dd($orphaned_objects);
+dd("List of dead parents");
+dd($dead_parents);
+dd("List of checked parents");
+dd($already_checked);
   $results = $orphaned_objects;
   }
 
