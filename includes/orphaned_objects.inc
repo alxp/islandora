@@ -172,11 +172,11 @@ function islandora_get_orphaned_objects() {
     $qp->solrParams['fl'] = $params;
     $qp->solrLimit = 1000000000;
 
-    // Check islandora_compound_object settings and changes query filters to include compound children if necessary.
+    // Check islandora_compound_object filters, include compound children if necessary.
     if (variable_get('islandora_compound_object_hide_child_objects_solr', TRUE)) {
       $fq = variable_get('islandora_compound_object_solr_fq', '-RELS_EXT_isConstituentOf_uri_mt:[* TO *]');
       if (!empty($fq)) {
-      // delete islandora_compound_object_solr_fq from the list of filters
+        // Delete islandora_compound_object_solr_fq from the list of filters.
         $filters = $qp->solrParams['fq'];
         if (($key = array_search($fq, $filters)) !== FALSE) {
           unset($filters[$key]);
@@ -202,7 +202,7 @@ function islandora_get_orphaned_objects() {
       if (array_key_exists($collection_field, $result['solr_doc'])) {
         foreach ($result['solr_doc'][$collection_field] AS $collection) {
           if (in_array($collection, $dead_parents)) {
-              $orphaned_objects[] = $result;
+            $orphaned_objects[] = $result;
           }
           elseif (!in_array($collection, $already_checked)) {
             $test = islandora_object_load($collection);
@@ -217,7 +217,7 @@ function islandora_get_orphaned_objects() {
       if (array_key_exists($member_field, $result['solr_doc'])) {
         foreach ($result['solr_doc'][$member_field] AS $membership) {
           if (in_array($membership, $dead_parents)) {
-              $orphaned_objects[] = $result;
+            $orphaned_objects[] = $result;
           }
           elseif (!in_array($membership, $already_checked)) {
             $test = islandora_object_load($membership);
@@ -230,16 +230,10 @@ function islandora_get_orphaned_objects() {
         }
       }
     }
-dd("List of orphans");
-dd($orphaned_objects);
-dd("List of dead parents");
-dd($dead_parents);
-dd("List of checked parents");
-dd($already_checked);
-  $results = $orphaned_objects;
+    $results = $orphaned_objects;
   }
 
-  elseif($query_method == "SPARQL") {
+  elseif ($query_method == "SPARQL") {
     $connection = islandora_get_tuque_connection();
     // SPARQL: get orphaned objects, exclude any with a living parent.
     $object_query = <<<EOQ
