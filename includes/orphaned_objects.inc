@@ -55,7 +55,7 @@ function islandora_manage_orphaned_objects_form(array $form, array $form_state) 
     Please be cautious when deleting, as this action is irreversible.'), 'warning');
     $orphaned_objects = islandora_get_orphaned_objects();
     $query_method = variable_get('islandora_orphaned_objects_backend', 'Solr');
-
+    module_load_include('inc', 'islandora', 'includes/utilities');
     $rows = array();
     foreach ($orphaned_objects as $orphaned_object) {
       if ($query_method == 'SPARQL') {
@@ -219,7 +219,6 @@ function islandora_get_orphaned_objects() {
             $orphaned_objects[] = $result;
           }
           elseif (!in_array($membership, $already_checked)) {
-$test=islandora_object_load($membership);
             $test = islandora_identify_dead_parents($membership);
             if (!$test) {
               $orphaned_objects[] = $result;
@@ -293,7 +292,6 @@ EOQ;
     ));
     $results = $connection->repository->ri->sparqlQuery($sparql_query_objects);
   }
-dd($results);
   return $results;
 }
 
@@ -327,21 +325,21 @@ function islandora_delete_orphaned_objects_create_batch(array $pids) {
  *
  */
 function islandora_identify_dead_parents($parent) {
-            $parent_params = "PID";
-            $parent_test = substr($parent, strpos($parent, '/') +1);
-            $parent_query = 'PID:"' . $parent_test . '"';
-            $qp = new islandoraSolrQueryProcessor();
-            $qp->buildQuery($parent_query);
-            $qp->solrParams['fl'] = $parent_params;
-            $qp->solrLimit = 1000000000;
-            $qp->executeQuery(FALSE);
-            try {
-              $parent_results = $qp->islandoraSolrResult['response']['objects'];
-            }
-            catch (Exception $e) {
-              watchdog_exception('Islandora', $e, 'Got an exception searching for parent objects .', array(), WATCHDOG_ERROR);
-              $parent_results = array();
-            }
+  $parent_params = "PID";
+  $parent_test = substr($parent, strpos($parent, '/') +1);
+  $parent_query = 'PID:"' . $parent_test . '"';
+  $qp = new islandoraSolrQueryProcessor();
+  $qp->buildQuery($parent_query);
+  $qp->solrParams['fl'] = $parent_params;
+  $qp->solrLimit = 1000000000;
+  $qp->executeQuery(FALSE);
+  try {
+    $parent_results = $qp->islandoraSolrResult['response']['objects'];
+  }
+  catch (Exception $e) {
+    watchdog_exception('Islandora', $e, 'Got an exception searching for parent objects .', array(), WATCHDOG_ERROR);
+    $parent_results = array();
+  }
   return($parent_results);
 }
 
