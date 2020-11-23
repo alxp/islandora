@@ -193,7 +193,6 @@ function islandora_get_orphaned_objects() {
       watchdog_exception('Islandora', $e, 'Got an exception searching for parent objects .', array(), WATCHDOG_ERROR);
       $results = array();
     }
-
     $orphaned_objects = array();
     $already_checked = array();
     $dead_parents = array();
