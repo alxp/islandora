@@ -54,23 +54,20 @@ function islandora_manage_orphaned_objects_form(array $form, array $form_state) 
     or a variety of other reasons. Some of these orphans may exist intentionally.
     Please be cautious when deleting, as this action is irreversible.'), 'warning');
     $orphaned_objects = islandora_get_orphaned_objects();
-    $query_method = variable_get('islandora_orphaned_objects_backend', 'Solr');
+    $query_method = variable_get('islandora_orphaned_objects_backend', 'SPARQL');
     module_load_include('inc', 'islandora', 'includes/utilities');
     $rows = array();
     foreach ($orphaned_objects as $orphaned_object) {
       if ($query_method == 'SPARQL') {
         $pid = $orphaned_object['object']['value'];
+        $title = $orphaned_object['title']['value'];
       }
       elseif ($query_method == 'Solr') {
         $pid = $orphaned_object['PID'];
+        $title = $orphaned_object['object_label'];
       }
       if (islandora_namespace_accessible($pid)) {
-        if ($query_method == 'SPARQL') {
-          $rows[$pid] = array(l($orphaned_object['title']['value'] . " (" . $pid . ")", "islandora/object/$pid"));
-        }
-        elseif ($query_method == 'Solr') {
-          $rows[$pid] = array(l($orphaned_object['object_label'] . " (" . $pid . ")", "islandora/object/$pid"));
-        }
+        $rows[$pid] = array(l($title . " (" . $pid . ")", "islandora/object/$pid"));
       }
     }
     ksort($rows);
@@ -156,7 +153,7 @@ function islandora_manage_orphaned_objects_confirm_submit(array $form, array &$f
  *   An array containing the results of the orphaned objects queries.
  */
 function islandora_get_orphaned_objects() {
-  $query_method = variable_get('islandora_orphaned_objects_backend', 'Solr');
+  $query_method = variable_get('islandora_orphaned_objects_backend', 'SPARQL');
 
   if ($query_method == 'Solr') {
     // Solr query for all objects.
@@ -195,19 +192,19 @@ function islandora_get_orphaned_objects() {
     }
     $orphaned_objects = array();
     $already_checked = array();
-    $dead_parents = array();
+    $missing_parents = array();
     // Check all results for PIDs that don't exist.
     foreach ($results AS $result) {
       if (array_key_exists($collection_field, $result['solr_doc'])) {
         foreach ($result['solr_doc'][$collection_field] AS $collection) {
-          if (in_array($collection, $dead_parents)) {
+          if (in_array($collection, $missing_parents)) {
             $orphaned_objects[] = $result;
           }
           elseif (!in_array($collection, $already_checked)) {
-            $test = islandora_identify_dead_parents($collection);
+            $test = islandora_identify_missing_parents($collection);
             if (!$test) {
               $orphaned_objects[] = $result;
-              $dead_parents[] = $collection;
+              $missing_parents[] = $collection;
             }
             $already_checked[] = $collection;
           }
@@ -215,14 +212,14 @@ function islandora_get_orphaned_objects() {
       }
       if (array_key_exists($member_field, $result['solr_doc'])) {
         foreach ($result['solr_doc'][$member_field] AS $membership) {
-          if (in_array($membership, $dead_parents)) {
+          if (in_array($membership, $missing_parents)) {
             $orphaned_objects[] = $result;
           }
           elseif (!in_array($membership, $already_checked)) {
-            $test = islandora_identify_dead_parents($membership);
+            $test = islandora_identify_missing_parents($membership);
             if (!$test) {
               $orphaned_objects[] = $result;
-              $dead_parents[] = $membership;
+              $missing_parents[] = $membership;
             }
             $already_checked[] = $membership;
           }
@@ -324,7 +321,7 @@ function islandora_delete_orphaned_objects_create_batch(array $pids) {
  * Solr query to check for deceased parents.
  *
  */
-function islandora_identify_dead_parents($parent) {
+function islandora_identify_missing_parents($parent) {
   $parent_params = "PID";
   $parent_test = substr($parent, strpos($parent, '/') +1);
   $parent_query = 'PID:"' . $parent_test . '"';
