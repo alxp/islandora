@@ -194,9 +194,9 @@ function islandora_get_orphaned_objects() {
     $already_checked = array();
     $missing_parents = array();
     // Check all results for PIDs that don't exist.
-    foreach ($results AS $result) {
+    foreach ($results as $result) {
       if (array_key_exists($collection_field, $result['solr_doc'])) {
-        foreach ($result['solr_doc'][$collection_field] AS $collection) {
+        foreach ($result['solr_doc'][$collection_field] as $collection) {
           if (in_array($collection, $missing_parents)) {
             $orphaned_objects[] = $result;
           }
@@ -211,7 +211,7 @@ function islandora_get_orphaned_objects() {
         }
       }
       if (array_key_exists($member_field, $result['solr_doc'])) {
-        foreach ($result['solr_doc'][$member_field] AS $membership) {
+        foreach ($result['solr_doc'][$member_field] as $membership) {
           if (in_array($membership, $missing_parents)) {
             $orphaned_objects[] = $result;
           }
