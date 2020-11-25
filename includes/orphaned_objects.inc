@@ -169,7 +169,7 @@ function islandora_get_orphaned_objects() {
     $qp->solrParams['fl'] = $params;
     $qp->solrLimit = 1000000000;
 
-    // Check islandora_compound_object filters, include compound children if necessary.
+    // Check islandora_compound_object filters to include compound children.
     if (variable_get('islandora_compound_object_hide_child_objects_solr', TRUE)) {
       $fq = variable_get('islandora_compound_object_solr_fq', '-RELS_EXT_isConstituentOf_uri_mt:[* TO *]');
       if (!empty($fq)) {
@@ -319,11 +319,10 @@ function islandora_delete_orphaned_objects_create_batch(array $pids) {
 
 /**
  * Solr query to check for deceased parents.
- *
  */
 function islandora_identify_missing_parents($parent) {
   $parent_params = "PID";
-  $parent_test = substr($parent, strpos($parent, '/') +1);
+  $parent_test = substr($parent, strpos($parent, '/') + 1);
   $parent_query = 'PID:"' . $parent_test . '"';
   $qp = new islandoraSolrQueryProcessor();
   $qp->buildQuery($parent_query);
@@ -337,7 +336,7 @@ function islandora_identify_missing_parents($parent) {
     watchdog_exception('Islandora', $e, 'Got an exception searching for parent objects .', array(), WATCHDOG_ERROR);
     $parent_results = array();
   }
-  return($parent_results);
+  return ($parent_results);
 }
 
 
