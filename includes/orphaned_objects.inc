@@ -155,7 +155,7 @@ function islandora_manage_orphaned_objects_confirm_submit(array $form, array &$f
 function islandora_get_orphaned_objects() {
   $query_method = variable_get('islandora_orphaned_objects_backend', 'SPARQL');
   $root_pid = variable_get('islandora_repository_pid', 'islandora:root');
-  $root_pid = "info:fedora/" . $root_pid;
+  $root_pid_check = "info:fedora/" . $root_pid;
   if ($query_method == 'Solr') {
     // Solr query for all objects.
     $collection_field = variable_get('islandora_solr_member_of_collection_field', 'RELS_EXT_isMemberOfCollection_uri_ms');
@@ -198,17 +198,19 @@ function islandora_get_orphaned_objects() {
     foreach ($results as $result) {
       if (array_key_exists($collection_field, $result['solr_doc'])) {
         foreach ($result['solr_doc'][$collection_field] as $collection) {
-          if ($collection != $root_pid) {
-            if (in_array($collection, $missing_parents)) {
-              $orphaned_objects[] = $result;
-            }
-            elseif (!in_array($collection, $already_checked)) {
-              $test = islandora_identify_missing_parents($collection);
-              if (!$test) {
+          if($result['PID'] != $root_pid) {
+            if ($collection != $root_pid_check) {
+              if (in_array($collection, $missing_parents)) {
+                $orphaned_objects[] = $result;
+              }
+              elseif (!in_array($collection, $already_checked)) {
+                $test = islandora_identify_missing_parents($collection);
+                if (!$test) {
                   $orphaned_objects[] = $result;
                   $missing_parents[] = $collection;
+                }
+                $already_checked[] = $collection;
               }
-              $already_checked[] = $collection;
             }
           }
         }
