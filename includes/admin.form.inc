@@ -127,6 +127,16 @@ function islandora_repository_admin(array $form, array &$form_state) {
             ),
           ),
         ),
+        'islandora_orphaned_objects_backend' => array(
+          '#type' => 'radios',
+          '#title' => t('Orphaned Objects query'),
+          '#description' => t('How the Orphaned Islandora Objects list is generated.'),
+          '#default_value' => variable_get('islandora_orphaned_objects_backend', 'SPARQL'),
+          '#options' => array(
+            'Solr' => t('Solr'),
+            'SPARQL' => t('SPARQL'),
+          ),
+        ),
         'islandora_risearch_use_itql_when_necessary' => array(
           '#type' => 'checkbox',
           '#title' => t('Use iTQL for particular queries'),

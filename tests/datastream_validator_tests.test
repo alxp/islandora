@@ -224,7 +224,7 @@ class PrefixDatastreamValidatorTestCase extends IslandoraWebTestCase {
       'dsid' => $prefix,
       'path' => $this->path . $filename,
       'control_group' => 'M',
-    ),
+      ),
     );
     $object = $this->ingestConstructedObject(array(), $datastreams);
     return $object;

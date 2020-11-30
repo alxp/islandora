@@ -42,7 +42,7 @@ if [ "$(phpenv version-name)" == "5.3.3" ]; then
   composer global require drupal/coder:7.*
 else
   composer global require drush/drush:7.*
-  composer global require drupal/coder
+  composer global require drupal/coder:7.*
 fi
 
 # Symlink the things

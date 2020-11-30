@@ -59,6 +59,7 @@ function islandora_uninstall() {
     'islandora_semaphore_period',
     'islandora_require_obj_upload',
     'islandora_breadcrumbs_backends',
+    'islandora_orphaned_objects_backend',
     'islandora_render_context_ingeststep',
     'islandora_deny_inactive_and_deleted',
   );

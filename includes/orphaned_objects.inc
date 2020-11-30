@@ -54,11 +54,20 @@ function islandora_manage_orphaned_objects_form(array $form, array $form_state) 
     or a variety of other reasons. Some of these orphans may exist intentionally.
     Please be cautious when deleting, as this action is irreversible.'), 'warning');
     $orphaned_objects = islandora_get_orphaned_objects();
+    $query_method = variable_get('islandora_orphaned_objects_backend', 'SPARQL');
+    module_load_include('inc', 'islandora', 'includes/utilities');
     $rows = array();
     foreach ($orphaned_objects as $orphaned_object) {
-      $pid = $orphaned_object['object']['value'];
+      if ($query_method == 'SPARQL') {
+        $pid = $orphaned_object['object']['value'];
+        $title = $orphaned_object['title']['value'];
+      }
+      elseif ($query_method == 'Solr') {
+        $pid = $orphaned_object['PID'];
+        $title = $orphaned_object['object_label'];
+      }
       if (islandora_namespace_accessible($pid)) {
-        $rows[$pid] = array(l($orphaned_object['title']['value'] . " (" . $pid . ")", "islandora/object/$pid"));
+        $rows[$pid] = array(l($title . " (" . $pid . ")", "islandora/object/$pid"));
       }
     }
     ksort($rows);
@@ -144,9 +153,86 @@ function islandora_manage_orphaned_objects_confirm_submit(array $form, array &$f
  *   An array containing the results of the orphaned objects queries.
  */
 function islandora_get_orphaned_objects() {
-  $connection = islandora_get_tuque_connection();
-  // SPARQL: get orphaned objects, exclude any with a living parent.
-  $object_query = <<<EOQ
+  $query_method = variable_get('islandora_orphaned_objects_backend', 'SPARQL');
+
+  if ($query_method == 'Solr') {
+    // Solr query for all objects.
+    $collection_field = variable_get('islandora_solr_member_of_collection_field', 'RELS_EXT_isMemberOfCollection_uri_ms');
+    $label_field = variable_get('islandora_solr_object_label_field', 'fgs_label_s');
+    $member_field = variable_get('islandora_solr_member_of_field', 'RELS_EXT_isMemberOf_uri_ms');
+
+    $params = "PID, " . $label_field . ", " . $collection_field . ", " . $member_field;
+
+    $query = "PID:*";
+    $qp = new islandoraSolrQueryProcessor();
+    $qp->buildQuery($query);
+    $qp->solrParams['fl'] = $params;
+    $qp->solrLimit = 1000000000;
+
+    // Check islandora_compound_object filters to include compound children.
+    if (variable_get('islandora_compound_object_hide_child_objects_solr', TRUE)) {
+      $fq = variable_get('islandora_compound_object_solr_fq', '-RELS_EXT_isConstituentOf_uri_mt:[* TO *]');
+      if (!empty($fq)) {
+        // Delete islandora_compound_object_solr_fq from the list of filters.
+        $filters = $qp->solrParams['fq'];
+        if (($key = array_search($fq, $filters)) !== FALSE) {
+          unset($filters[$key]);
+          $qp->solrParams['fq'] = $filters;
+        }
+      }
+    }
+    $qp->executeQuery(FALSE);
+
+    try {
+      $results = $qp->islandoraSolrResult['response']['objects'];
+    }
+    catch (Exception $e) {
+      watchdog_exception('Islandora', $e, 'Got an exception searching for parent objects .', array(), WATCHDOG_ERROR);
+      $results = array();
+    }
+    $orphaned_objects = array();
+    $already_checked = array();
+    $missing_parents = array();
+    // Check all results for PIDs that don't exist.
+    foreach ($results as $result) {
+      if (array_key_exists($collection_field, $result['solr_doc'])) {
+        foreach ($result['solr_doc'][$collection_field] as $collection) {
+          if (in_array($collection, $missing_parents)) {
+            $orphaned_objects[] = $result;
+          }
+          elseif (!in_array($collection, $already_checked)) {
+            $test = islandora_identify_missing_parents($collection);
+            if (!$test) {
+              $orphaned_objects[] = $result;
+              $missing_parents[] = $collection;
+            }
+            $already_checked[] = $collection;
+          }
+        }
+      }
+      if (array_key_exists($member_field, $result['solr_doc'])) {
+        foreach ($result['solr_doc'][$member_field] as $membership) {
+          if (in_array($membership, $missing_parents)) {
+            $orphaned_objects[] = $result;
+          }
+          elseif (!in_array($membership, $already_checked)) {
+            $test = islandora_identify_missing_parents($membership);
+            if (!$test) {
+              $orphaned_objects[] = $result;
+              $missing_parents[] = $membership;
+            }
+            $already_checked[] = $membership;
+          }
+        }
+      }
+    }
+    $results = $orphaned_objects;
+  }
+
+  elseif ($query_method == "SPARQL") {
+    $connection = islandora_get_tuque_connection();
+    // SPARQL: get orphaned objects, exclude any with a living parent.
+    $object_query = <<<EOQ
 !prefix
 SELECT DISTINCT ?object ?title 
 WHERE {
@@ -171,37 +257,38 @@ WHERE {
   FILTER (!bound(?liveparent))
 } ORDER BY ?object
 EOQ;
-  $parent_relationships = module_invoke_all('islandora_solution_pack_child_relationships', 'all');
-  $parent_relationships['prefix'] = array_unique($parent_relationships['prefix']);
-  $parent_relationships['predicate'] = array_unique($parent_relationships['predicate']);
-  if (count($parent_relationships['predicate']) == 0) {
-    // No predicates to search for. Exit early.
-    return array();
+    $parent_relationships = module_invoke_all('islandora_solution_pack_child_relationships', 'all');
+    $parent_relationships['prefix'] = array_unique($parent_relationships['prefix']);
+    $parent_relationships['predicate'] = array_unique($parent_relationships['predicate']);
+    if (count($parent_relationships['predicate']) == 0) {
+      // No predicates to search for. Exit early.
+      return array();
+    }
+    $optionals = (array) module_invoke('islandora_xacml_api', 'islandora_basic_collection_get_query_optionals', 'view');
+    $filter_modules = array(
+      'islandora_xacml_api',
+      'islandora',
+    );
+    $filters = array();
+    foreach ($filter_modules as $module) {
+      $filters = array_merge_recursive($filters, (array) module_invoke($module, 'islandora_basic_collection_get_query_filters', 'view'));
+    }
+    $filter_map = function ($filter) {
+      return "FILTER($filter)";
+    };
+    $parent_map = function ($parent) {
+      return "?object $parent ?liveparent";
+    };
+    // Use separate queries for different object types.
+    $sparql_query_objects = format_string($object_query, array(
+      '!optionals' => !empty($optionals) ? ('OPTIONAL {{' . implode('} UNION {', $optionals) . '}}') : '',
+      '!filters' => !empty($filters) ? implode(' ', array_map($filter_map, $filters)) : '',
+      '!dead_parent_relationships' => '?p = ' . implode(' || ?p = ', $parent_relationships['predicate']),
+      '!live_parent_relationships' => '{' . implode(' } UNION { ', array_map($parent_map, $parent_relationships['predicate'])) . '}',
+      '!prefix' => implode("\n", $parent_relationships['prefix']),
+    ));
+    $results = $connection->repository->ri->sparqlQuery($sparql_query_objects);
   }
-  $optionals = (array) module_invoke('islandora_xacml_api', 'islandora_basic_collection_get_query_optionals', 'view');
-  $filter_modules = array(
-    'islandora_xacml_api',
-    'islandora',
-  );
-  $filters = array();
-  foreach ($filter_modules as $module) {
-    $filters = array_merge_recursive($filters, (array) module_invoke($module, 'islandora_basic_collection_get_query_filters', 'view'));
-  }
-  $filter_map = function ($filter) {
-    return "FILTER($filter)";
-  };
-  $parent_map = function ($parent) {
-    return "?object $parent ?liveparent";
-  };
-  // Use separate queries for different object types.
-  $sparql_query_objects = format_string($object_query, array(
-    '!optionals' => !empty($optionals) ? ('OPTIONAL {{' . implode('} UNION {', $optionals) . '}}') : '',
-    '!filters' => !empty($filters) ? implode(' ', array_map($filter_map, $filters)) : '',
-    '!dead_parent_relationships' => '?p = ' . implode(' || ?p = ', $parent_relationships['predicate']),
-    '!live_parent_relationships' => '{' . implode(' } UNION { ', array_map($parent_map, $parent_relationships['predicate'])) . '}',
-    '!prefix' => implode("\n", $parent_relationships['prefix']),
-  ));
-  $results = $connection->repository->ri->sparqlQuery($sparql_query_objects);
   return $results;
 }
 
@@ -229,6 +316,29 @@ function islandora_delete_orphaned_objects_create_batch(array $pids) {
   );
   return $batch;
 }
+
+/**
+ * Solr query to check for deceased parents.
+ */
+function islandora_identify_missing_parents($parent) {
+  $parent_params = "PID";
+  $parent_test = substr($parent, strpos($parent, '/') + 1);
+  $parent_query = 'PID:"' . $parent_test . '"';
+  $qp = new islandoraSolrQueryProcessor();
+  $qp->buildQuery($parent_query);
+  $qp->solrParams['fl'] = $parent_params;
+  $qp->solrLimit = 1000000000;
+  $qp->executeQuery(FALSE);
+  try {
+    $parent_results = $qp->islandoraSolrResult['response']['objects'];
+  }
+  catch (Exception $e) {
+    watchdog_exception('Islandora', $e, 'Got an exception searching for parent objects .', array(), WATCHDOG_ERROR);
+    $parent_results = array();
+  }
+  return ($parent_results);
+}
+
 
 /**
  * Constructs and performs the deleting batch operation.
