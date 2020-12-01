@@ -198,7 +198,7 @@ function islandora_get_orphaned_objects() {
     foreach ($results as $result) {
       if (array_key_exists($collection_field, $result['solr_doc'])) {
         foreach ($result['solr_doc'][$collection_field] as $collection) {
-          if (($result['PID'] != $root_pid) && ($collection != $root_pid_check) ) {
+          if (($result['PID'] != $root_pid) && ($collection != $root_pid_check)) {
             if (in_array($collection, $missing_parents)) {
               $orphaned_objects[] = $result;
             }
