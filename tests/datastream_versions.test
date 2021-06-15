@@ -2,9 +2,12 @@
 
 /**
  * @file
- * Tests that datastream versions code works as intended
+ * Tests that datastream versions code works as intended.
  */
 
+/**
+ * Datastream version tests.
+ */
 class IslandoraDatastreamVersionTestCase extends IslandoraWebTestCase {
 
   /**
@@ -195,4 +198,5 @@ class IslandoraDatastreamVersionTestCase extends IslandoraWebTestCase {
     $this->drupalGet("islandora/object/{$this->pid}/datastream/DC/version/0/delete");
     $this->assertResponse(404);
   }
+
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Utilities classes for simpletest.
@@ -13,14 +14,37 @@
  * breaking existing implementations.
  */
 
+/**
+ * An implementation of the IslandoraTestUtilityClass.
+ */
 class IslandoraTestUtilities extends IslandoraTestUtilityClass {
 
+  /**
+   * The passed test configuration.
+   *
+   * @var array
+   */
   protected $configuration;
 
+  /**
+   * Any additional parameters the method called may need to function.
+   *
+   * @var array
+   */
   protected $params;
 
+  /**
+   * An array of IslandoraTestUtilityResults.
+   *
+   * @var array
+   */
   public $results = array();
 
+  /**
+   * The repository used for the tests.
+   *
+   * @var FedoraRepository
+   */
   protected $repository;
 
   /**
@@ -31,7 +55,7 @@ class IslandoraTestUtilities extends IslandoraTestUtilityClass {
    * @param array $params
    *   Any additional parameters the method called may need to function.
    */
-  public function __construct($configuration, array $params = array()) {
+  public function __construct(array $configuration, array $params = array()) {
     $this->configuration = $configuration;
     $this->params = $params;
     $connection = new RepositoryConnection($this->configuration['fedora_url'], $this->configuration['admin_user'], $this->configuration['admin_pass']);
@@ -111,7 +135,7 @@ class IslandoraTestUtilities extends IslandoraTestUtilityClass {
    * @return bool
    *   TRUE on success, FALSE on fail.
    */
-  public function assertDatastreams($object, array $datastreams) {
+  public function assertDatastreams(AbstractObject $object, array $datastreams) {
     if (!self::assertFedoraObject($object)) {
       $this->addResult(FALSE, "Failed. Object passed in is invalid.", 'Islandora');
     }
@@ -136,7 +160,7 @@ class IslandoraTestUtilities extends IslandoraTestUtilityClass {
    * @param array $datastreams
    *   An array of datastreams to confirm not present.
    */
-  public function assertNoDatastreams($object, array $datastreams) {
+  public function assertNoDatastreams(AbstractObject $object, array $datastreams) {
     if (!self::assertFedoraObject($object)) {
       $this->addResult(FALSE, "Failed. Object passed in is invalid.", 'Islandora');
       return;

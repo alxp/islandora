@@ -122,8 +122,8 @@ function islandora_regenerate_datastream_derivative_batch(AbstractDatastream $da
   return array(
     'title' => t('Regenerating derivatives for the @dsid datastream', array('@dsid' => $datastream->id)),
     'operations' => islandora_do_batch_derivatives($datastream->parent, array(
-        'force' => TRUE,
-        'destination_dsid' => $datastream->id,
+      'force' => TRUE,
+      'destination_dsid' => $datastream->id,
     )),
     'init_message' => t('Preparing to regenerate derivatives...'),
     'progress_message' => t('Time elapsed: @elapsed <br/>Estimated time remaining @estimate.'),
@@ -139,17 +139,17 @@ function islandora_regenerate_datastream_derivative_batch(AbstractDatastream $da
  * @param string $function
  *   The name of the function we are calling for derivatives.
  * @param bool|string $file
- *   FALSE if there is no file to load, the path to require otherwise
+ *   FALSE if there is no file to load, the path to require otherwise.
  * @param string $pid
  *   The pid of the object we are performing.
  * @param bool $force
  *   Whether we are forcing derivative regeneration or not.
  * @param array $hook
  *   The derivative definition.
- * @param array $context
+ * @param DrushBatchContext|array $context
  *   The context of the current batch operation.
  */
-function islandora_derivative_perform_batch_operation($function, $file, $pid, $force, $hook, &$context) {
+function islandora_derivative_perform_batch_operation($function, $file, $pid, $force, array $hook, &$context) {
   if ($file) {
     require_once $file;
   }
@@ -167,14 +167,14 @@ function islandora_derivative_perform_batch_operation($function, $file, $pid, $f
 /**
  * Finished function for derivative batch regeneration.
  *
- * @param array $success
- *   An array of success passed from the batch.
+ * @param bool $success
+ *   A boolean indicating whether the batch has completed successfully.
  * @param array $results
  *   An array of results passed from the batch.
  * @param array $operations
  *   An array of operations passed from the batch.
  */
-function islandora_regenerate_derivative_batch_finished($success, $results, $operations) {
+function islandora_regenerate_derivative_batch_finished($success, array $results, array $operations) {
   module_load_include('inc', 'islandora', 'includes/derivatives');
   if (!empty($results['logging'])) {
     islandora_derivative_logging($results['logging']);

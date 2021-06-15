@@ -11,6 +11,9 @@
  * To make sense of these tests reference islandora_hooks_test.module.
  */
 
+/**
+ * Ingest tests.
+ */
 class IslandoraIngestsTestCase extends IslandoraWebTestCase {
 
   /**

@@ -2,8 +2,9 @@
 
 /**
  * @file
- * Wrapper around the tuque library, allows for autoloading of Islandora Tuque
- * Objects.
+ * Wrapper around the tuque library.
+ *
+ * Allows for autoloading of Islandora Tuque Objects.
  *
  * @todo Overload functions and apply pre/post hooks.
  */
@@ -75,9 +76,23 @@ function islandora_invoke_datastream_hooks($hook, array $models, $dsid) {
   return islandora_invoke_hook_list($hook, $refinements, array_slice(func_get_args(), 3));
 }
 
+/**
+ * Implementation of the FedoraRepository class.
+ */
 class IslandoraFedoraRepository extends FedoraRepository {
+  /**
+   * {@inheritdoc}
+   */
   protected $queryClass = 'IslandoraRepositoryQuery';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $newObjectClass = 'IslandoraNewFedoraObject';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $objectClass = 'IslandoraFedoraObject';
 
   /**
@@ -119,9 +134,10 @@ class IslandoraFedoraRepository extends FedoraRepository {
     }
     catch (Exception $e) {
       watchdog('islandora', 'Failed to ingest object: @pid</br>code: @code<br/>message: @msg', array(
-          '@pid' => $object->id,
-          '@code' => $e->getCode(),
-          '@msg' => $e->getMessage()), WATCHDOG_ERROR);
+        '@pid' => $object->id,
+        '@code' => $e->getCode(),
+        '@msg' => $e->getMessage(),
+      ), WATCHDOG_ERROR);
       throw $e;
     }
   }
@@ -134,7 +150,7 @@ class IslandoraFedoraRepository extends FedoraRepository {
   public function constructObject($id = NULL, $create_uuid = NULL) {
     // Enforces UUID when set, but allows to override if called
     // with $create_uuid set to bool.
-    return parent::constructObject($id, static::useUUIDs($create_uuid));
+    return parent::constructObject($id, static::useUuids($create_uuid));
   }
 
   /**
@@ -145,13 +161,13 @@ class IslandoraFedoraRepository extends FedoraRepository {
   public function getNextIdentifier($namespace = NULL, $create_uuid = NULL, $count = 1) {
     // Enforces UUID when set, but allows to override if called
     // with $create_uuid set to bool.
-    return parent::getNextIdentifier($namespace, static::useUUIDs($create_uuid), $count);
+    return parent::getNextIdentifier($namespace, static::useUuids($create_uuid), $count);
   }
 
   /**
    * Helper for three-valued logic with UUIDs.
    *
-   * @param bool|NULL $to_create
+   * @param bool|null $to_create
    *   The variable to test.
    *
    * @return bool
@@ -159,24 +175,54 @@ class IslandoraFedoraRepository extends FedoraRepository {
    *   'islandora_basic_collection_generate_uuid' Drupal variable; otherwise,
    *   the value of $to_create itself.
    */
-  protected static function useUUIDs($to_create) {
+  protected static function useUuids($to_create) {
     return is_null($to_create) ?
       variable_get('islandora_basic_collection_generate_uuid', FALSE) :
       $to_create;
   }
-}
 
+}
+/**
+ * Implementation of RepositoryQuery class.
+ */
 class IslandoraRepositoryQuery extends RepositoryQuery {}
-
+/**
+ * Implementation of NewFedoraObject class.
+ */
 class IslandoraNewFedoraObject extends NewFedoraObject {
+  /**
+   * {@inheritdoc}
+   */
   protected $newFedoraDatastreamClass = 'IslandoraNewFedoraDatastream';
-  protected $fedoraDatastreamClass = 'IslandoraFedoraDatastream';
-  protected $fedoraRelsExtClass = 'IslandoraFedoraRelsExt';
-}
 
-class IslandoraFedoraObject extends FedoraObject {
-  protected $newFedoraDatastreamClass = 'IslandoraNewFedoraDatastream';
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraDatastreamClass = 'IslandoraFedoraDatastream';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $fedoraRelsExtClass = 'IslandoraFedoraRelsExt';
+
+}
+/**
+ * Implementation, magic functions for a FedoraObject class.
+ */
+class IslandoraFedoraObject extends FedoraObject {
+  /**
+   * {@inheritdoc}
+   */
+  protected $newFedoraDatastreamClass = 'IslandoraNewFedoraDatastream';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $fedoraDatastreamClass = 'IslandoraFedoraDatastream';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraRelsExtClass = 'IslandoraFedoraRelsExt';
 
   /**
@@ -240,14 +286,6 @@ class IslandoraFedoraObject extends FedoraObject {
       return $ret;
     }
     catch (Exception $e) {
-      if ($e instanceof DatastreamExistsException && variable_get('islandora_deprecation_return_false_when_datastream_exists', TRUE)) {
-        $message = format_string('The datastream @dsid already exists on the object: @pid. As of 7.x-1.10 the function signature for ingestDatastream will be changed from returning FALSE on failure to throwing an exception.', array(
-          '@dsid' => $datastream->id,
-          '@pid' => $object->id,
-        ));
-        trigger_error(filter_xss($message), E_USER_DEPRECATED);
-        return FALSE;
-      }
       watchdog('islandora', 'Failed to ingest datastream @dsid on object: @pid</br>code: @code<br/>message: @msg', array(
         '@pid' => $object->id,
         '@dsid' => $datastream->id,
@@ -275,9 +313,10 @@ class IslandoraFedoraObject extends FedoraObject {
     }
     catch (Exception $e) {
       watchdog('islandora', 'Failed to modify object: @pid</br>code: @code<br/>message: @msg', array(
-          '@pid' => $this->id,
-          '@code' => $e->getCode(),
-          '@msg' => $e->getMessage()), WATCHDOG_ERROR);
+        '@pid' => $this->id,
+        '@code' => $e->getCode(),
+        '@msg' => $e->getMessage(),
+      ), WATCHDOG_ERROR);
       throw $e;
     }
   }
@@ -322,16 +361,21 @@ class IslandoraFedoraObject extends FedoraObject {
     }
     catch (Exception $e) {
       watchdog('islandora', 'Failed to purge datastream @dsid from @pid</br>code: @code<br/>message: @msg', array(
-          '@pid' => $this->id,
-          '@dsid' => $id,
-          '@code' => $e->getCode(),
-          '@msg' => $e->getMessage()), WATCHDOG_ERROR);
+        '@pid' => $this->id,
+        '@dsid' => $id,
+        '@code' => $e->getCode(),
+        '@msg' => $e->getMessage(),
+      ), WATCHDOG_ERROR);
       throw $e;
     }
   }
-}
 
+}
+/**
+ * Implementation of a RepositoryConnection class.
+ */
 class IslandoraRepositoryConnection extends RepositoryConnection {
+
   /**
    * Constructor.
    *
@@ -345,8 +389,11 @@ class IslandoraRepositoryConnection extends RepositoryConnection {
     parent::__construct($url, $username, $password);
     drupal_alter('islandora_repository_connection_construction', $this);
   }
-}
 
+}
+/**
+ * Implementation of a FedoraApi class.
+ */
 class IslandoraFedoraApi extends FedoraApi {
 
   /**
@@ -362,8 +409,11 @@ class IslandoraFedoraApi extends FedoraApi {
     $this->m = new IslandoraFedoraApiM($connection, $serializer);
     $this->connection = $connection;
   }
-}
 
+}
+/**
+ * Implementation of FedoraApiM class.
+ */
 class IslandoraFedoraApiM extends FedoraApiM {
 
   /**
@@ -452,9 +502,10 @@ class IslandoraFedoraApiM extends FedoraApiM {
     }
     catch (Exception $e) {
       watchdog('islandora', 'Failed to purge object @pid</br>code: @code<br/>message: @msg', array(
-          '@pid' => $pid,
-          '@code' => $e->getCode(),
-          '@msg' => $e->getMessage()), WATCHDOG_ERROR);
+        '@pid' => $pid,
+        '@code' => $e->getCode(),
+        '@msg' => $e->getMessage(),
+      ), WATCHDOG_ERROR);
       throw $e;
     }
   }
@@ -505,7 +556,7 @@ class IslandoraFedoraApiM extends FedoraApiM {
    *
    * All extra arguments are passed along to the callback.
    *
-   * @param callable $callback
+   * @param string $callback
    *   The method we are wrapping.
    * @param string $pid
    *   The PID to create a semaphore for.
@@ -540,17 +591,39 @@ class IslandoraFedoraApiM extends FedoraApiM {
       return call_user_func_array(array($this, "parent::$callback"), $args);
     }
   }
-}
 
+}
+/**
+ * Implementation of SimpleCache class.
+ */
 class IslandoraSimpleCache extends SimpleCache {}
-
+/**
+ * Implementation of NewFedoraDatastream class.
+ */
 class IslandoraNewFedoraDatastream extends NewFedoraDatastream {
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraRelsIntClass = 'IslandoraFedoraRelsInt';
-  protected $fedoraDatastreamVersionClass = 'IslandoraFedoraDatastreamVersion';
-}
 
+  /**
+   * {@inheritdoc}
+   */
+  protected $fedoraDatastreamVersionClass = 'IslandoraFedoraDatastreamVersion';
+
+}
+/**
+ * Implementation and magic functions for FedoraDatastream class.
+ */
 class IslandoraFedoraDatastream extends FedoraDatastream {
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraRelsIntClass = 'IslandoraFedoraRelsInt';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraDatastreamVersionClass = 'IslandoraFedoraDatastreamVersion';
 
   /**
@@ -610,20 +683,36 @@ class IslandoraFedoraDatastream extends FedoraDatastream {
     }
     catch (Exception $e) {
       watchdog('islandora', 'Failed to modify datastream @dsid from @pid</br>code: @code<br/>message: @msg', array(
-          '@pid' => $this->parent->id,
-          '@dsid' => $this->id,
-          '@code' => $e->getCode(),
-          '@msg' => $e->getMessage()), WATCHDOG_ERROR);
+        '@pid' => $this->parent->id,
+        '@dsid' => $this->id,
+        '@code' => $e->getCode(),
+        '@msg' => $e->getMessage(),
+      ), WATCHDOG_ERROR);
       throw $e;
     }
   }
-}
 
+}
+/**
+ * Implementation of FedoraDatastreamVersion class.
+ */
 class IslandoraFedoraDatastreamVersion extends FedoraDatastreamVersion {
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraRelsIntClass = 'IslandoraFedoraRelsInt';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $fedoraDatastreamVersionClass = 'IslandoraFedoraDatastreamVersion';
+
 }
-
+/**
+ * Implementation of FedoraRelsExt class.
+ */
 class IslandoraFedoraRelsExt extends FedoraRelsExt {}
-
+/**
+ * Implementation of FedoraRelsInt class.
+ */
 class IslandoraFedoraRelsInt extends FedoraRelsInt {}

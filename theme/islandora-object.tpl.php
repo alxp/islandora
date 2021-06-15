@@ -19,10 +19,7 @@
  *
  * to test if a datastream exists isset($object['dsid'])
  *
- * to iterate over datastreams:
- * foreach ($object as $ds) {
- *   $ds->label, etc
- * }
+ * to iterate over datastreams do a "foreach ($object as $ds) {}"
  *
  * each $ds in the above loop has the following properties:
  *    $ds->label             - The label for this datastream.
@@ -49,13 +46,6 @@
  * and each element has an array of values.
  * dc.title can have none, one or many titles
  * this is the case for all dc elements.
- *
- *
- *
- * we can get a list of datastreams by doing
- * foreach ($object as $ds) {
- * do something here
- * }
  */
 ?>
 <div class="islandora-object islandora">
@@ -86,11 +76,16 @@
   </tr>
   <?php foreach($datastreams as $key => $value): ?>
   <tr>
-      <td><?php if(isset($value['id'])): ?><?php print $value['id']; ?><?php endif; ?></td>
-      <td><?php if(isset($value['label_link'])): ?><?php print $value['label_link']; ?><?php endif; ?></td>
-      <td><?php if(isset($value['size'])): ?><?php print $value['size']; ?><?php endif; ?></td>
-      <td><?php if(isset($value['mimetype'])): ?><?php print $value['mimetype']; ?><?php endif; ?></td>
-      <td><?php if(isset($value['created_date'])): ?><?php print $value['created_date']; ?><?php endif; ?></td>
+      <td><?php if(isset($value['id'])): ?><?php print $value['id']; ?><?php
+     endif; ?></td>
+      <td><?php if(isset($value['label_link'])): ?><?php print $value['label_link']; ?><?php
+     endif; ?></td>
+      <td><?php if(isset($value['size'])): ?><?php print $value['size']; ?><?php
+     endif; ?></td>
+      <td><?php if(isset($value['mimetype'])): ?><?php print $value['mimetype']; ?><?php
+     endif; ?></td>
+      <td><?php if(isset($value['created_date'])): ?><?php print $value['created_date']; ?><?php
+     endif; ?></td>
   </tr>
   <?php endforeach; ?>
 </table>

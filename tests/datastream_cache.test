@@ -5,6 +5,9 @@
  * Tests to verify the cache headers we provide.
  */
 
+/**
+ * Datastream caching tests.
+ */
 class IslandoraDatastreamCacheTestCase extends IslandoraWebTestCase {
 
   /**
@@ -134,7 +137,7 @@ class IslandoraDatastreamCacheTestCase extends IslandoraWebTestCase {
     ));
     $this->assertResponse(200);
 
-    // Test combination of If-None-Match and If-Modified-Since
+    // Test combination of If-None-Match and If-Modified-Since.
     $result = $this->drupalGet("islandora/object/{$object->id}/datastream/{$datastream->id}/view", array(), array(
       'If-Modified-Since: ' . $datastream->createdDate->format('D, d M Y H:i:s \G\M\T'),
       format_string('If-None-Match: "!checksum"', array(
@@ -157,4 +160,5 @@ class IslandoraDatastreamCacheTestCase extends IslandoraWebTestCase {
     ));
     $this->assertResponse(200);
   }
+
 }

@@ -25,37 +25,69 @@ export CATALINA_HOME='.'
 export JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=512m -XX:+CMSClassUnloadingEnabled -Djavax.net.ssl.trustStore=$CATALINA_HOME/fedora/server/truststore -Djavax.net.ssl.trustStorePassword=tomcat"
 # TODO: roll a Fedora 3.8.1 islandora_tomcat that doesn't require a rebuild.
 if [ $FEDORA_VERSION = "3.8.1" ]; then
-  export FEDORA_HOME=fedora
+  export FEDORA_HOME=$HOME/islandora_tomcat/fedora
   ./fedora/server/bin/fedora-rebuild.sh -r org.fcrepo.server.utilities.rebuild.SQLRebuilder
 fi
 ./bin/startup.sh
 
-# Drush installation.
 cd $HOME
-pear channel-discover pear.drush.org
-pear upgrade --force Console_Getopt
-pear upgrade --force pear
-pear channel-discover pear.drush.org
-wget http://alpha.library.yorku.ca/drush-6.3.tar.gz
-tar xf drush-6.3.tar.gz
-sudo mv drush-6.3 /opt/
-sudo ln -s /opt/drush-6.3/drush /usr/bin/drush
 
-# PHPCS installation.
-wget http://alpha.library.yorku.ca/PHP_CodeSniffer-1.5.6.tgz
-pear install PHP_CodeSniffer-1.5.6.tgz
+# Drush and PHPCS installation.
+if [ "$(phpenv version-name)" == "5.3.3" ]; then
+  # No mod_openssl in Travis 5.3.3 boxes
+  composer config -g disable-tls true
+  composer config -g secure-http false
+  composer self-update
+  composer global require drush/drush:6.*
+  composer global require drupal/coder:7.*
+else
+  composer global require drush/drush:7.*
+  composer global require drupal/coder:7.*
+fi
+
+# Symlink the things
+if [ -f "$HOME/.config/composer/vendor/bin/drush" ]; then
+  sudo ln -s $HOME/.config/composer/vendor/bin/drush /usr/bin/drush
+elif [ -f "$HOME/.composer/vendor/bin/drush" ]; then
+  sudo ln -s $HOME/.composer/vendor/bin/drush /usr/bin/drush
+else
+  echo "Could not find drush"
+  exit 1
+fi
+/usr/bin/drush version
+
+if [ -f "$HOME/.config/composer/vendor/bin/phpcs" ]; then
+  sudo ln -s $HOME/.config/composer/vendor/bin/phpcs /usr/bin/phpcs
+elif [ -f "$HOME/.composer/vendor/bin/phpcs" ]; then
+  sudo ln -s $HOME/.composer/vendor/bin/phpcs /usr/bin/phpcs
+else
+  echo "Did not find phpcs"
+  exit 1
+fi
+/usr/bin/phpcs --version
 
 # PHP Copy-Paste Detection installation.
-wget http://alpha.library.yorku.ca/phpcpd.phar
-sudo mv phpcpd.phar /usr/local/bin/phpcpd
-sudo chmod +x /usr/local/bin/phpcpd
+composer global require --dev sebastian/phpcpd
+if [ -f "$HOME/.config/composer/vendor/bin/phpcpd" ]; then
+  sudo ln -s $HOME/.config/composer/vendor/bin/phpcpd /usr/local/bin/phpcpd
+elif [ -f "$HOME/.composer/vendor/bin/phpcpd" ]; then
+  sudo ln -s $HOME/.composer/vendor/bin/phpcpd /usr/local/bin/phpcpd
+else
+  echo "Did not find phpcpd"
+  exit 1
+fi
+/usr/local/bin/phpcpd --version
 
 # Drupal installation.
 phpenv rehash
 drush dl --yes drupal
 cd drupal-*
 drush si minimal --db-url=mysql://drupal:drupal@localhost/drupal --yes
-drush runserver --php-cgi=$HOME/.phpenv/shims/php-cgi localhost:8081 &>/tmp/drush_webserver.log &
+if [ "$(phpenv version-name)" == "5.3.3" ]; then
+  drush runserver --php-cgi=$HOME/.phpenv/shims/php-cgi localhost:8081 &>/tmp/drush_webserver.log &
+else
+  drush runserver localhost:8081 &>/tmp/drush_webserver.log &
+fi
 # Add Islandora to the list of symlinked modules.
 ln -s $ISLANDORA_DIR sites/all/modules/islandora
 # Use our custom Travis test config for Simpletest.

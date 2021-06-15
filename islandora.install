@@ -59,6 +59,7 @@ function islandora_uninstall() {
     'islandora_semaphore_period',
     'islandora_require_obj_upload',
     'islandora_breadcrumbs_backends',
+    'islandora_orphaned_objects_backend',
     'islandora_render_context_ingeststep',
     'islandora_deny_inactive_and_deleted',
   );
@@ -132,4 +133,15 @@ function islandora_update_7001(&$sandbox) {
   drupal_install_schema('islandora');
   $t = get_t();
   return $t("Islandora database updates complete");
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Removing old variable around changes to ingestDatastream signature.
+ * These changes are complete and deprecation warnings are removed.
+ */
+function islandora_update_7002() {
+  // Removing as the deprecation has been removed.
+  variable_del('islandora_deprecation_return_false_when_datastream_exists');
 }

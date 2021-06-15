@@ -64,8 +64,11 @@ function islandora_ingest_form(array $form, array &$form_state, array $configura
       WATCHDOG_ERROR
     );
     drupal_set_message($e->getMessage(), 'error');
-    return array(array(
-        '#markup' => l(t('Back'), 'javascript:window.history.back();', array('external' => TRUE))));
+    return array(
+      array(
+        '#markup' => l(t('Back'), 'javascript:window.history.back();', array('external' => TRUE)),
+      ),
+    );
   }
 }
 
@@ -285,7 +288,7 @@ function islandora_ingest_form_increment_step(array &$form_state) {
  *   The Drupal form state.
  */
 function islandora_ingest_form_decrement_step(array &$form_state) {
-  $previous_step_id  = islandora_ingest_form_get_previous_step_id($form_state);
+  $previous_step_id = islandora_ingest_form_get_previous_step_id($form_state);
   // Don't decrement passed the first step.
   if (isset($previous_step_id)) {
     islandora_ingest_form_stash_info($form_state);
@@ -496,7 +499,7 @@ function islandora_ingest_form_stepify(array $form, array &$form_state, array $s
  */
 function islandora_ingest_form_add_step_context(array &$form, array $form_state) {
   $items = array();
-  $get_label = function(AbstractObject $collection = NULL, AbstractObject $fedora_cmodel) {
+  $get_label = function (AbstractObject $collection = NULL, AbstractObject $fedora_cmodel) {
     if (isset($collection['COLLECTION_POLICY'])) {
       $policy = new CollectionPolicy($collection['COLLECTION_POLICY']->content);
       $policy_content_models = $policy->getContentModels();
@@ -876,18 +879,18 @@ function &islandora_ingest_form_get_objects(array &$form_state) {
 /**
  * Gets a single object from the stored NewFedoraObject's.
  *
- * @note In our current use case we are only dealing with a single object
- *   ingest, this makes it convenient to access it. Ideally the steps
- *   implementations will be abstracted to be indifferent to what object it's
- *   currently working on. This will act as a placeholder for such
- *   functionality.
- *
  * @param array $form_state
  *   The Drupal form state.
  *
  * @return NewFedoraObject
  *   Returns the 'current' object in the array of NewFedoraObjects, generally
  *   this is only used when there is one object in the list of objects.
+ *
+ * @note In our current use case we are only dealing with a single object
+ *   ingest, this makes it convenient to access it. Ideally the steps
+ *   implementations will be abstracted to be indifferent to what object it's
+ *   currently working on. This will act as a placeholder for such
+ *   functionality.
  */
 function islandora_ingest_form_get_object(array &$form_state) {
   $objects = &islandora_ingest_form_get_objects($form_state);
@@ -899,7 +902,7 @@ function islandora_ingest_form_get_object(array &$form_state) {
  *
  * @param array $form_state
  *   The Drupal form state.
- * @param array $step_id
+ * @param string $step_id
  *   The ID of the step.
  *
  * @return array
@@ -1004,7 +1007,7 @@ function islandora_ingest_form_get_steps(array &$form_state) {
  */
 function islandora_ingest_form_get_form_steps(array &$form_state) {
   $steps = islandora_ingest_form_get_steps($form_state);
-  $form_step_filter = function($o) {
+  $form_step_filter = function ($o) {
     return $o['type'] == 'form';
   };
   return array_filter($steps, $form_step_filter);
@@ -1022,7 +1025,7 @@ function islandora_ingest_form_get_form_steps(array &$form_state) {
  */
 function islandora_ingest_form_get_callback_steps(array &$form_state) {
   $steps = islandora_ingest_form_get_steps($form_state);
-  $callback_step_filter = function($o) {
+  $callback_step_filter = function ($o) {
     return $o['type'] == 'callback';
   };
   return array_filter($steps, $callback_step_filter);

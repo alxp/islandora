@@ -76,6 +76,10 @@ function islandora_get_extensions_for_datastream(AbstractObject $object, $dsid) 
   module_load_include('inc', 'islandora', 'includes/utilities');
   $datastream_mime_map = islandora_get_datastreams_requirements_from_models($object->models);
   $mimes = isset($datastream_mime_map[$dsid]) ? $datastream_mime_map[$dsid]['mime'] : array();
+  // If no restriction set via DS-COMPOSITE-MODEL return an empty array.
+  if (empty($mimes)) {
+    return array();
+  }
   if (isset($object[$dsid])) {
     $current_mime = $object[$dsid]->mimetype;
     if (!in_array($current_mime, $mimes)) {
@@ -268,7 +272,7 @@ function islandora_mime_mapping() {
     // Web Archives:
     "warc" => "application/warc",
     "json" => "application/json",
-    // JSON-LD
+    // JSON-LD.
     "jsonld" => "application/ld+json",
   );
 }

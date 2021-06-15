@@ -11,6 +11,9 @@
  * To make sense of these tests reference islandora_hooks_test.module.
  */
 
+/**
+ * Islandora hooks tests.
+ */
 class IslandoraHooksTestCase extends IslandoraWebTestCase {
 
   /**
@@ -256,4 +259,5 @@ class IslandoraHooksTestCase extends IslandoraWebTestCase {
     $this->assert($_SESSION['islandora_hooks']['hook'][ISLANDORA_DATASTREAM_INGESTED_HOOK], 'Called ISLANDORA_DATASTREAM_INGESTED_HOOK when ingesting via FedoraObject::ingestDatastream.');
     $this->repository->purgeObject($object->id);
   }
+
 }

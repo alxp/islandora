@@ -227,7 +227,7 @@ function islandora_add_datastream_form_autocomplete_callback(AbstractObject $obj
   $dsids = array_combine($dsids, $dsids);
   $query = trim($query);
   if (!empty($query)) {
-    $filter = function($id) use($query) {
+    $filter = function ($id) use ($query) {
       return stripos($id, $query) !== FALSE;
     };
     $dsids = array_filter($dsids, $filter);
